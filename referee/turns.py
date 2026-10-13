@@ -1,0 +1,218 @@
+"""One radio turn -> grounded, covered, canonical commands (or the reason it cannot be read).
+
+Order per turn: schema check -> grounding -> coverage (+ retraction cues) -> aliases -> registry resolution.
+Anything that fails here makes the turn unreadable: an exchange that contains it abstains, it never verifies.
+The turn kinds that steer pairing (say-again, operator correction, imperative repeat) are decided by code from the
+alias tables, never taken from the model's `kind`.
+"""
+
+from __future__ import annotations
+
+import math
+from dataclasses import dataclass, field
+
+from referee import aliases as al
+from referee import coverage, grounding
+from referee.registry import Registry
+from referee.schema import validate_extraction
+from referee.verdict import R_COVERAGE, R_GROUNDING, CanonCommand, r_unmapped
+
+# fillers that may precede the verb of an operator's repeat ("tolong tutup …", "operator, close …")
+_LEAD_FILLERS = frozenset({"tolong", "please", "operator", "control", "over", "uh", "um", "eh", "okay", "ok"})
+
+
+@dataclass
+class Turn:
+    id: str
+    channel: str
+    t_start: float
+    t_end: float
+    transcript: str
+    extraction: dict | None = None
+    # (char start, char end, log-prob) per ASR token, aligned to `transcript`; None when the ASR route has none
+    tokens: list[tuple[int, int, float]] | None = None
+    alt_transcript: str | None = None  # unprompted ASR pass, for the disagreement gate
+    not_audited: str | None = None  # "rate limited" / "timeout" / … when a model call failed
+    meta: dict = field(default_factory=dict)
+
+
+@dataclass
+class TurnAnalysis:
+    turn: Turn
+    status: str  # ok | abstain | not_audited
+    reason: str | None = None
+    detail: str = ""
+    commands: list[CanonCommand] = field(default_factory=list)
+    spans: list[dict[str, grounding.Span | None]] = field(default_factory=list)
+    retracted: list[grounding.Span] = field(default_factory=list)
+    say_again: bool = False
+    operator_correction: bool = False
+    imperative: bool = False
+    opens_window: bool = False
+
+    @property
+    def id(self) -> str:
+        return self.turn.id
+
+
+# ------------------------------------------------------------------------------------------ code kinds
+
+
+def _strip_openers(toks: list[al.Token]) -> list[al.Token]:
+    changed = True
+    while changed and toks:
+        changed = False
+        for p in al.REPEAT_OPENERS:
+            if al.starts_with(toks, p):
+                toks, changed = toks[len(p) :], True
+        if toks and (toks[0].norm in _LEAD_FILLERS or toks[0].norm in al.OPERATOR_CORRECTION_CUES):
+            toks, changed = toks[1:], True
+    return toks
+
+
+def is_say_again(text: str) -> bool:
+    """The technician asking for a repeat: a say-again phrase, no tag, not the operator's 'I say again …'."""
+    toks = al.tokenize(text)
+    if any(al.starts_with(toks, p) for p in al.REPEAT_OPENERS):
+        return False
+    if al.tag_mentions(toks):
+        return False
+    return any(al.contains_phrase(toks, p) for p in al.SAY_AGAIN_PHRASES)
+
+
+def opens_with_correction(text: str) -> bool:
+    """An operator turn starting 'negative / koreksi / bukan / correction …' right after a read-back."""
+    toks = al.tokenize(text)
+    return bool(toks) and toks[0].norm in al.OPERATOR_CORRECTION_CUES
+
+
+def is_imperative(text: str) -> bool:
+    """Opens with a bare imperative verb (after 'I say again', 'negative', 'tolong' …) — the operator's repeat.
+
+    Bahasa order ("valve dua nol tiga tutup") counts when a tag noun opens and an imperative verb follows.
+    Read-back openers ('copy', 'siap') and progressive / past forms ('closing') are not imperative.
+    """
+    toks = _strip_openers(al.tokenize(text))
+    if not toks or toks[0].norm in al.READBACK_CUES:
+        return False
+    if toks[0].norm in al.IMPERATIVE_ACTIONS:
+        return True
+    if toks[0].norm in al.TAG_NOUNS or toks[0].norm == "motor":
+        return any(t.norm in al.IMPERATIVE_ACTIONS for t in toks[1:])
+    return False
+
+
+# ------------------------------------------------------------------------------------------- analysis
+
+
+def _prev_word(text: str, start: int) -> str | None:
+    toks = [t for t in al.tokenize(text[:start])]
+    return toks[-1].text if toks else None
+
+
+def analyze(turn: Turn, registry: Registry) -> TurnAnalysis:
+    a = TurnAnalysis(turn=turn, status="ok")
+    text = turn.transcript or ""
+    a.say_again = is_say_again(text)
+    a.operator_correction = opens_with_correction(text)
+    a.imperative = is_imperative(text)
+    if turn.not_audited:
+        a.status, a.reason = "not_audited", turn.not_audited
+        return a
+    if turn.extraction is None:
+        a.status, a.reason = "not_audited", "no extraction"
+        return a
+
+    def fail(reason: str, detail: str) -> TurnAnalysis:
+        a.status, a.reason, a.detail = "abstain", reason, detail
+        a.opens_window = _scan_opens_window(text, registry)
+        return a
+
+    problem = validate_extraction(turn.extraction)
+    if problem:
+        return fail(R_GROUNDING, f"malformed extraction: {problem}")
+    try:
+        g = grounding.ground(text, turn.extraction)
+    except grounding.GroundingError as e:
+        return fail(R_GROUNDING, str(e))
+    try:
+        coverage.check(text, g)
+    except coverage.CoverageError as e:
+        return fail(e.reason if e.reason != "coverage" else R_COVERAGE, e.detail)
+    a.spans, a.retracted = g.commands, g.retracted
+
+    cmds: list[CanonCommand] = []
+    prev_action: str | None = None
+    for sp in g.commands:
+        vals: dict = {}
+        if sp["action_span"] is not None:
+            act = al.canon_action(text[sp["action_span"][0] : sp["action_span"][1]])
+            if isinstance(act, al.Unmapped):
+                return fail(r_unmapped(act.word), "action words not in the alias tables")
+            vals["action"] = act
+        else:
+            vals["action"] = prev_action  # "close 203 and 208": the verb distributes over the conjunction
+        prev_action = vals["action"]
+        if sp["tag_span"] is not None:
+            s, e = sp["tag_span"]
+            m = al.canon_tag(text[s:e], preceding_word=_prev_word(text, s))
+            if isinstance(m, al.Unmapped):
+                return fail(r_unmapped(m.word), "tag words not in the alias tables")
+            res = registry.resolve(m.prefix, m.suffix or "")
+            vals.update(tag=res.tag, tag_status=res.status, registry_line=res.line)
+        if sp["line_span"] is not None:
+            ln = al.canon_line(text[sp["line_span"][0] : sp["line_span"][1]])
+            if isinstance(ln, al.Unmapped):
+                return fail(r_unmapped(ln.word), "line words not in the alias tables")
+            vals["line"] = ln
+        if sp["state_span"] is not None:
+            st = al.canon_state(text[sp["state_span"][0] : sp["state_span"][1]])
+            if isinstance(st, al.Unmapped):
+                return fail(r_unmapped(st.word), "state words not in the alias tables")
+            vals["state"] = st
+        cmds.append(CanonCommand(**vals))
+    a.commands = cmds
+    # a turn opens a pairing window only with >= 1 grounded command that has an action and a tag that resolves to a
+    # full tag (spoken prefix, or a bare number the registry knows); chatter and status talk ("pump one-forty is
+    # running") never open one
+    a.opens_window = any(
+        c.action is not None and c.tag is not None and (c.tag_status in ("ok", "ambiguous") or "-" in c.tag)
+        for c in cmds
+    )
+    return a
+
+
+def _scan_opens_window(text: str, registry: Registry) -> bool:
+    """For an unreadable turn: does code alone see an instruction-shaped turn (an action + a resolvable tag)?
+
+    Fail closed: if the model could not be checked on a turn that names a real tag and a verb, the exchange still
+    opens and ends in a card, instead of vanishing as chatter.
+    """
+    toks = al.tokenize(text)
+    if not al.action_mentions(toks):
+        return False
+    for m in al.tag_mentions(toks):
+        res = registry.resolve(m.prefix, m.suffix or "")
+        if res.status in ("ok", "ambiguous") or m.prefix is not None:
+            return True
+    return False
+
+
+def span_confidence(analyses: list[TurnAnalysis]) -> float | None:
+    """Minimum ASR token probability inside the action, tag and line spans of every given turn.
+
+    None when any turn has no token probabilities (the ASR route does not expose them) — never invented.
+    """
+    probs: list[float] = []
+    for a in analyses:
+        if a.turn.tokens is None:
+            return None
+        for cmd in a.spans:
+            for f in ("action_span", "tag_span", "line_span"):
+                sp = cmd.get(f)
+                if sp is None:
+                    continue
+                for s, e, lp in a.turn.tokens:
+                    if s < sp[1] and sp[0] < e:
+                        probs.append(math.exp(lp))
+    return min(probs) if probs else None
