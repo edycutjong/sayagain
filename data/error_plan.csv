@@ -1,0 +1,8 @@
+error_type,count_a2,what changes in the read-back
+wrong_line,12,the line letter
+lookalike_tag,14,"the tag only, to its look-alike (XV-203/208, P-114/140, MOV-31A/31H); the line stays"
+wrong_action,8,the action
+omitted_field,6,the line (4) or the action (2) is left out
+no_readback,4,nothing: 10 s of silence
+omitted_command,4,one of two commands is left out
+uncorrected_retraction,4,the read-back keeps the value the operator took back
