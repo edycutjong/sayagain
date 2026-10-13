@@ -1,0 +1,40 @@
+[project]
+name = "sayagain"
+version = "0.1.0"
+description = "Checks every radio read-back of a safety instruction and sends the wrong ones to a human."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+dependencies = [
+    "httpx>=0.27",
+    "numpy>=1.26",
+    "scipy>=1.11",
+    "soundfile>=0.12",
+]
+
+[project.optional-dependencies]
+# local Whisper for the kill test only (Mac / CPU); never on the judged path
+killtest = [
+    "torch>=2.3",
+    "transformers>=4.44",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.6",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]

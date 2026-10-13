@@ -1,0 +1,31 @@
+# secrets — credentials live in ~/.config/amd-tokenfactory/env, never here
+.env
+.env.*
+!.env.example
+*.pem
+
+# python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage/
+dist/
+
+# audio that must never be committed (MIMII is CC BY-SA, eval-only; human takes stay local)
+data/noise/
+data/mix/
+data/human/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+
+# kitchen tooling outputs
+graphify-out/
+.impeccable/
+
+node_modules/
+.next/
+.DS_Store
