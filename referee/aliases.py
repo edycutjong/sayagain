@@ -648,7 +648,7 @@ def canon_tag(span: str, *, preceding_word: str | None = None) -> Mention | Unma
     """A tag span -> one tag mention (prefix is None for a bare number).
 
     `preceding_word` is the transcript word right before the span. A time-shaped number ("2:03") is a tag only
-    next to a tag noun (then it has a prefix) or an action verb, inside the span or right before it (N10).
+    next to a tag noun (then it has a prefix) or an action verb, inside the span or right before it.
     """
     toks = tokenize(span)
     ms = tag_mentions(toks, explicit=True)

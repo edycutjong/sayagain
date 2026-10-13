@@ -35,7 +35,7 @@ Radio path: `scripts/radioize.py` (300–3400 Hz band-pass, μ-law 8 kHz round-t
 Noise: `scripts/mix.py --seed 1018` at clean / +6 / 0 / −6 dB SNR with MIMII pump / valve / fan recordings (CC BY-SA 4.0, eval
 only, never committed). The four SNR copies of one exchange are the same speech: each SNR is its own row, never pooled.
 
-### Dev slice (N12)
+### Dev slice
 
 Aliases, the ASR prompt and the coverage rules may be tuned **only** on the dev slice: the 20 KT exchanges + the first 20 A2
 exchanges in card order (`A2-001` … `A2-020`). They are then frozen by the git tag `aliases-frozen-v1`. Every headline number is
@@ -91,7 +91,7 @@ errors per 180 exchanges, the live budget implies **false-alarm load ≤ 5 %**.
 | False-alarm load | ≤ 5 % |
 | False-VERIFIED | 0 (any non-zero is reported as a limitation with its clip) |
 
-### Model ladder (N1) — the benchmark
+### Model ladder — the benchmark
 
 * Rung 0 = `referee/regex_extractor.py` (no model). Rungs 1–3 = instruct models served by the AMD Token Factory, ordered by
   parameter count (smallest first), chosen from the `/models` list in `bench/results/access-gate.json`. **At most 4 rungs.**
@@ -99,8 +99,8 @@ errors per 180 exchanges, the live budget implies **false-alarm load ≤ 5 %**.
 * Per rung: false-VERIFIED, MISMATCH-only recall, errors flagged, false-alarm load, ungrounded rate (model rungs only — regex is
   grounded by construction), p50 / p95 extraction latency.
 * **Headline = the smallest rung with 0 false-VERIFIED AND false-alarm load ≤ 5 %**, on the 0 dB row only.
-* **R17 trigger:** if rung 0 (regex) meets the headline, the pitch switches the same day to the fallback (the referee and the
-  grounding self-ablation carry the story; no claim that a model is needed).
+* **If rung 0 (regex) meets the headline**, that is the reported result: no language model is needed on this corpus, and no
+  claim says otherwise. The referee and the grounding self-ablation are then the reported contribution.
 
 ### Baselines and ablation
 
@@ -138,4 +138,6 @@ exchange, errors caught / missed, seconds from card shown to decision. n = 1 aud
 
 ## Deviations
 
-None yet.
+| Date | Change | Why |
+|---|---|---|
+| 2026-10-14 | Editorial only: internal planning labels removed from two headings and the rung-0 rule reworded; no threshold, formula or rule changed | the labels referred to private planning notes |

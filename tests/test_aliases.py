@@ -57,7 +57,7 @@ def test_time_format_counts_next_to_noun_or_verb() -> None:
 
 
 def test_time_token_not_a_tag() -> None:
-    """N10: a clock time in chatter is not a tag ("2:03" / "2.03" only next to a tag noun or action verb)."""
+    """A clock time in chatter is not a tag ("2:03" / "2.03" only next to a tag noun or action verb)."""
     assert tags("Shift handover at 2:03, see you there.") == []
     assert tags("Break until 2.03 okay") == []
     assert isinstance(al.canon_tag("2:03", preceding_word="at"), al.Unmapped)
