@@ -1,0 +1,18 @@
+{
+  "_label": "synthetic fixture — OpenAI-compatible response shapes, NOT a recorded AMD Token Factory response",
+  "models": {"object": "list", "data": [
+    {"id": "Qwen/Qwen3-8B", "object": "model"},
+    {"id": "Qwen/Qwen3-32B", "object": "model"},
+    {"id": "openai/whisper-large-v3", "object": "model"}
+  ]},
+  "extract": {"id": "chatcmpl-fixture-1", "object": "chat.completion", "model": "Qwen/Qwen3-32B",
+    "choices": [{"index": 0, "finish_reason": "stop", "message": {"role": "assistant",
+      "content": "<think>\n\n</think>\n\n{\"kind\": \"readback\", \"commands\": [{\"action_span\": \"closing\", \"tag_span\": \"two-oh-eight\", \"state_span\": null, \"line_span\": \"line Bravo\"}], \"retracted_spans\": []}"}}],
+    "usage": {"prompt_tokens": 180, "completion_tokens": 42, "total_tokens": 222}},
+  "logprobs": {"id": "chatcmpl-fixture-2", "object": "chat.completion", "model": "Qwen/Qwen3-32B",
+    "choices": [{"index": 0, "finish_reason": "stop", "message": {"role": "assistant", "content": "copy"},
+      "logprobs": {"content": [{"token": "copy", "logprob": -0.01, "top_logprobs": []}]}}],
+    "usage": {"prompt_tokens": 12, "completion_tokens": 1, "total_tokens": 13}},
+  "asr": {"text": "Copy, closing 208, line Bravo.", "language": "english",
+    "segments": [{"id": 0, "start": 0.0, "end": 2.1, "text": "Copy, closing 208, line Bravo.", "avg_logprob": -0.21}]}
+}

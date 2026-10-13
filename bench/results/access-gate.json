@@ -1,0 +1,58 @@
+{
+  "asr": {
+    "ok": false,
+    "reason": "no audio model in /models"
+  },
+  "branch": "B or C \u2014 no audio route on the Token Factory; depends on the notebook GPU check (human)",
+  "extraction": {
+    "body": "{\"error\":{\"message\":\"Model DeepSeek-V4-Flash does not support JSON schema output mode\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":null}}",
+    "ok": false,
+    "reason": "rejected (400)",
+    "status": 400,
+    "thinking_off": "no_think"
+  },
+  "host": "developer.amd.com.cn",
+  "key_expiry": "not exposed by the API \u2014 check the Token Factory console",
+  "logprobs": {
+    "ok": true,
+    "rate_limit_headers": {},
+    "returned": false,
+    "usage_present": true
+  },
+  "models": {
+    "all": [
+      "DeepSeek-V4-Flash",
+      "DeepSeek-V4-Flash-Vision-Exp",
+      "DeepSeek-V4.1-Flash",
+      "GLM-5.3-Flash",
+      "Gemma-4-31B-IT",
+      "MiMo-V2.6-Flash",
+      "MinerU2.5-Pro",
+      "MiniCPM-V-4.7-1B",
+      "MiniCPM-V-4.7-35B-A3B",
+      "MiniCPM5-2B",
+      "Qwen3.8-27B",
+      "Qwen3.8-Flash-Next"
+    ],
+    "audio": [],
+    "instruct": [
+      "DeepSeek-V4-Flash",
+      "DeepSeek-V4-Flash-Vision-Exp",
+      "DeepSeek-V4.1-Flash",
+      "GLM-5.3-Flash",
+      "Gemma-4-31B-IT",
+      "MiniCPM-V-4.7-1B",
+      "MiniCPM-V-4.7-35B-A3B",
+      "MiniCPM5-2B",
+      "Qwen3.8-27B",
+      "Qwen3.8-Flash-Next"
+    ]
+  },
+  "models_request": {
+    "latency_s": 0.7675,
+    "rate_limit_headers": {}
+  },
+  "on_amd": false,
+  "probe_model": "DeepSeek-V4-Flash",
+  "run_at": "2026-10-13T23:54:39+00:00"
+}
