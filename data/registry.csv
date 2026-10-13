@@ -1,0 +1,121 @@
+tag,type,line,area,allowed_actions,spoken_variants
+MOV-16A,motor-operated valve,B,sterilizer,OPEN|CLOSE|ISOLATE|STOP,one-six Alpha|satu enam Alpha
+MOV-21B,motor-operated valve,D,kernel plant,OPEN|CLOSE|ISOLATE|STOP,two-one Bravo|dua satu Bravo
+MOV-22H,motor-operated valve,C,clarification,OPEN|CLOSE|ISOLATE|STOP,two-two Hotel|dua dua Hotel
+MOV-23C,motor-operated valve,D,effluent,OPEN|CLOSE|ISOLATE|STOP,two-three Charlie|dua tiga Charlie
+MOV-24D,motor-operated valve,D,sterilizer,OPEN|CLOSE|ISOLATE|STOP,two-four Delta|dua empat Delta
+MOV-25C,motor-operated valve,A,press station,OPEN|CLOSE|ISOLATE|STOP,two-five Charlie|dua lima Charlie
+MOV-28A,motor-operated valve,C,kernel plant,OPEN|CLOSE|ISOLATE|STOP,two-eight Alpha|dua delapan Alpha
+MOV-28H,motor-operated valve,C,clarification,OPEN|CLOSE|ISOLATE|STOP,two-eight Hotel|dua delapan Hotel
+MOV-30C,motor-operated valve,A,kernel plant,OPEN|CLOSE|ISOLATE|STOP,three-oh Charlie|tiga nol Charlie
+MOV-31A,motor-operated valve,D,sterilizer,OPEN|CLOSE|ISOLATE|STOP,three-one Alpha|tiga satu Alpha
+MOV-31H,motor-operated valve,B,press station,OPEN|CLOSE|ISOLATE|STOP,three-one Hotel|tiga satu Hotel
+MOV-32F,motor-operated valve,C,sterilizer,OPEN|CLOSE|ISOLATE|STOP,three-two Foxtrot|tiga dua Foxtrot
+MOV-35H,motor-operated valve,C,clarification,OPEN|CLOSE|ISOLATE|STOP,three-five Hotel|tiga lima Hotel
+MOV-39B,motor-operated valve,C,press station,OPEN|CLOSE|ISOLATE|STOP,three-nine Bravo|tiga sembilan Bravo
+MOV-41A,motor-operated valve,C,effluent,OPEN|CLOSE|ISOLATE|STOP,four-one Alpha|empat satu Alpha
+MOV-41D,motor-operated valve,B,press station,OPEN|CLOSE|ISOLATE|STOP,four-one Delta|empat satu Delta
+MOV-43B,motor-operated valve,D,clarification,OPEN|CLOSE|ISOLATE|STOP,four-three Bravo|empat tiga Bravo
+MOV-47D,motor-operated valve,B,kernel plant,OPEN|CLOSE|ISOLATE|STOP,four-seven Delta|empat tujuh Delta
+MOV-56B,motor-operated valve,D,boiler house,OPEN|CLOSE|ISOLATE|STOP,five-six Bravo|lima enam Bravo
+MOV-59A,motor-operated valve,C,clarification,OPEN|CLOSE|ISOLATE|STOP,five-nine Alpha|lima sembilan Alpha
+P-103,pump,C,press station,START|STOP|ISOLATE,103|one-oh-three|satu nol tiga
+P-107,pump,B,sterilizer,START|STOP|ISOLATE,107|one-oh-seven|satu nol tujuh
+P-108,pump,D,clarification,START|STOP|ISOLATE,108|one-oh-eight|satu nol delapan
+P-109,pump,A,press station,START|STOP|ISOLATE,109|one-oh-nine|satu nol sembilan
+P-112,pump,A,press station,START|STOP|ISOLATE,112|one-one-two|satu satu dua
+P-113,pump,B,kernel plant,START|STOP|ISOLATE,113|one-one-three|satu satu tiga
+P-114,pump,C,kernel plant,START|STOP|ISOLATE,114|one-one-four|satu satu empat
+P-117,pump,C,press station,START|STOP|ISOLATE,117|one-one-seven|satu satu tujuh
+P-118,pump,B,kernel plant,START|STOP|ISOLATE,118|one-one-eight|satu satu delapan
+P-119,pump,C,sterilizer,START|STOP|ISOLATE,119|one-one-nine|satu satu sembilan
+P-122,pump,A,press station,START|STOP|ISOLATE,122|one-two-two|satu dua dua
+P-127,pump,A,press station,START|STOP|ISOLATE,127|one-two-seven|satu dua tujuh
+P-128,pump,B,press station,START|STOP|ISOLATE,128|one-two-eight|satu dua delapan
+P-134,pump,C,clarification,START|STOP|ISOLATE,134|one-three-four|satu tiga empat
+P-135,pump,A,boiler house,START|STOP|ISOLATE,135|one-three-five|satu tiga lima
+P-140,pump,C,clarification,START|STOP|ISOLATE,140|one-four-oh|satu empat nol
+P-142,pump,B,kernel plant,START|STOP|ISOLATE,142|one-four-two|satu empat dua
+P-143,pump,B,boiler house,START|STOP|ISOLATE,143|one-four-three|satu empat tiga
+P-145,pump,D,effluent,START|STOP|ISOLATE,145|one-four-five|satu empat lima
+P-149,pump,D,effluent,START|STOP|ISOLATE,149|one-four-nine|satu empat sembilan
+P-152,pump,A,boiler house,START|STOP|ISOLATE,152|one-five-two|satu lima dua
+P-154,pump,B,kernel plant,START|STOP|ISOLATE,154|one-five-four|satu lima empat
+P-156,pump,C,kernel plant,START|STOP|ISOLATE,156|one-five-six|satu lima enam
+P-157,pump,C,boiler house,START|STOP|ISOLATE,157|one-five-seven|satu lima tujuh
+P-161,pump,B,effluent,START|STOP|ISOLATE,161|one-six-one|satu enam satu
+P-162,pump,A,boiler house,START|STOP|ISOLATE,162|one-six-two|satu enam dua
+P-164,pump,B,effluent,START|STOP|ISOLATE,164|one-six-four|satu enam empat
+P-165,pump,D,kernel plant,START|STOP|ISOLATE,165|one-six-five|satu enam lima
+P-170,pump,D,sterilizer,START|STOP|ISOLATE,170|one-seven-oh|satu tujuh nol
+P-174,pump,B,effluent,START|STOP|ISOLATE,174|one-seven-four|satu tujuh empat
+P-176,pump,B,press station,START|STOP|ISOLATE,176|one-seven-six|satu tujuh enam
+P-181,pump,D,clarification,START|STOP|ISOLATE,181|one-eight-one|satu delapan satu
+P-184,pump,C,clarification,START|STOP|ISOLATE,184|one-eight-four|satu delapan empat
+P-185,pump,D,clarification,START|STOP|ISOLATE,185|one-eight-five|satu delapan lima
+P-191,pump,A,sterilizer,START|STOP|ISOLATE,191|one-nine-one|satu sembilan satu
+P-194,pump,D,kernel plant,START|STOP|ISOLATE,194|one-nine-four|satu sembilan empat
+P-199,pump,D,press station,START|STOP|ISOLATE,199|one-nine-nine|satu sembilan sembilan
+P-215,pump,B,sterilizer,START|STOP|ISOLATE,215|two-one-five|dua satu lima
+XV-201,on/off valve,D,boiler house,OPEN|CLOSE|ISOLATE,201|two-oh-one|dua nol satu
+XV-202,on/off valve,B,sterilizer,OPEN|CLOSE|ISOLATE,202|two-oh-two|dua nol dua
+XV-203,on/off valve,B,press station,OPEN|CLOSE|ISOLATE,203|two-oh-three|dua nol tiga
+XV-207,on/off valve,A,effluent,OPEN|CLOSE|ISOLATE,207|two-oh-seven|dua nol tujuh
+XV-208,on/off valve,A,clarification,OPEN|CLOSE|ISOLATE,208|two-oh-eight|dua nol delapan
+XV-209,on/off valve,A,press station,OPEN|CLOSE|ISOLATE,209|two-oh-nine|dua nol sembilan
+XV-210,on/off valve,A,sterilizer,OPEN|CLOSE|ISOLATE,210|two-one-oh|dua satu nol
+XV-211,on/off valve,C,clarification,OPEN|CLOSE|ISOLATE,211|two-one-one|dua satu satu
+XV-212,on/off valve,A,effluent,OPEN|CLOSE|ISOLATE,212|two-one-two|dua satu dua
+XV-213,on/off valve,A,press station,OPEN|CLOSE|ISOLATE,213|two-one-three|dua satu tiga
+XV-214,on/off valve,D,press station,OPEN|CLOSE|ISOLATE,214|two-one-four|dua satu empat
+XV-216,on/off valve,B,boiler house,OPEN|CLOSE|ISOLATE,216|two-one-six|dua satu enam
+XV-219,on/off valve,D,boiler house,OPEN|CLOSE|ISOLATE,219|two-one-nine|dua satu sembilan
+XV-220,on/off valve,D,effluent,OPEN|CLOSE|ISOLATE,220|two-two-oh|dua dua nol
+XV-222,on/off valve,C,sterilizer,OPEN|CLOSE|ISOLATE,222|two-two-two|dua dua dua
+XV-223,on/off valve,C,boiler house,OPEN|CLOSE|ISOLATE,223|two-two-three|dua dua tiga
+XV-224,on/off valve,C,clarification,OPEN|CLOSE|ISOLATE,224|two-two-four|dua dua empat
+XV-226,on/off valve,A,clarification,OPEN|CLOSE|ISOLATE,226|two-two-six|dua dua enam
+XV-228,on/off valve,C,boiler house,OPEN|CLOSE|ISOLATE,228|two-two-eight|dua dua delapan
+XV-229,on/off valve,A,press station,OPEN|CLOSE|ISOLATE,229|two-two-nine|dua dua sembilan
+XV-233,on/off valve,A,clarification,OPEN|CLOSE|ISOLATE,233|two-three-three|dua tiga tiga
+XV-234,on/off valve,C,press station,OPEN|CLOSE|ISOLATE,234|two-three-four|dua tiga empat
+XV-238,on/off valve,B,sterilizer,OPEN|CLOSE|ISOLATE,238|two-three-eight|dua tiga delapan
+XV-241,on/off valve,A,boiler house,OPEN|CLOSE|ISOLATE,241|two-four-one|dua empat satu
+XV-242,on/off valve,A,effluent,OPEN|CLOSE|ISOLATE,242|two-four-two|dua empat dua
+XV-243,on/off valve,D,boiler house,OPEN|CLOSE|ISOLATE,243|two-four-three|dua empat tiga
+XV-244,on/off valve,C,boiler house,OPEN|CLOSE|ISOLATE,244|two-four-four|dua empat empat
+XV-247,on/off valve,D,clarification,OPEN|CLOSE|ISOLATE,247|two-four-seven|dua empat tujuh
+XV-250,on/off valve,B,effluent,OPEN|CLOSE|ISOLATE,250|two-five-oh|dua lima nol
+XV-251,on/off valve,C,clarification,OPEN|CLOSE|ISOLATE,251|two-five-one|dua lima satu
+XV-253,on/off valve,D,press station,OPEN|CLOSE|ISOLATE,253|two-five-three|dua lima tiga
+XV-254,on/off valve,A,clarification,OPEN|CLOSE|ISOLATE,254|two-five-four|dua lima empat
+XV-255,on/off valve,B,press station,OPEN|CLOSE|ISOLATE,255|two-five-five|dua lima lima
+XV-258,on/off valve,B,press station,OPEN|CLOSE|ISOLATE,258|two-five-eight|dua lima delapan
+XV-259,on/off valve,A,boiler house,OPEN|CLOSE|ISOLATE,259|two-five-nine|dua lima sembilan
+XV-260,on/off valve,B,clarification,OPEN|CLOSE|ISOLATE,260|two-six-oh|dua enam nol
+XV-263,on/off valve,B,press station,OPEN|CLOSE|ISOLATE,263|two-six-three|dua enam tiga
+XV-264,on/off valve,C,boiler house,OPEN|CLOSE|ISOLATE,264|two-six-four|dua enam empat
+XV-266,on/off valve,C,press station,OPEN|CLOSE|ISOLATE,266|two-six-six|dua enam enam
+XV-267,on/off valve,D,kernel plant,OPEN|CLOSE|ISOLATE,267|two-six-seven|dua enam tujuh
+XV-268,on/off valve,A,kernel plant,OPEN|CLOSE|ISOLATE,268|two-six-eight|dua enam delapan
+XV-269,on/off valve,B,boiler house,OPEN|CLOSE|ISOLATE,269|two-six-nine|dua enam sembilan
+XV-271,on/off valve,C,effluent,OPEN|CLOSE|ISOLATE,271|two-seven-one|dua tujuh satu
+XV-272,on/off valve,B,effluent,OPEN|CLOSE|ISOLATE,272|two-seven-two|dua tujuh dua
+XV-274,on/off valve,B,sterilizer,OPEN|CLOSE|ISOLATE,274|two-seven-four|dua tujuh empat
+XV-275,on/off valve,D,clarification,OPEN|CLOSE|ISOLATE,275|two-seven-five|dua tujuh lima
+XV-276,on/off valve,C,kernel plant,OPEN|CLOSE|ISOLATE,276|two-seven-six|dua tujuh enam
+XV-277,on/off valve,A,effluent,OPEN|CLOSE|ISOLATE,277|two-seven-seven|dua tujuh tujuh
+XV-278,on/off valve,A,press station,OPEN|CLOSE|ISOLATE,278|two-seven-eight|dua tujuh delapan
+XV-279,on/off valve,C,clarification,OPEN|CLOSE|ISOLATE,279|two-seven-nine|dua tujuh sembilan
+XV-280,on/off valve,C,clarification,OPEN|CLOSE|ISOLATE,280|two-eight-oh|dua delapan nol
+XV-283,on/off valve,B,clarification,OPEN|CLOSE|ISOLATE,283|two-eight-three|dua delapan tiga
+XV-284,on/off valve,C,effluent,OPEN|CLOSE|ISOLATE,284|two-eight-four|dua delapan empat
+XV-286,on/off valve,B,boiler house,OPEN|CLOSE|ISOLATE,286|two-eight-six|dua delapan enam
+XV-287,on/off valve,A,sterilizer,OPEN|CLOSE|ISOLATE,287|two-eight-seven|dua delapan tujuh
+XV-289,on/off valve,D,effluent,OPEN|CLOSE|ISOLATE,289|two-eight-nine|dua delapan sembilan
+XV-291,on/off valve,D,press station,OPEN|CLOSE|ISOLATE,291|two-nine-one|dua sembilan satu
+XV-293,on/off valve,D,sterilizer,OPEN|CLOSE|ISOLATE,293|two-nine-three|dua sembilan tiga
+XV-295,on/off valve,A,kernel plant,OPEN|CLOSE|ISOLATE,295|two-nine-five|dua sembilan lima
+XV-296,on/off valve,D,boiler house,OPEN|CLOSE|ISOLATE,296|two-nine-six|dua sembilan enam
+XV-298,on/off valve,B,clarification,OPEN|CLOSE|ISOLATE,298|two-nine-eight|dua sembilan delapan
+XV-299,on/off valve,C,kernel plant,OPEN|CLOSE|ISOLATE,299|two-nine-nine|dua sembilan sembilan
