@@ -21,6 +21,8 @@
 
 ---
 
+**Track:** Intelligent Industry · lablab AMD Developer Hackathon ACT III
+
 > **Status: under construction (AMD Developer Hackathon ACT III, Oct 2026).** Every result below comes from a file in
 > `bench/results/`. No recorded speech has been measured yet: the rows that exist feed the written words of the recording
 > cards to each extractor (`text·scripted`), and are labelled that way everywhere.
