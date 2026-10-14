@@ -1,0 +1,14 @@
+{
+ "cards_compared": 40,
+ "cards_same_label": 40,
+ "first": "bench/results/text/dev-r1.json",
+ "kind": "reproducibility",
+ "label_differences": [],
+ "note": "temperature 0; the gateway drops `seed`, so identical outputs are not guaranteed",
+ "output_differences": [],
+ "outputs_compared": 83,
+ "outputs_identical": 83,
+ "provenance": "text·scripted",
+ "rung": "regex",
+ "second": "bench/results/text/dev-r2-repro-reaudit.json"
+}

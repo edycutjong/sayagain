@@ -919,6 +919,41 @@ def cmd_report(args) -> int:
     return 0
 
 
+def cmd_compare(args) -> int:
+    """Run-to-run reproducibility of one rung: two result files -> per-card label agreement + identical outputs."""
+    a_path, b_path = (Path(f).resolve() for f in args.files)
+    a, b = (json.loads(x.read_text(encoding="utf-8")) for x in (a_path, b_path))
+    ra, rb = a["rungs"][args.model], b["rungs"][args.model]
+    ca = {c["exchange_id"]: c for c in read_jsonl(ROOT / ra["cards"])}
+    cb = {c["exchange_id"]: c for c in read_jsonl(ROOT / rb["cards"])}
+    ea = {e["text"]: e["obj"] for e in read_jsonl(ROOT / ra["extractions"])}
+    eb = {e["text"]: e["obj"] for e in read_jsonl(ROOT / rb["extractions"])}
+    common = sorted(set(ca) & set(cb))
+    label_diff = [f"{k}: {ca[k]['label']!r} vs {cb[k]['label']!r}" for k in common if ca[k]["label"] != cb[k]["label"]]
+    out_diff = [t for t in ea if t in eb and ea[t] != eb[t]]
+    res = {
+        "kind": "reproducibility",
+        "rung": args.model,
+        "provenance": PROVENANCE,
+        "first": str(a_path.relative_to(ROOT)),
+        "second": str(b_path.relative_to(ROOT)),
+        "cards_compared": len(common),
+        "cards_same_label": len(common) - len(label_diff),
+        "label_differences": label_diff,
+        "outputs_compared": len(set(ea) & set(eb)),
+        "outputs_identical": len(set(ea) & set(eb)) - len(out_diff),
+        "output_differences": [{"text": t, "first": ea[t], "second": eb[t]} for t in out_diff],
+        "note": "temperature 0; the gateway drops `seed`, so identical outputs are not guaranteed",
+    }
+    out = OUT / f"repro-{args.run or b['run']}.json"
+    write_json(out, res)
+    print(
+        f"{res['cards_same_label']}/{res['cards_compared']} cards same label · "
+        f"{res['outputs_identical']}/{res['outputs_compared']} outputs identical -> {out.relative_to(ROOT)}"
+    )
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     g = ap.add_mutually_exclusive_group(required=True)
@@ -926,6 +961,7 @@ def main(argv: list[str] | None = None) -> int:
     g.add_argument("--ablate", choices=["grounding"])
     g.add_argument("--baseline", choices=["llm-judge"])
     g.add_argument("--rescore", action="store_true")
+    g.add_argument("--compare", action="store_true", help="reproducibility of --model between two result files")
     g.add_argument("--report", action="store_true", help="write bench/results/text/RESULTS.md from result files")
     ap.add_argument("--rungs", help="comma-separated rung names (default: the ladder)")
     ap.add_argument("--model", default="DeepSeek-V4-Flash")
@@ -949,6 +985,8 @@ def main(argv: list[str] | None = None) -> int:
             return cmd_single(args, "llm-judge")
         if args.report:
             return cmd_report(args)
+        if args.compare:
+            return cmd_compare(args)
         return cmd_rescore(args)
     except MissingCredentials as e:
         print(f"no Token Factory key: {e}", file=sys.stderr)
