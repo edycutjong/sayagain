@@ -4,16 +4,19 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SayAgain · pitch deck</title>
-<meta name="description" content="SayAgain pitch deck: checks every radio read-back of a safety instruction and sends the wrong ones to a human.">
+<meta name="description" content="SayAgain pitch deck: checks each read-back of a radioed safety order against the plant registry and sends only the wrong ones to the supervisor.">
 <meta name="theme-color" content="#272A2B">
 <meta name="color-scheme" content="dark">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="SayAgain">
 <meta property="og:title" content="SayAgain · pitch deck">
-<meta property="og:description" content="Nobody on the channel noticed. The radio log did. 11 slides: the read-back that went wrong, the referee that caught it, the model ladder, who pays.">
-<meta property="og:image" content="../assets/og.png">
+<meta property="og:description" content="11 slides: the read-back that went wrong, the referee that caught it, the model ladder and who pays.">
+<meta property="og:url" content="https://edycutjong.github.io/sayagain/pitch/">
+<meta property="og:image" content="https://edycutjong.github.io/sayagain/assets/og.png?v=2">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="../assets/og.png">
+<meta name="twitter:image" content="https://edycutjong.github.io/sayagain/assets/og.png?v=2">
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
 <link rel="preload" href="../assets/fonts/SairaStencilOne-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <style>
@@ -53,7 +56,7 @@
 
 </style>
 <link rel="stylesheet" href="deck.css">
-<!-- Keys: arrows / space / PageDown navigate · Esc overview · P presenter notes · C contrast check · F fullscreen · Cmd+P prints one slide per page.
+<!-- Keys: arrows / space / PageDown navigate · Esc overview · P presenter notes · F fullscreen (C toggles a contrast-debug outline) · Cmd+P prints one slide per page.
      Images: ../assets/shots/*.webp are captures of docs/replay/. Every figure is read from bench/results/ or evidence/. -->
 </head>
 <body>
@@ -64,8 +67,8 @@
 <div class="cv-l">
 <p class="lab">AMD Developer Hackathon ACT III · Intelligent Industry</p>
 <p class="wm"><img src="../assets/icon.svg" alt="" width="64" height="64"><span>SAYAGAIN</span></p>
-<h1><span class="g">Nobody on the channel noticed.</span> <span class="k">The radio log did.</span></h1>
-<p class="sub">Checks every radio read-back of a safety instruction, and sends the wrong ones to a human.</p>
+<h1><span class="g">Nobody on the channel noticed.</span> <span class="k"><span class="chipline">The radio<br> log did.</span></span></h1>
+<p class="sub wide">Checks each read-back of a radioed safety order against the plant registry; only the wrong ones reach the supervisor.</p>
 </div>
 <div class="cv-r render">
 <article class="xcard v-MISMATCH" id="x-open" data-x="H-01" data-ins="H-01-0" data-rb="H-01-1">
@@ -157,7 +160,7 @@
 <div class="flow3 render">
 <div class="f1"><p class="h">1 · the exchange the model read</p><p class="who5">order</p><p class="line dim"><span class="sp" data-f="action" data-c="0">Close</span> <span class="sp" data-f="tag" data-c="0">valve two-oh-three</span>, <span class="sp" data-f="line" data-c="0">line Bravo</span>.</p><p class="who5">read-back</p><p class="line">Copy, <span class="sp" data-f="action" data-c="0">closing</span> <span class="sp" data-f="tag" data-c="0">two-oh-eight</span>, <span class="sp" data-f="line" data-c="0">line Bravo</span>.</p><p class="m">H-01 · written words, text·scripted</p></div>
 <div class="arr" aria-hidden="true">→</div>
-<div class="f2"><p class="h">2 · what Gemma-4-31B-IT returned · AMD Token Factory</p><pre class="json">{
+<div class="f2"><p class="h">2 · what Gemma-4-31B-IT returned</p><pre class="json">{
   <span class="k">&quot;commands&quot;</span>: [
     {
       <span class="k">&quot;action_span&quot;</span>: <span class="s">&quot;closing&quot;</span>,
@@ -173,7 +176,7 @@
 <div class="f3"><p class="h">3 · what code decided</p><ol class="tr"><li>instruction: grounded + covered (1 command(s))</li><li>read-back: grounded + covered (1 command(s))</li><li>audio: no gate (no token probabilities, no unprompted pass)</li><li>instruction: <span class="nw">XV-203</span> line B (registry ok)</li><li>compare: tag: <span class="nw">XV-203</span> ≠ <span class="nw">XV-208</span></li></ol><p class="vd">MISMATCH · <span>tag: <span class="nw">XV-203</span> ≠ <span class="nw">XV-208</span></span></p></div>
 </div>
 <p class="stl render">speech-to-text: not run yet · <b>span extraction: AMD Token Factory</b> · referee: local, plain Python · queue: local</p>
-<p class="rcpt render" data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">receipt · request c9647a04cfcc4eeaadbfa965a4d74c6d · self-dploy/Gemma-4-31B-IT · developer.amd.com.cn · latency 35.4972 s · cost_usd 4.8937e-06</p>
+<p class="rcpt render" data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json bench/results/text/ladder-r1.json">receipt, as stored · request_id c9647a04cfcc4eeaadbfa965a4d74c6d · model_served self-dploy/Gemma-4-31B-IT · host developer.amd.com.cn · latency_s 35.4972 (a slow call; the first pass’s median was 4.304 s) · cost_usd 4.8937e-06</p>
 <aside class="speaker-notes">This is one real exchange end to end. The model has one job, on the AMD Token Factory: copy out the words that carry the action, the tag and the line. Each call leaves a receipt with the host, the model served, the request id and the cost; speech-to-text has not run on a recording yet. Plain code checks those words are really in the transcript, that every safety word is accounted for, and that the tag exists in the plant registry. A pure function returns the verdict; the model never writes it.</aside>
 </section>
 
@@ -181,7 +184,7 @@
 <p class="lab"><span class="nw">XV-205</span> · a valve the plant registry does not have</p>
 <h2>Judging is not the model’s job.</h2>
 <div class="vs">
-<div class="side judge" data-src="bench/results/text/llm-judge-r1-reaudit.json"><p class="who">LLM-as-judge · DeepSeek-V4.1-Flash, no registry</p><p class="vword">VERIFIED</p><p class="d">Order and read-back match; the valve does not exist.</p><p class="d2">It also passed 2 wrong read-backs.</p></div>
+<div class="side judge" data-src="bench/results/text/llm-judge-r1-reaudit.json"><p class="who">LLM-as-judge<br>DeepSeek-V4.1-Flash · no registry</p><p class="vword">VERIFIED</p><p class="d">Order and read-back match; <span class="amb">the valve does not exist.</span></p><p class="d2">It also passed <b class="bad">2</b> wrong read-backs.</p></div>
 <div class="side ours render"><article class="xcard v-ABSTAIN" id="x-refused" data-x="R-01" data-ins="R-01-0" data-rb="R-01-1">
 <header class="xc-h">
 <p class="xc-v"><i class="ring" aria-hidden="true"></i><span>ABSTAIN</span></p>
@@ -219,10 +222,10 @@
 
 <section class="slide s-ladder" data-title="The model ladder" aria-label="Slide 7, the model ladder">
 <p class="lab" data-src="bench/results/text/ladder-r1-reaudit.json">Model ladder · 89 held-out exchanges · text·scripted</p>
-<h2>Climb only as high as needed.</h2>
-<p class="sub7" data-src="bench/results/text/ladder-r1-reaudit.json">0 wrong read-backs passed on all five rungs; an LLM judge passed 2.</p>
+<h2 class="h7" data-src="bench/results/text/llm-judge-r1-reaudit.json bench/results/text/ladder-r1-reaudit.json"><b class="bad">2</b><span class="arw" aria-hidden="true">→</span>0 wrong read-backs passed.</h2>
+<p class="sub7" data-src="bench/results/text/ladder-r1-reaudit.json">The LLM-as-judge baseline passed 2. Each of the five rungs passed 0.</p>
 <div class="ld render">
-<p class="hd"><span>rung</span><span>false-VERIFIED</span><span>false alarms on 48 correct read-backs · dashed: budget</span><span></span><span>rule</span></p>
+<p class="hd" data-src="bench/results/text/ladder-r1-reaudit.json"><span>rung</span><span>false-VERIFIED</span><span>false alarms on 48 correct read-backs · dashed: 5 % budget</span><span></span><span>rule</span></p>
 <div class="lr meets"><span class="nm">regex<small>rung 0 · no model</small></span><span class="fv" data-src="bench/results/text/ladder-r1-reaudit.json">0</span><span class="cells"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="fa" data-src="bench/results/text/ladder-r1-reaudit.json">0/48</span><span class="mr">meets</span></div>
 <div class="lr allhuman"><span class="nm">MiniCPM5-2B<small>smallest model</small></span><span class="fv" data-src="bench/results/text/ladder-r1-reaudit.json">0</span><span class="cells"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="fa" data-src="bench/results/text/ladder-r1-reaudit.json">48/48</span><span class="mr">all 48 to a human</span></div>
 <div class="lr meets"><span class="nm">Gemma-4-31B-IT<small>thinking off</small></span><span class="fv" data-src="bench/results/text/ladder-r1-reaudit.json">0</span><span class="cells"><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="fa" data-src="bench/results/text/ladder-r1-reaudit.json">2/48</span><span class="mr">meets</span></div>
@@ -240,9 +243,7 @@
 <p class="lab">Who pays</p>
 <h2>Priced per channel. Bought by HSE.</h2>
 <div class="calc" data-src="evidence/sources.json"><p><span class="n">1,318</span><span>mills, Indonesia 2022 (Trase)</span></p><p><span class="n">× 30 %</span><span>addressable*</span></p><p><span class="n">× 6</span><span>channels per mill*</span></p><p><span class="n">× USD 2,400</span><span>per channel-year*</span></p><p class="tot"><span class="n">≈ USD 5.7 M</span><span>a year, mills only (estimate)</span></p><p class="ast">* assumption</p></div>
-<ul class="who-pays">
-<li><b>Wedge</b> free 30-day listen-only baseline</li>
-</ul>
+<div class="wedge"><p class="wl">Wedge</p><p class="wb">Free <span class="nw">30-day</span> <span class="nw">listen-only</span> baseline</p></div>
 <aside class="speaker-notes">We sell an on-prem licence per monitored radio channel to the HSE or K3 manager, who needs audit evidence for the SMK3 audit. The wedge is a free thirty-day listen-only baseline at one mill; after Indonesian mills come the Malaysian mills, refineries, mines and ports, none of them sized yet. The mills line alone, from our labelled assumptions, is an estimate of about 5.7 million dollars a year in Indonesia.</aside>
 </section>
 
@@ -252,34 +253,34 @@
 <table class="mx render">
 <thead><tr><th></th><th>transcribes radio</th><th>compares a read-back</th><th>plant tag registry</th></tr></thead>
 <tbody>
-<tr><th>NICE Inform AI</th><td class="y">yes</td><td>not in public docs</td><td>no</td></tr>
-<tr><th>Eventide NexLog + Speech Factor AI</th><td class="y">yes</td><td>not in public docs</td><td>not in public docs</td></tr>
-<tr><th>Motorola Assist</th><td class="y">yes</td><td>not in public docs</td><td>not in public docs</td></tr>
-<tr><th>IntelliPERMIT</th><td>no</td><td>radioed codes, not speech</td><td class="y">yes</td></tr>
+<tr><th>NICE Inform AI</th><td class="y">yes</td><td class="dash">—</td><td class="dash">—</td></tr>
+<tr><th>Eventide NexLog + Speech Factor AI</th><td class="y">yes</td><td class="dash">—</td><td class="dash">—</td></tr>
+<tr><th>Motorola Assist</th><td class="y">yes</td><td class="dash">—</td><td class="dash">—</td></tr>
+<tr><th>IntelliPERMIT</th><td class="dash">—</td><td>radioed codes, not speech</td><td class="y">yes</td></tr>
 <tr><th>HAAWAII (air-traffic research)</th><td class="y">yes</td><td class="y">yes, aviation</td><td>no</td></tr>
 <tr class="us"><th>SayAgain</th><td>planned</td><td class="y">yes</td><td class="y">yes</td></tr>
 </tbody>
 </table>
-<p class="srcs">Public documentation read 2026-10-09 · sources: evidence/sources.json</p>
+<p class="srcs">— not in the public documentation we read, 2026-10-09 · sources: evidence/sources.json</p>
 <aside class="speaker-notes">Radio loggers already record, transcribe and spot keywords. Among the vendors we checked, none documents comparing an instruction with its read-back. Automatic read-back checking exists in air-traffic research; IntelliPERMIT checks radioed codes, which needs a procedure change. SayAgain checks natural speech against the plant's own registry.</aside>
 </section>
 
-<section class="slide s-honest" data-title="Honest by design" aria-label="Slide 10, honest by design">
+<section class="slide s-honest" data-title="What we abstain on" aria-label="Slide 10, what we abstain on">
 <p class="lab">README</p>
-<h2>Honest by design.</h2>
+<h2>What we abstain on.</h2>
 <div class="hq">
-<blockquote><p>No recorded speech has been measured.</p></blockquote>
-<blockquote><p>The plant, its 120 tags and every exchange are fictional…</p></blockquote>
-<blockquote><p>…what a language model adds is unproven until the audio rows exist.</p></blockquote>
+<blockquote class="ab"><p class="ab-h"><i class="ring" aria-hidden="true"></i>ABSTAIN</p><p class="ab-q">No recorded speech has been measured.</p></blockquote>
+<blockquote class="ab"><p class="ab-h"><i class="ring" aria-hidden="true"></i>ABSTAIN</p><p class="ab-q">The plant, its 120 tags and every exchange are fictional…</p></blockquote>
+<blockquote class="ab"><p class="ab-h"><i class="ring" aria-hidden="true"></i>ABSTAIN</p><p class="ab-q">…what a language model adds is unproven…</p></blockquote>
 </div>
-<p class="slots-h">Needs the recordings · planned for Oct 16</p>
+<p class="slots-h">Next · audio eval scheduled Oct 16</p>
 <ul class="slots render">
 <li><b>Audio row</b><span>the rule on recorded speech</span></li>
 <li><b>Failure case</b><span>−6 dB look-alike tags</span></li>
 <li><b>Kill test</b><span>English, Bahasa or auto</span></li>
 <li><b>Blind auditor</b><span>by ear vs the queue</span></li>
 </ul>
-<aside class="speaker-notes">Everything you saw ran on the written scripts of a fictional plant. No recording has been measured, and on clean words a regex already meets our rule. The recordings decide the rest: the audio row, the minus-six-decibel failure case, the language test and a blind auditor.</aside>
+<aside class="speaker-notes">SayAgain abstains when it cannot check, and so do we. Everything you saw ran on the written scripts of a fictional plant. No recording has been measured, and on clean words a regex already meets our rule. The recordings decide the rest: the audio row, the minus-six-decibel failure case, the language test and a blind auditor.</aside>
 </section>
 
 <section class="slide s-ask" data-title="The ask" aria-label="Slide 11, the ask">
@@ -304,11 +305,11 @@
 <button type="button" id="notes" aria-label="Presenter notes (P)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v10H4z"/><path d="M8 19h8"/></svg></button>
 <button type="button" id="next" aria-label="Next slide"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
 </div>
-<p class="hint">← → navigate · Esc overview · P notes · C contrast · Cmd+P PDF</p>
+<p class="hint">← → navigate · Esc overview · P notes · Cmd+P PDF</p>
 <p class="phone">This deck is 16:9. On a phone, open the <a href="sayagain-pitch-deck.pdf">PDF</a> or turn the phone sideways.</p>
 <div class="notes-panel" id="notesPanel" aria-live="polite"><div class="nt" id="noteText"></div><div class="meta" id="noteMeta"></div></div>
 <div class="overview" id="overview" role="dialog" aria-label="Slide overview"></div>
-<script>window.DECK_VERSION = "dev build 0d97410";</script>
+<script>window.DECK_VERSION = "built on 33efed4 · 2026-10-14";</script>
 <script src="deck.js" defer></script>
 </body>
 </html>

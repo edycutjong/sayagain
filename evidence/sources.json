@@ -78,9 +78,9 @@
       "assumption": "USD 2,400 per monitored channel per year (USD 200 a month), an on-prem licence."
     },
     {
-      "id": "floor",
+      "id": "mills-estimate",
       "figure": "USD 5.7 M",
-      "assumption": "1,318 x 30 % x 6 channels x USD 2,400 = about USD 5.7 M a year: the mills line only, the floor of the Indonesian beachhead."
+      "assumption": "1,318 x 30 % x 6 channels x USD 2,400 = about USD 5.7 M a year: an estimate for the mills line only, built from the labelled assumptions above. Not a floor and not a measurement."
     }
   ],
   "competitors": [

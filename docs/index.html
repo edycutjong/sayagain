@@ -10,13 +10,14 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="SayAgain">
 <meta property="og:title" content="Nobody on the channel noticed. The radio log did.">
-<meta property="og:description" content="The read-back said two-oh-eight. The order was two-oh-three. SayAgain puts the one wrong word in front of the shift supervisor.">
-<meta property="og:image" content="assets/og.png">
+<meta property="og:description" content="The order said two-oh-three; the read-back said two-oh-eight. SayAgain puts that one word in front of the supervisor.">
+<meta property="og:url" content="https://edycutjong.github.io/sayagain/">
+<meta property="og:image" content="https://edycutjong.github.io/sayagain/assets/og.png?v=2">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="SayAgain: the read-back two-oh-eight blocked red under the order two-oh-three, verdict MISMATCH">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="assets/og.png">
+<meta name="twitter:image" content="https://edycutjong.github.io/sayagain/assets/og.png?v=2">
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preload" href="assets/fonts/SairaStencilOne-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/IBMPlexMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
@@ -98,14 +99,14 @@
 <a class="brand" href="#top" aria-label="SayAgain, top of page"><img src="assets/icon.svg" alt="" width="34" height="34"><span>SAYAGAIN</span></a>
 <nav aria-label="Sections">
 <ul class="links">
-<li><a href="#consequence">The problem</a></li>
+<li><a href="#consequence">Problem</a></li>
 <li><a href="#try">Try it</a></li>
 <li><a href="#ladder">Ladder</a></li>
 <li><a href="#how">How it decides</a></li>
 <li><a href="#amd">AMD</a></li>
 <li><a href="#pays">Who pays</a></li>
 <li><a href="#faq">FAQ</a></li>
-<li><a href="pitch/">Pitch deck</a></li>
+<li><a href="pitch/">Deck</a></li>
 </ul>
 </nav>
 <div class="nav-cta">
@@ -120,7 +121,7 @@
 <section class="fold" aria-labelledby="h1">
 <div class="fold-h">
 <p class="lab">CH-01 · AMD Hackathon ACT III · Intelligent Industry</p>
-<h1 id="h1"><span class="s1">Nobody on the channel noticed.</span> <span class="s2">The radio log did.</span></h1>
+<h1 id="h1"><span class="s1">Nobody on the channel noticed.</span> <span class="s2"><span class="chipline">The radio<br class="cb"> log did.</span></span></h1>
 <p class="def-sm">SayAgain checks each read-back of a radioed safety order and sends only the wrong ones to the shift supervisor.</p>
 </div>
 <div class="fold-card" id="opening">
@@ -154,12 +155,12 @@
 </ul>
 </article>
 <div class="fold-cap">
-<button type="button" class="btn ghost sm" id="replay-strip" aria-label="Play again: the read-back arriving"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 3-6.2M4 4v4h4"/></svg>Play again</button>
-<p>Scripted exchange H-01, redrawn from the queue: the written words, the stored Gemma-4-31B-IT extraction and the referee’s verdict.</p>
+<button type="button" class="btn ghost sm" id="replay-strip" aria-label="Say again: replay the read-back arriving"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 3-6.2M4 4v4h4"/></svg>Say again</button>
+<p>Scripted exchange H-01, redrawn from the queue: the written words, the stored Gemma-4-31B-IT extraction and the referee’s verdict. <b>“Say again” is radio for “repeat that”.</b> A wrong read-back deserves one.</p>
 </div>
 </div>
 <div class="fold-l">
-<p class="lede"><b>SayAgain checks each read-back of a radioed safety order</b> against the order and the plant registry, and sends only the wrong ones to the shift supervisor. A model on the AMD Token Factory points at the words; plain code decides.</p>
+<p class="lede"><span class="lede-def"><b>SayAgain checks each read-back of a radioed safety order</b> against the order and the plant registry, and sends only the wrong ones to the shift supervisor. </span>A model on the AMD Token Factory points at the words; plain code decides.</p>
 <div class="cta">
 <a class="btn lg" href="https://github.com/edycutjong/sayagain"><svg class="gh" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.8c-2.8.6-3.4-1.2-3.4-1.2-.5-1.1-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.4 1.1 2.9.8.1-.7.4-1.1.6-1.3-2.2-.3-4.6-1.1-4.6-5a3.9 3.9 0 0 1 1-2.7c-.1-.2-.4-1.3.1-2.7 0 0 .8-.3 2.7 1a9.4 9.4 0 0 1 5 0c1.9-1.3 2.7-1 2.7-1 .5 1.4.2 2.5.1 2.7a3.9 3.9 0 0 1 1 2.7c0 3.9-2.4 4.7-4.6 5 .4.3.7.9.7 1.9V21c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg>GitHub</a>
 <a class="btn lg" href="pitch/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18v12H3zM12 16v4M8 20h8"/></svg>Pitch deck</a>
@@ -169,11 +170,11 @@
 <p class="lab">Receipts · 89 held-out exchanges · text·scripted</p>
 <ul>
 <li data-src="bench/results/text/llm-judge-r1-reaudit.json bench/results/text/ladder-r1-reaudit.json"><b class="num"><span class="was">2</span><span class="arw" aria-hidden="true">→</span><span>0</span></b><span>wrong read-backs passed: an LLM judge, then the referee</span></li>
-<li data-src="bench/results/text/ladder-r1-reaudit.json"><b class="num"><span data-count="41">41</span>/41</b><span>seeded errors caught, every rung</span></li>
-<li data-src="bench/results/text/ladder-r1-reaudit.json"><b class="num"><span data-count="2">2</span>/48</b><span>false alarms, Gemma-4-31B-IT</span></li>
-<li data-src="bench/results/text/ladder-r1.json"><b class="num cost"><small>USD</small>0.000895</b><span>300 calls on the AMD Token Factory, 178 answered</span></li>
+<li data-src="bench/results/text/ladder-r1-reaudit.json"><b class="num"><span data-count="41">41</span>/41</b><span>seeded errors caught, Gemma-4-31B-IT</span></li>
+<li data-src="bench/results/text/ladder-r1-reaudit.json"><b class="num"><span data-count="2">2</span>/48</b><span>false alarms on correct read-backs, same rung</span></li>
+<li data-src="evidence/terminal-2026-10-14.log"><b class="num">24<small>× OK</small></b><span>result rows re-derived offline in 2.9 s</span></li>
 </ul>
-<p class="srcs">bench/results/text/ · llm-judge-r1-reaudit.json · ladder-r1-reaudit.json · ladder-r1.json (the cost: Gemma-4-31B-IT’s first pass)</p>
+<p class="srcs">bench/results/text/llm-judge-r1-reaudit.json · bench/results/text/ladder-r1-reaudit.json · evidence/terminal-2026-10-14.log</p>
 </div>
 </div>
 </section>
@@ -197,7 +198,7 @@
 </svg>
 <figcaption><code>data/registry.csv</code> · fictional plant, 120 tags: <span class="nw"><span class="nw">XV-203</span> · on/off valve · line B · press station</span> · <span class="nw"><span class="nw">XV-208</span> · on/off valve · line A · clarification</span></figcaption>
 </figure>
-<div class="context">
+<div class="context band">
 <blockquote data-src="evidence/sources.json"><p class="fig"><b class="num"><span class="nw">63 % tower</span> · <span class="nw">50 % approach</span></b></p><p>of pilots’ read-back errors are caught by air-traffic controllers, in the literature. The rest go through.</p><cite>Helmke et al., ATM Seminar 2021 · aviation, not plant radio · evidence/sources.json</cite></blockquote>
 <blockquote><p class="fig"><b class="num">1 killed, 6&nbsp;injured</b></p><p>What a wrong valve state can cost: Goodyear, Houston, 2008. An isolation valve was left closed after maintenance and the remaining relief path was then blocked.</p><cite>US Chemical Safety Board case study · evidence/sources.json</cite></blockquote>
 <blockquote><p class="fig"><b class="num">No rate</b></p><p>of read-back errors on industrial plant radio has been published that we could find. Measuring it is the pilot’s first job.</p><cite>Our search, Oct 2026 · the check is called three-way communication</cite></blockquote>
@@ -212,7 +213,7 @@
 </div>
 <figure class="browser wide">
 <div class="bar"><i></i><i></i><i></i><span>sayagain · supervisor queue · replay</span></div>
-<a href="replay/" class="shot"><picture><source media="(max-width: 640px)" srcset="assets/shots/card-h01.webp"><img src="assets/shots/queue-h01-crop.webp" width="1440" height="665" loading="lazy" decoding="async" alt="SayAgain supervisor queue replaying the stored shift: the list of exchanges on the left, card H-01 on the right with two-oh-eight blocked red and the buttons Confirm error and Dismiss"></picture></a>
+<a href="replay/" class="shot"><picture><source media="(max-width: 640px)" srcset="assets/shots/queue-h01-390-card.webp"><img src="assets/shots/queue-h01-crop.webp" width="1440" height="665" loading="lazy" decoding="async" alt="SayAgain supervisor queue replaying the stored shift: the list of exchanges on the left, card H-01 on the right with two-oh-eight blocked red and the buttons Confirm error and Dismiss"></picture></a>
 <figcaption>Real capture of <code>docs/replay/</code>: the same page as the live queue, verdicts precomputed. <a href="replay/">Open it</a>.</figcaption>
 </figure>
 <div class="pair2">
@@ -794,10 +795,10 @@
 <span role="cell" class="ef" data-src="bench/results/text/llm-judge-r1-reaudit.json">35/41<small>4 not audited</small></span>
 <span role="cell" class="fa" data-src="bench/results/text/llm-judge-r1-reaudit.json"><span class="cells"><i title="A2-021: VERIFIED"></i><i title="A2-022: VERIFIED"></i><i title="A2-024: VERIFIED"></i><i title="A2-025: VERIFIED"></i><i title="A2-026: VERIFIED"></i><i title="A2-028: VERIFIED"></i><i title="A2-030: VERIFIED"></i><i title="A2-035: VERIFIED"></i><i class="on" title="A2-036: false alarm"></i><i title="A2-037: VERIFIED"></i><i title="A2-038: VERIFIED"></i><i title="A2-040: VERIFIED"></i><i title="A2-041: VERIFIED"></i><i title="A2-042: VERIFIED"></i><i title="A2-045: VERIFIED"></i><i title="A2-047: VERIFIED"></i><i title="A2-048: VERIFIED"></i><i title="A2-049: VERIFIED"></i><i title="A2-050: VERIFIED"></i><i title="A2-051: VERIFIED"></i><i class="na" title="A2-054: call failed, not audited"></i><i title="A2-057: VERIFIED"></i><i title="A2-058: VERIFIED"></i><i title="A2-059: VERIFIED"></i><i title="A2-060: VERIFIED"></i><i title="A2-062: VERIFIED"></i><i title="A2-067: VERIFIED"></i><i title="A2-070: VERIFIED"></i><i title="A2-072: VERIFIED"></i><i title="A2-073: VERIFIED"></i><i title="A2-077: VERIFIED"></i><i title="A2-079: VERIFIED"></i><i title="A2-081: VERIFIED"></i><i title="A2-083: VERIFIED"></i><i title="A2-084: VERIFIED"></i><i title="A2-086: VERIFIED"></i><i title="A2-087: VERIFIED"></i><i title="A2-088: VERIFIED"></i><i title="A2-090: VERIFIED"></i><i title="A2-094: VERIFIED"></i><i title="A2-095: VERIFIED"></i><i title="A2-096: VERIFIED"></i><i title="A2-099: VERIFIED"></i><i title="A2-100: VERIFIED"></i><i title="A2-102: VERIFIED"></i><i title="A2-103: VERIFIED"></i><i title="A2-104: VERIFIED"></i><i title="A2-106: VERIFIED"></i></span><b>1/48</b></span>
 <span role="cell" class="lt">n/a</span>
-<span role="cell" class="mr">no · passed <span class="nw">XV-205</span></span>
+<span role="cell" class="mr">no · passed <b class="amb"><span class="nw">XV-205</span></b></span>
 </div>
 </div>
-<p class="legend" data-src="bench/results/text/ladder-r1.json">Cells: the 48 correct read-backs, filled where a rung sent one to a human anyway (hatched: a failed call; MiniCPM5-2B sent the whole row). Dashed: the 5 % budget. Rows: the 89 held-out of the 145 cards (the others are the 40-card dev slice, 15 chatter cards and the refusal). Latency: each model rung’s first pass. Gemma-4-31B-IT and Qwen3.8-27B rows are re-audits: as run, their first passes left 45 and 3 cards not audited (bench/results/text/ladder-r1.json).</p>
+<p class="legend" data-src="bench/results/text/ladder-r1.json">Cells: the 48 correct read-backs, filled where a rung sent one to a human anyway (hatched: a failed call; MiniCPM5-2B sent the whole row). Dashed: the 5 % budget. Rows: the 89 held-out of the 145 cards (the others are the 40-card dev slice, 15 chatter cards and the refusal). Latency: each model rung’s first pass. Gemma-4-31B-IT, Qwen3.8-27B and DeepSeek-V4-Flash (1 call) rows are re-audits: as run, the first passes of Gemma and Qwen left 45 and 3 cards not audited (bench/results/text/ladder-r1.json).</p>
 <p class="legend" data-src="bench/results/text/RESULTS.md">With so few cards the rates are wide: Gemma-4-31B-IT’s 2/48 is 4.17 % with a 95 % Wilson interval of 1.15 % to 13.98 % (bench/results/text/RESULTS.md). The baseline is DeepSeek-V4.1-Flash, a different model from the DeepSeek-V4-Flash rung.</p>
 <div class="ladder-notes">
 <p class="note" data-src="bench/results/text/ladder-r1-reaudit.json"><b>On written words, rung 0 already meets the rule.</b> A frozen regex, no model: 41/41 errors flagged, 0/48 false alarms. Whether that survives real speech, noise and other people’s phrasing is what the audio rows measure.</p>
@@ -829,7 +830,7 @@
 <li><p class="n">02</p><div class="tx"><h3>The words must be there</h3><p>Every span must appear in the transcript, word for word.</p></div>
 <p class="ev" data-src="bench/results/text/ablate-grounding-r1-reaudit.json"><b>2/48 → 6/48</b><span class="lbl">false alarms when the same model returns values instead of copied words (one more card not audited)</span><code>code: referee/grounding.py</code></p></li>
 <li><p class="n">03</p><div class="tx"><h3>Every safety word counted</h3><p>A read-back that drops the action word, or keeps a line the operator retracted, cannot verify. A model that returns nothing usable sends the card to a human.</p></div>
-<p class="ev" data-src="bench/results/text/ladder-r1-reaudit.json"><b>48/48</b><span class="lbl">correct read-backs sent to a human when MiniCPM5-2B returned malformed spans; none passed</span><code>code: referee/coverage.py</code></p></li>
+<p class="ev" data-src="bench/results/text/ladder-r1-reaudit.json"><b>48/48</b><span class="lbl">correct read-backs sent to a human when MiniCPM5-2B returned spans the referee could not ground or cover; none passed</span><code>code: referee/coverage.py</code></p></li>
 <li><p class="n">04</p><div class="tx"><h3>The plant registry has the last word</h3><p>Spoken digits and NATO letters become tags through alias tables, and the tag must sit on the line the order names.</p></div>
 <p class="ev"><b>120</b><span class="lbl">tags in the registry; <span class="nw">XV-205</span> is not one of them, so its order is refused</span><code>data: data/registry.csv</code></p></li>
 <li><p class="n">05</p><div class="tx"><h3>A human closes every card</h3><p>Confirm, or dismiss with a reason. Nothing is ever sent to the plant.</p></div>
@@ -846,7 +847,7 @@
 <p class="lede">Span extraction, the model’s one job, runs on the AMD Token Factory: it copies out the words that carry the order. Each call leaves a receipt with the gateway host, the model served, the request id and the cost, and every card prints where each stage ran.</p>
 </div>
 <ol class="stages">
-<li class="pending"><p class="st">Speech-to-text</p><p class="where">not measured yet</p><p class="what">Local Whisper is planned and badged with where it ran. The Token Factory lists no transcription model.</p><p class="slot">planned for Oct 16</p></li>
+<li class="pending"><p class="st">Speech-to-text</p><p class="where">not measured yet</p><p class="what">Local Whisper is planned and badged with where it ran. The Token Factory lists no transcription model.</p><p class="slot">audio eval scheduled Oct 16</p></li>
 <li class="on"><p class="st">Span extraction</p><p class="where">AMD Token Factory · developer.amd.com.cn</p><p class="what">Gemma-4-31B-IT, DeepSeek-V4-Flash, Qwen3.8-27B and MiniCPM5-2B served the ladder; every call has a receipt in <code>bench/results/receipts/</code>.</p></li>
 <li><p class="st">Referee</p><p class="where">local · plain Python</p><p class="what" data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">0.77 ms for card H-01, from the stored run.</p></li>
 <li><p class="st">Supervisor queue</p><p class="where">local · FastAPI</p><p class="what">Server-sent events to the queue page; reviews in SQLite.</p></li>
@@ -855,8 +856,8 @@
 <p class="pl-h">access probe · 2026-10-14 · bench/results/access-gate.json</p>
 <p><b>12</b> models listed: <b>11</b> instruct, <b>0</b> audio</p>
 <p><b>8</b> read the read-back “Copy, closing two-oh-eight, line Bravo.” as CLOSE · <span class="nw">XV-208</span> · line B</p>
-<p>response_format json_schema: rejected by every model, so the schema is checked in code (JSON mode)</p>
-<p>token log-probs: returned by none</p>
+<p>response_format json_schema: rejected by every model probed, so the schema is checked in code (JSON mode)</p>
+<p>token log-probs: returned by none of the models probed</p>
 <p>/audio/transcriptions: “Transcription model not found: whisper-1”</p>
 </div>
 <p class="probe-src" data-src="bench/results/access-gate.json"><code>bench/results/access-gate.json</code> · Gemma-4-31B-IT’s probe answer was not valid JSON; it meets the rule in the ladder re-audit · friction log: <a href="DX-REPORT.md">docs/DX-REPORT.md</a></p>
@@ -887,17 +888,18 @@
 
 <section class="sec honest" id="honest" aria-labelledby="h-hon">
 <div class="sec-head">
-<p class="lab">build/README.md · what is not true yet</p>
-<h2 id="h-hon">Honest by design.</h2>
+<p class="lab">build/README.md · honest limits</p>
+<h2 id="h-hon">What we abstain on.</h2>
+<p class="lede">SayAgain refuses to clear what it cannot check. So does this page: these are the claims it does not make yet.</p>
 </div>
-<div class="quotes">
-<blockquote><p>No recorded speech has been measured. Every result is <code>text·scripted</code>, each rung&#x27;s result on clean written words.</p><cite>Honest limits, 1</cite></blockquote>
-<blockquote><p>The held-out set is 89 cards, so the intervals are wide: the best model&#x27;s 2/48 false alarms is a 4.17 % rate with a Wilson interval of 1.15 % to 13.98 % (bench/results/text/RESULTS.md).</p><cite>Honest limits, 2</cite></blockquote>
-<blockquote><p>On scripted words the plain regex rung meets the rule with no model, so what a language model adds is unproven until the audio rows exist.</p><cite>Honest limits, 3</cite></blockquote>
-<blockquote><p>The plant, its 120 tags and every exchange are fictional; the error mix is seeded, not sampled from a real site.</p><cite>Honest limits, 4</cite></blockquote>
+<div class="abst">
+<blockquote class="ab"><p class="ab-h">ABSTAIN · honest limit 1</p><p class="ab-q">No recorded speech has been measured. Every result is <code>text·scripted</code>, each rung&#x27;s result on clean written words.</p><cite>build/README.md</cite></blockquote>
+<blockquote class="ab"><p class="ab-h">ABSTAIN · honest limit 2</p><p class="ab-q">The held-out set is 89 cards, so the intervals are wide: the best model&#x27;s 2/48 false alarms is a 4.17 % rate with a Wilson interval of 1.15 % to 13.98 % (bench/results/text/RESULTS.md).</p><cite>build/README.md</cite></blockquote>
+<blockquote class="ab"><p class="ab-h">ABSTAIN · honest limit 3</p><p class="ab-q">On scripted words the plain regex rung meets the rule with no model, so what a language model adds is unproven until the audio rows exist.</p><cite>build/README.md</cite></blockquote>
+<blockquote class="ab"><p class="ab-h">ABSTAIN · honest limit 4</p><p class="ab-q">The plant, its 120 tags and every exchange are fictional; the error mix is seeded, not sampled from a real site.</p><cite>build/README.md</cite></blockquote>
 </div>
 <div class="pending-wrap">
-<p class="lab">Needs the human recordings · planned for Oct 16</p>
+<p class="lab">Not in this build · audio eval scheduled Oct 16</p>
 <ul class="slots">
 <li><b>Audio row</b><span>errors flagged, false-alarm load and false-VERIFIED on recorded speech at 0 dB</span></li>
 <li><b>Failure case</b><span>−6 dB look-alike pairs: <span class="nw">XV-203</span> vs <span class="nw">XV-208</span>, <span class="nw">P-114</span> vs <span class="nw">P-140</span>, <span class="nw">MOV-31A</span> vs <span class="nw">MOV-31H</span></span></li>
@@ -921,7 +923,7 @@
 <details><summary>A regex already meets the rule. Why a model at all?</summary>
 <p>On clean written words it does: that is our own result, and the page says so. Real speech is not clean: recognition errors, code-switched Bahasa, other people’s phrasing. The audio rows decide whether a model earns its place; if they say it does not, the report will say that.</p></details>
 <details><summary>What happens when the radio is too noisy to hear?</summary>
-<p>On the written-word rows, a failed model call is NOT_AUDITED and an exchange the referee cannot clear reaches a human as ABSTAIN, in amber: listen yourself. How it behaves on noisy audio is not measured yet; the −6 dB look-alike failure case is planned for Oct 16.</p></details>
+<p>On the written-word rows, a failed model call is NOT_AUDITED and an exchange the referee cannot clear reaches a human as ABSTAIN, in amber: listen yourself. How it behaves on noisy audio is not measured in this build; the −6 dB look-alike failure case needs the human recordings (audio eval scheduled Oct 16).</p></details>
 <details><summary>Does SayAgain control anything in the plant?</summary>
 <p>No. It has no write path to the plant. A card leaves the queue only when a supervisor confirms it or dismisses it with a reason.</p></details>
 <details><summary>Isn’t this a way to watch workers?</summary>
@@ -948,7 +950,7 @@
 <li><a href="DX-REPORT.md">DX report</a></li>
 <li><a href="https://github.com/edycutjong/sayagain/blob/main/LICENSE">MIT licence</a></li>
 </ul>
-<p class="ver">no release tag yet · results from commit cf3769a · page built 2026-10-14</p>
+<p class="ver">replay data from commit cf3769a · page built 2026-10-14</p>
 </div>
 </footer>
 <script src="assets/site.js" defer></script>

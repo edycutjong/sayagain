@@ -32,18 +32,23 @@
     if (!ins || !rb) return;
     var box = strip.getBoundingClientRect();
     var v = card.className;
+    // a wrapped line makes span-to-span ticks cross the text: then only the red tick is drawn, aimed at the red block
+    function wraps(turn) { var sd = $('.said', turn); if (!sd) return false; var lh = parseFloat(getComputedStyle(sd).lineHeight) || 30; return sd.getBoundingClientRect().height > lh * 1.5; }
+    var wrapped = wraps(ins) || wraps(rb);
     $$('.sp', ins).forEach(function (a) {
       var b = $('.sp[data-f="' + a.getAttribute('data-f') + '"][data-c="' + a.getAttribute('data-c') + '"]', rb);
       if (!b) return;
       var ra = a.getClientRects(), rbx = b.getClientRects();
       if (!ra.length || !rbx.length) return;
-      var A = ra[ra.length - 1], B = rbx[0];
+      var red = /v-MISMATCH/.test(v) && $('mark.red', b);
+      if (wrapped && !red) return;
+      var A = ra[ra.length - 1], B = red ? red.getBoundingClientRect() : rbx[0];
       var x1 = A.left + A.width / 2 - box.left, y1 = A.bottom - box.top + 3;
       var x2 = B.left + B.width / 2 - box.left, y2 = B.top - box.top - 3;
       if (y2 <= y1) return;
       var ln = doc.createElementNS('http://www.w3.org/2000/svg', 'line');
       ln.setAttribute('x1', x1); ln.setAttribute('y1', y1); ln.setAttribute('x2', x2); ln.setAttribute('y2', y2);
-      if (/v-MISMATCH/.test(v) && $('mark.red', b)) ln.setAttribute('class', 'red');
+      if (red) ln.setAttribute('class', 'red');
       else if (a.classList.contains('amb')) ln.setAttribute('class', 'amb');
       svg.appendChild(ln);
     });
@@ -141,7 +146,7 @@
     $$('[data-pick-detail]').forEach(function (d) { d.hidden = d.getAttribute('data-pick-detail') !== id; });
     var det = $('[data-pick-detail="' + id + '"]'), card = det && $('.xcard', det);
     if (card) { drawLinks(card); if (MOTION) play(card, true, true); }
-    if (focusRow) { var r = $('.row[data-pick="' + id + '"]', list); if (r) r.focus(); }
+    if (focusRow) { var r = $('.row[data-pick="' + id + '"]', list); if (r) { r.focus({ preventScroll: true }); r.scrollIntoView({ block: 'nearest' }); } }
     if (det && window.innerWidth < 1024) det.scrollIntoView({ behavior: MOTION ? 'smooth' : 'auto', block: 'start' });
     else if (det) {
       var r = det.getBoundingClientRect();
