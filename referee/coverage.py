@@ -5,8 +5,9 @@ transcript with the alias tables (`aliases.all_mentions`: actions, tags, line le
 mention must overlap a command span of its own field (or a retraction that code accepted), and a span may hold words
 of its own field only. A retraction is accepted only if a cue from the
 closed list ("correction", "koreksi", "ralat", "bukan", "no") sits between the retracted words and the operative words
-that replace them. A turn with an action and a negator ("do not open", "jangan tutup", "unable to close") is never
-read as the command: the referee abstains.
+that replace them, and every action, tag or line it takes back is replaced by words of the same field. A turn with an
+action and a negator ("do not open", "jangan tutup", "unable to close") is never read as the command: the referee
+abstains.
 """
 
 from __future__ import annotations
@@ -26,11 +27,13 @@ def _overlaps(a: Span, b: Span) -> bool:
     return a[0] < b[1] and b[0] < a[1]
 
 
-def _field_of(transcript: str, sp: Span) -> str | None:
+def _fields_in(transcript: str, sp: Span) -> list[str]:
+    """The safety fields (action / tag / line) whose mentions a span overlaps, in transcript order."""
+    out: list[str] = []
     for m in al.all_mentions(transcript):
-        if _overlaps((m.start, m.end), sp):
-            return m.field
-    return None
+        if _overlaps((m.start, m.end), sp) and m.field not in out:
+            out.append(m.field)
+    return out
 
 
 _SPAN_FIELD = {"action_span": "action", "tag_span": "tag", "line_span": "line", "state_span": "state"}
@@ -42,18 +45,23 @@ def check(transcript: str, g: Grounded) -> None:
     command_spans = [(f, sp) for cmd in g.commands for f, sp in cmd.items() if sp is not None]
 
     for r in g.retracted:
-        rfield = _field_of(transcript, r)
         later = sorted((sp for f, sp in command_spans if sp[0] >= r[1]), key=lambda s: s[0])
-        same = sorted((sp for f, sp in command_spans if sp[0] >= r[1] and _SPAN_FIELD[f] == rfield), key=lambda s: s[0])
-        operative = same[0] if same else (later[0] if later else None)
-        if operative is None:
-            raise CoverageError("retraction cue missing", f"nothing replaces the retracted {transcript[r[0] : r[1]]!r}")
-        if not any(t.start >= r[1] and t.end <= operative[0] for t in al.retraction_cues(toks)):
-            raise CoverageError(
-                "retraction cue missing",
-                f"no correction word between {transcript[r[0] : r[1]]!r} and "
-                f"{transcript[operative[0] : operative[1]]!r}",
-            )
+        # every safety word taken back must be replaced by words of its own field: a verb or a tag that nothing replaces
+        # would silently drop the command (no pairing window, no card), so it is refused instead of read as retracted
+        for rfield in _fields_in(transcript, r) or [None]:
+            same = [sp for f, sp in command_spans if sp[0] >= r[1] and _SPAN_FIELD[f] == rfield]
+            operative = min(same, key=lambda s: s[0]) if same else (later[0] if later and rfield is None else None)
+            if operative is None:
+                kind = f" {rfield}" if rfield else ""
+                raise CoverageError(
+                    "retraction cue missing", f"nothing replaces the retracted{kind} {transcript[r[0] : r[1]]!r}"
+                )
+            if not any(t.start >= r[1] and t.end <= operative[0] for t in al.retraction_cues(toks)):
+                raise CoverageError(
+                    "retraction cue missing",
+                    f"no correction word between {transcript[r[0] : r[1]]!r} and "
+                    f"{transcript[operative[0] : operative[1]]!r}",
+                )
 
     if al.action_mentions(toks):
         for m in al.negation_mentions(toks, transcript):
