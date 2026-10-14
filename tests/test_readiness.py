@@ -4,6 +4,8 @@ import json
 import sys
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
 import check_submission_readiness as cr  # noqa: E402
@@ -190,3 +192,21 @@ def test_submit_stage_refuses_a_dated_slot_on_any_page(tmp_path: Path) -> None:
     readme = "3 tests. Live replay: https://example.github.io/sayagain/replay/\n"
     assert checks(site(tmp_path, readme, files=files), stage="submit") == ["submit"]
     assert checks(site(tmp_path / "b", readme, files=files), stage="build") == []
+
+
+@pytest.mark.parametrize(
+    "slot", ["planned for Oct 16", "scheduled for 16 October", "scheduled 2026-10-16", "scheduled for Oct. 16th"]
+)
+def test_submit_stage_refuses_other_dated_slot_spellings(tmp_path: Path, slot: str) -> None:
+    files = {"bench/results/text/ladder-r1.json": "{}", "bench/results/access-gate.json": "{}", "docs/x.html": slot}
+    readme = "3 tests. Live replay: https://example.github.io/sayagain/replay/\n"
+    assert checks(site(tmp_path, readme, files=files), stage="submit") == ["submit"]
+
+
+@pytest.mark.parametrize(
+    "link",
+    ["https://www.github.com/e/s/tree/main/docs/replay/", "https://raw.githubusercontent.com/e/s/main/docs/replay/"],
+)
+def test_submit_stage_wants_the_site_not_github_for_the_replay(tmp_path: Path, link: str) -> None:
+    files = {"bench/results/text/ladder-r1.json": "{}", "bench/results/access-gate.json": "{}"}
+    assert checks(site(tmp_path, f"3 tests. Replay: {link}\n", files=files), stage="submit") == ["submit"]

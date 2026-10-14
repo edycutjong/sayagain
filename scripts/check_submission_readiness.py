@@ -91,8 +91,11 @@ class Finding:
 
 
 # a promise with a date ("audio eval scheduled Oct 16"): stale by the time judges read it
+_MONTH = r"(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?"
 FUTURE_SLOT = re.compile(
-    r"\bscheduled\s+(?:for\s+|on\s+)?(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+\d{1,2}\b", re.I
+    rf"\b(?:scheduled|planned)\s+(?:for\s+|on\s+)?(?:{_MONTH}\s+\d{{1,2}}(?:st|nd|rd|th)?|\d{{1,2}}(?:st|nd|rd|th)?\s+{_MONTH}"
+    r"|\d{4}-\d{2}-\d{2})",
+    re.I,
 )
 
 
@@ -268,7 +271,7 @@ def check_files(root: Path, stage: str, collected_tests: int | None = None) -> l
         # the README a judge opens first links the live replay: the published site, not the repository folder
         readme = root / "README.md"
         body = readme.read_text(encoding="utf-8") if readme.exists() else ""
-        if not re.search(r"https://(?!github\.com/)\S+/replay/", body):
+        if not re.search(r"https://(?![^/\s]*github(?:usercontent)?\.com/)[^/\s]+/\S*replay/", body):
             findings.append(Finding("submit", "README.md", 0, "no https link to the live replay (…/replay/)"))
         # no public page still calls itself unfinished or unpublished, or carries a dated promise judges read too late
         for f in judged_files(root):
