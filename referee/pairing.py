@@ -16,6 +16,8 @@ written down and tested:
   * "Stand by" / "wait one" / "tunggu" (no command) while a read-back is awaited extends the window; chatter while a
     repeat is awaited is ignored; after "Negative." an order for different tags starts a new exchange;
   * an unreadable (NOT_AUDITED) instruction's window closes when a new instruction-shaped turn arrives;
+  * while a read-back is awaited, a cue-less order for OTHER tags starts a new exchange; the same order with a query
+    ("…, do you copy?") is the operator repeating; a second read-back after the first is kept and judged;
   * no read-back inside the window -> NO_READBACK. Radio is half-duplex: no overlap model.
 """
 
@@ -37,6 +39,8 @@ class Exchange:
     events: list[str] = field(default_factory=list)
     # (instruction in force, the read-back the operator corrected on the channel)
     caught: list[tuple[TurnAnalysis, TurnAnalysis]] = field(default_factory=list)
+    # further read-back-shaped turns after the first (each is judged; the worst verdict stands)
+    more_readbacks: list[TurnAnalysis] = field(default_factory=list)
 
 
 @dataclass
@@ -106,6 +110,20 @@ def _pair_channel(turns: list[TurnAnalysis], window_s: float, out: Paired) -> No
             if ex.instruction.status == "not_audited" and t.status != "not_audited" and t.opens_window:
                 close()  # an unreadable turn must not swallow the next real instruction
                 idle(t)
+            elif (
+                t.status != "not_audited"
+                and t.imperative
+                and t.opens_window
+                and t.query
+                and _tags(t) == _tags(ex.instruction)
+            ):
+                ex.instruction = t  # "Close valve two-oh-three, line Bravo, do you copy?" — the operator's own repeat
+                ex.turn_ids.append(t.id)
+                ex.events.append("repeat")
+                deadline = t.turn.t_end + window_s
+            elif t.status != "not_audited" and t.imperative and t.opens_window and _tags(t) != _tags(ex.instruction):
+                close()  # a cue-less order for other equipment: a new exchange, not this one's read-back
+                idle(t)
             elif t.status != "not_audited" and t.stand_by:
                 ex.turn_ids.append(t.id)  # "Stand by." — the read-back is still coming
                 ex.events.append("stand by")
@@ -152,7 +170,12 @@ def _pair_channel(turns: list[TurnAnalysis], window_s: float, out: Paired) -> No
                 else:
                     state = _AWAIT_REPEAT  # "Negative." — the repeat follows in the next turn
                 deadline = t.turn.t_end + window_s
-            elif t.status != "not_audited" and not t.opens_window and not t.say_again:
+            elif t.status == "ok" and t.commands and not (t.imperative and t.opens_window):
+                ex.more_readbacks.append(t)  # a second read-back: judged too, never dropped as an "ack"
+                ex.turn_ids.append(t.id)
+                ex.events.append("second read-back")
+                deadline = t.turn.t_end + window_s
+            elif t.status != "not_audited" and not t.opens_window and not t.say_again and not t.commands:
                 ex.turn_ids.append(t.id)  # "Correct." / "Betul." — the operator's acknowledgement
                 close()
             else:

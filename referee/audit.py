@@ -18,6 +18,7 @@ from referee.turns import Turn, TurnAnalysis, analyze, span_confidence
 from referee.verdict import ABSTAIN, MISMATCH, NO_READBACK, NOT_AUDITED, R_AUDIO, VERIFIED, Verdict, verdict
 
 SPOT_CHECKS_PER_SHIFT = 10
+_SEVERITY = {VERIFIED: 0, NO_READBACK: 1, NOT_AUDITED: 2, ABSTAIN: 3, MISMATCH: 4}
 LIVE = (MISMATCH, NO_READBACK, ABSTAIN)
 
 
@@ -131,7 +132,13 @@ def audit(
     judged: list[Judged] = []
     for ex in paired.exchanges:
         caught = [judge(Exchange(ex.channel, i, r), floor=floor, audio_gate=audio_gate) for i, r in ex.caught]
-        judged.append(Judged(ex, judge(ex, floor=floor, audio_gate=audio_gate), caught))
+        v = judge(ex, floor=floor, audio_gate=audio_gate)
+        for extra in ex.more_readbacks:  # every read-back in the exchange is judged; the worst one stands
+            v2 = judge(Exchange(ex.channel, ex.instruction, extra), floor=floor, audio_gate=audio_gate)
+            if _SEVERITY[v2.verdict] > _SEVERITY[v.verdict]:
+                v2.trace = [*v2.trace, f"second read-back {extra.id} (first was {v.label})"]
+                v = v2
+        judged.append(Judged(ex, v, caught))
     verified = [j for j in judged if j.verdict.verdict == VERIFIED]
     for j in random.Random(seed).sample(verified, min(spot_checks, len(verified))):
         j.spot_check = True

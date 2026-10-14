@@ -51,6 +51,7 @@ class TurnAnalysis:
     imperative: bool = False
     readback_shaped: bool = False  # opens with copy / roger / siap …: never opens a window of its own
     stand_by: bool = False  # "stand by" / "wait one" / "tunggu" with no command: the reply is still coming
+    query: bool = False  # "… do you copy?" / "how copy" — the operator asking for the read-back
     opens_window: bool = False
     disagrees: bool = False  # prompted vs unprompted ASR read differently (only with an unprompted pass)
 
@@ -97,10 +98,29 @@ def cue_only(text: str) -> bool:
 
 
 def is_stand_by(text: str) -> bool:
+    """No command, and either a stand-by phrase or the operator prompting ("Field two, do you copy?")."""
     toks = al.tokenize(text)
     if al.tag_mentions(toks) or al.action_mentions(toks):
         return False
-    return any(al.contains_phrase(toks, p) for p in _STAND_BY)
+    return any(al.contains_phrase(toks, p) for p in _STAND_BY) or has_query(text)
+
+
+_QUERY = (
+    ("do", "you", "copy"),
+    ("how", "copy"),
+    ("how", "do", "you", "read"),
+    ("come", "in"),
+    ("dengar",),
+    ("copy", "ga"),
+    ("copy", "nggak"),
+    ("konfirmasi",),
+    ("acknowledge",),
+)
+
+
+def has_query(text: str) -> bool:
+    toks = al.tokenize(text)
+    return any(al.contains_phrase(toks, p) for p in _QUERY)
 
 
 _STAND_BY = (("stand", "by"), ("standby",), ("wait", "one"), ("wait",), ("tunggu",), ("sebentar",), ("hold", "on"))
@@ -186,6 +206,7 @@ def analyze(turn: Turn, registry: Registry) -> TurnAnalysis:
     correction_cue = opens_with_correction(text)
     a.imperative = is_imperative(text)
     a.readback_shaped = readback_shaped(text)
+    a.query = has_query(text)
     a.stand_by = is_stand_by(text)
     if turn.alt_transcript is not None:
         a.disagrees = canonical_tuples(text, registry) != canonical_tuples(turn.alt_transcript, registry)
