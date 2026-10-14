@@ -1,0 +1,282 @@
+{
+ "budget_usd": 0.03,
+ "canonical_prompt_sha256": "22f984e087c93f49c4c7e7fdcb808a4320b75fb66672de0ecc6e035b52e309fb",
+ "cards_sha256": "02766dc15ff4edb90933fbef2ee85b87de7c1fb7b8c3103598d6623416e0f724",
+ "finished_at": "2026-10-14T08:05:04+00:00",
+ "git_head": "56cf412",
+ "headline_note": "the pre-registered headline is the 0 dB audio row (bench/PROTOCOL.md §5): not run",
+ "judge_prompt_sha256": "0b62697b10c61b979446141b1635c1ddc16f80aa9677d7548cf4e6da39d31927",
+ "kind": "llm-judge",
+ "n_cards": 145,
+ "provenance": "text·scripted",
+ "provenance_note": "turn transcripts are the card scripts (no audio, no ASR): the ASR-free ceiling per rung",
+ "reaudit_of": "bench/results/text/llm-judge-r1.json",
+ "results": {
+  "llm_judge": {
+   "calls": {
+    "calls": 44,
+    "calls_failed": 24,
+    "calls_ok": 20,
+    "completion_tokens": 743,
+    "cost_usd": 0.00187,
+    "hosts": [
+     "developer.amd.com.cn"
+    ],
+    "latency_s_p50": 3.8606,
+    "latency_s_p95": 68.7281,
+    "model_served": [
+     "self-dploy/DeepSeek-V4.1-Flash"
+    ],
+    "on_amd": [
+     true
+    ],
+    "prompt_tokens": 5193,
+    "rate_limited_attempts": 18,
+    "reasoning_tokens_reported": 0,
+    "schema_invalid": 0
+   },
+   "cards": "bench/results/text/llm-judge-r1-reaudit/DeepSeek-V4.1-Flash.judge.cards.jsonl",
+   "meets_rule": {
+    "fully_audited": false,
+    "literal": false,
+    "strict": false
+   },
+   "mode": "llm-judge (per-field yes/no; speaker roles given; no registry)",
+   "receipts": "bench/results/receipts/text-llm-judge-r1-reaudit-DeepSeek-V4.1-Flash.judge.jsonl",
+   "rows": {
+    "chatter": {
+     "false_card_exchanges": [
+      "C-12: ['NO_READBACK']"
+     ],
+     "false_cards": 1,
+     "n_cards": 15,
+     "n_turns": 0,
+     "per_channel_hour": "not measurable on text rows (no audio duration); measured on the audio rows"
+    },
+    "dev": {
+     "abstain_rate": {
+      "ci95": [
+       0.0,
+       0.0876
+      ],
+      "k": 0,
+      "n": 40,
+      "rate": 0.0
+     },
+     "cards_per_shift_assumption": {
+      "2_errors_per_180": 2.0,
+      "5_errors_per_180": 5.0
+     },
+     "caught_on_channel_detected": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "errors_flagged": {
+      "ci95": [
+       0.8064,
+       1.0
+      ],
+      "k": 16,
+      "n": 16,
+      "rate": 1.0
+     },
+     "false_alarm_exchanges": [],
+     "false_alarm_load": {
+      "ci95": [
+       0.0,
+       0.138
+      ],
+      "k": 0,
+      "n": 24,
+      "rate": 0.0
+     },
+     "false_verified": {
+      "ci95": [
+       0.0,
+       0.1936
+      ],
+      "count": 0,
+      "exchanges": [],
+      "k": 0,
+      "n": 16,
+      "rate": 0.0
+     },
+     "label_exact": {
+      "ci95": [
+       0.8712,
+       0.9956
+      ],
+      "k": 39,
+      "n": 40,
+      "rate": 0.975
+     },
+     "label_misses": [
+      "KT-19: expected 'VERIFIED', got 'NOT_AUDITED'"
+     ],
+     "mismatch_only_recall": {
+      "ci95": [
+       0.7961,
+       1.0
+      ],
+      "k": 15,
+      "n": 15,
+      "rate": 1.0
+     },
+     "missed_no_card": {
+      "count": 0,
+      "exchanges": []
+     },
+     "n_cards": 40,
+     "n_correct": 24,
+     "n_seeded_errors": 16,
+     "not_audited": {
+      "ci95": [
+       0.0044,
+       0.1288
+      ],
+      "k": 1,
+      "n": 40,
+      "rate": 0.025
+     },
+     "precision_at_1pct_prevalence": 1.0,
+     "precision_at_corpus_prevalence": 1.0
+    },
+    "held_out": {
+     "abstain_rate": {
+      "ci95": [
+       0.0,
+       0.0414
+      ],
+      "k": 0,
+      "n": 89,
+      "rate": 0.0
+     },
+     "cards_per_shift_assumption": {
+      "2_errors_per_180": 5.42,
+      "5_errors_per_180": 7.91
+     },
+     "caught_on_channel_detected": {
+      "ci95": [
+       0.0,
+       0.3543
+      ],
+      "k": 0,
+      "n": 7,
+      "rate": 0.0
+     },
+     "errors_flagged": {
+      "ci95": [
+       0.7156,
+       0.9312
+      ],
+      "k": 35,
+      "n": 41,
+      "rate": 0.8537
+     },
+     "false_alarm_exchanges": [
+      "A2-036: MISMATCH"
+     ],
+     "false_alarm_load": {
+      "ci95": [
+       0.0037,
+       0.109
+      ],
+      "k": 1,
+      "n": 48,
+      "rate": 0.0208
+     },
+     "false_verified": {
+      "ci95": [
+       0.0135,
+       0.1614
+      ],
+      "count": 2,
+      "exchanges": [
+       "A2-044",
+       "A2-066"
+      ],
+      "k": 2,
+      "n": 41,
+      "rate": 0.0488
+     },
+     "label_exact": {
+      "ci95": [
+       0.8325,
+       0.9537
+      ],
+      "k": 81,
+      "n": 89,
+      "rate": 0.9101
+     },
+     "label_misses": [
+      "A2-036: expected 'VERIFIED', got 'MISMATCH'",
+      "A2-044: expected 'MISMATCH', got 'VERIFIED'",
+      "A2-054: expected 'VERIFIED', got 'NOT_AUDITED'",
+      "A2-055: expected 'MISMATCH', got 'NOT_AUDITED'",
+      "A2-066: expected 'MISMATCH', got 'VERIFIED'",
+      "A2-075: expected 'NO_READBACK', got 'NOT_AUDITED'",
+      "A2-089: expected 'MISMATCH', got 'NOT_AUDITED'",
+      "A2-092: expected 'MISMATCH', got 'NOT_AUDITED'"
+     ],
+     "mismatch_only_recall": {
+      "ci95": [
+       0.7267,
+       0.9425
+      ],
+      "k": 33,
+      "n": 38,
+      "rate": 0.8684
+     },
+     "missed_no_card": {
+      "count": 0,
+      "exchanges": []
+     },
+     "n_cards": 89,
+     "n_correct": 48,
+     "n_seeded_errors": 41,
+     "not_audited": {
+      "ci95": [
+       0.0242,
+       0.1249
+      ],
+      "k": 5,
+      "n": 89,
+      "rate": 0.0562
+     },
+     "precision_at_1pct_prevalence": 0.2927,
+     "precision_at_corpus_prevalence": 0.9722
+    },
+    "refusal": [
+     {
+      "exchange_id": "R-01",
+      "expected": "ABSTAIN",
+      "got": "VERIFIED"
+     }
+    ]
+   },
+   "rung": {
+    "max_tokens": 2048,
+    "model": "DeepSeek-V4.1-Flash",
+    "name": "DeepSeek-V4.1-Flash",
+    "params_b": null,
+    "reasoning_effort": null,
+    "thinking": "default"
+   },
+   "wall_s": 1357.6
+  }
+ },
+ "run": "llm-judge-r1-reaudit",
+ "shift_assumption": "180 exchanges per shift, 2-5 real errors",
+ "span_prompt_sha256": "b79578f3acc9d4301958637513f2ead0848bf9c2a286a4a1947bc75aa0016d97",
+ "spent_usd": 0.00787,
+ "started_at": "2026-10-14T07:42:26+00:00",
+ "subset": "all",
+ "usage_before": {
+  "daily_cost_limit_usd": 1,
+  "daily_cost_used_usd": 0.05958735942840576,
+  "daily_reset_at": "2026-10-14T16:00:00.000Z",
+  "rpm_limit": 20
+ }
+}
