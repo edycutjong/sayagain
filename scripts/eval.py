@@ -403,9 +403,31 @@ def stored_extractor(rows: list[dict]) -> Callable[[str], Extraction]:
     return call
 
 
+def _reaudit(fresh: Callable[[str], Extraction], prior: list[dict]) -> Callable[[str], Extraction]:
+    stored = {r["text"]: r for r in prior}
+
+    def call(text: str) -> Extraction:
+        r = stored.get(text)
+        if r is not None and r["not_audited"] is None:
+            keep = {k: r.get(k) for k in ("request_id", "client_id", "latency_s", "cost_usd")}
+            return Extraction(text, r["obj"], None, {**keep, "reused": True}, r.get("attempts", 0))
+        return fresh(text)
+
+    return call
+
+
 def run_extraction_rung(
-    run: str, rung: Rung, cards: list[dict], registry: Registry, pacer: Pacer, budget: Budget, mode: str = "spans"
+    run: str,
+    rung: Rung,
+    cards: list[dict],
+    registry: Registry,
+    pacer: Pacer,
+    budget: Budget,
+    mode: str = "spans",
+    prior: list[dict] | None = None,
 ) -> dict:
+    """`prior` (re-audit): the stored extractions of an earlier run of this rung — every transcript it audited is
+    reused as-is, only the NOT_AUDITED ones (server error, timeout, rate limit) are requested again."""
     tag = rung.name if mode == "spans" else f"{rung.name}.canonical"
     analyzer = analyze if mode == "spans" else analyze_canonical
     rpath = RECEIPTS / f"text-{run}-{tag}.jsonl"
@@ -417,6 +439,8 @@ def run_extraction_rung(
             raise SystemExit(f"{rpath.relative_to(ROOT)} exists: pick a new --run name (receipts never mix runs)")
         client = open_client(rpath, rung=tag, run=run)
         fn = guarded(TokenFactoryExtractor(client, rung, pacer=pacer, mode=mode), budget)
+        if prior is not None:
+            fn = _reaudit(fn, prior)
     cache = Cache(fn)
     t0 = time.time()
     try:
@@ -442,6 +466,7 @@ def run_extraction_rung(
             "client_id": (e.receipt or {}).get("client_id"),
             "latency_s": (e.receipt or {}).get("latency_s"),
             "cost_usd": (e.receipt or {}).get("cost_usd"),
+            "reused_from_first_pass": bool((e.receipt or {}).get("reused")),
         }
         for e in cache.store.values()
     ]
@@ -459,6 +484,11 @@ def run_extraction_rung(
         extractions=str((OUT / run / f"{tag}.extractions.jsonl").relative_to(ROOT)),
         cards=str((OUT / run / f"{tag}.cards.jsonl").relative_to(ROOT)),
     )
+    if prior is not None:
+        summary["reaudit"] = {
+            "requested_again": sum(not x["reused_from_first_pass"] for x in exts),
+            "still_not_audited": sum(x["not_audited"] is not None for x in exts),
+        }
     summary["meets_rule"] = meets_rule(summary)
     return summary
 
@@ -593,6 +623,18 @@ def select_cards(cards: list[dict], subset: str) -> list[dict]:
 def cmd_ladder(args) -> int:
     registry, cards = Registry.load(), select_cards(load_cards(), args.subset)
     names = args.rungs.split(",") if args.rungs else list(DEFAULT_LADDER)
+    priors: dict[str, list[dict] | None] = {}
+    first = None
+    if args.reaudit:  # same rungs and cards as the first pass; only its NOT_AUDITED transcripts are asked again
+        first_path = Path(args.reaudit).resolve()
+        first = json.loads(first_path.read_text(encoding="utf-8"))
+        if first["cards_sha256"] != sha256(CARDS_PATH.read_bytes()) or first["subset"] != args.subset:
+            print("--reaudit: the first pass used other cards", file=sys.stderr)
+            return 2
+        names = list(first["rungs"])
+        for n in names:
+            ex = first["rungs"][n].get("extractions")
+            priors[n] = read_jsonl(ROOT / ex) if CANDIDATES[n].model is not None and ex else None
     rungs = [CANDIDATES[n] for n in names]
     paid = any(r.model for r in rungs)
     allowed, snap = check_daily(args.budget) if paid else (0.0, {})
@@ -601,9 +643,17 @@ def cmd_ladder(args) -> int:
         return 2
     budget, pacer = Budget(allowed), Pacer(PACE_S)
     run = args.run or f"{args.subset}-{datetime.now(UTC).strftime('%Y%m%dT%H%M%SZ')}"
-    meta = metadata(run, cards, {"subset": args.subset, "budget_usd": round(allowed, 4), "usage_before": snap})
+    extra = {"subset": args.subset, "budget_usd": round(allowed, 4), "usage_before": snap}
+    if first is not None:
+        extra["reaudit_of"] = str(first_path.relative_to(ROOT))
+    meta = metadata(run, cards, extra)
     with ThreadPoolExecutor(max_workers=max(1, len(rungs))) as pool:
-        futs = {r.name: pool.submit(run_extraction_rung, run, r, cards, registry, pacer, budget) for r in rungs}
+        futs = {
+            r.name: pool.submit(
+                run_extraction_rung, run, r, cards, registry, pacer, budget, "spans", priors.get(r.name)
+            )
+            for r in rungs
+        }
         results = {n: f.result() for n, f in futs.items()}
     order = sorted(rungs, key=lambda r: (r.params_b is None, r.params_b or 0.0))
     headline = next((r.name for r in order if results[r.name]["meets_rule"]["literal"]), None)
@@ -838,6 +888,7 @@ def main(argv: list[str] | None = None) -> int:
         "--budget", type=float, default=0.50, help="USD this run may spend (also capped by the daily guard)"
     )
     ap.add_argument("--run", help="run name (default: subset + UTC time)")
+    ap.add_argument("--reaudit", help="--ladder: re-request only the NOT_AUDITED transcripts of this ladder result")
     ap.add_argument("--write", action="store_true", help="--rescore: rewrite results that differ (offline)")
     ap.add_argument("--reuse", help="--ablate: take the with-grounding side from this ladder result file")
     ap.add_argument("files", nargs="*", help="--rescore: result files (default: all of bench/results/text/*.json)")

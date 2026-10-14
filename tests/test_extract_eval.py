@@ -404,3 +404,16 @@ def test_garbage_usage_does_not_crash_the_receipt() -> None:
 
     e = TokenFactoryExtractor(make(h), RUNG)("Copy.")
     assert e.not_audited is None and e.receipt["cost_usd"] is None
+
+
+def test_reaudit_asks_again_only_for_not_audited_transcripts() -> None:
+    from sayagain.extract import Extraction
+
+    prior = [
+        {"text": "a", "obj": SPANS, "not_audited": None, "request_id": "r1", "attempts": 1},
+        {"text": "b", "obj": None, "not_audited": "server error", "request_id": None, "attempts": 1},
+    ]
+    asked: list = []
+    fn = ev._reaudit(lambda t: asked.append(t) or Extraction(t, SPANS, None, {"request_id": "r2"}, 1), prior)
+    assert fn("a").receipt["reused"] is True and fn("a").obj == SPANS
+    assert fn("b").receipt == {"request_id": "r2"} and asked == ["b"]
