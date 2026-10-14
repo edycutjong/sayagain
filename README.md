@@ -1,28 +1,86 @@
-# SayAgain
+<div align="center">
+  <img src="docs/icon.svg" alt="SayAgain icon" width="144">
+  <h1>SayAgain 📻</h1>
+  <p><em>Checks every radio read-back of a safety instruction, and sends the wrong ones to a human.</em></p>
+  <img src="docs/screenshots/replay-1440-2-hero.png" alt="The supervisor queue: the field tech read back two-oh-eight, the operator said two-oh-three, and the one differing word is red" width="1000">
 
-**Checks every radio read-back of a safety instruction, and sends the wrong ones to a human.**
+  <br/>
 
-> **Status: under construction (AMD Developer Hackathon ACT III, Oct 2026).** Nothing in this repository has been measured
-> on recorded speech yet. This README says what exists in the code today; every result will come from a file in
-> `bench/results/`.
+  [![Built for AMD Developer Hackathon ACT III](https://img.shields.io/badge/lablab-AMD_Developer_Hackathon_ACT_III-ed1c24?style=for-the-badge)](https://lablab.ai/ai-hackathons/amd-developer-hackathon-act-iii)
 
-## The problem
+  <br/>
+
+  ![Python](https://img.shields.io/badge/Python_3.11-3776AB?style=flat&logo=python&logoColor=white)
+  ![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat&logo=fastapi&logoColor=white)
+  ![uv](https://img.shields.io/badge/uv-261230?style=flat&logo=uv&logoColor=white)
+  ![ruff](https://img.shields.io/badge/ruff-261230?style=flat&logo=ruff&logoColor=white)
+  [![License](https://img.shields.io/badge/License-MIT-yellow)](https://opensource.org/licenses/MIT)
+  [![CI](https://github.com/edycutjong/sayagain/actions/workflows/ci.yml/badge.svg)](https://github.com/edycutjong/sayagain/actions/workflows/ci.yml)
+
+</div>
+
+---
+
+> **Status: under construction (AMD Developer Hackathon ACT III, Oct 2026).** Every result below comes from a file in
+> `bench/results/`. No recorded speech has been measured yet: the rows that exist feed the written words of the recording
+> cards to each extractor (`text·scripted`), and are labelled that way everywhere.
+
+## 📸 See it in Action
+
+The supervisor queue, replaying a stored run over the 145 recording cards. Red marks only the read-back word that differs from
+the instruction; the card leaves the queue only through **Confirm** or **Dismiss** (a reason is required).
+
+| The hero exchange | The refused one | End of shift |
+|---|---|---|
+| ![MISMATCH card: tag XV-203 ≠ XV-208](docs/screenshots/replay-1440-2-hero.png) | ![ABSTAIN card: XV-205 is not in the plant registry](docs/screenshots/replay-1440-6-refused.png) | ![End-of-shift list: spot-checks, caught on channel, not audited](docs/screenshots/replay-1440-5-eos.png) |
+
+Every card says where each stage ran (`speaker`, `radio`, `extraction`, `referee`) and lists the receipt of each model call
+behind it. The words on these cards are the recording cards' scripts (`text·scripted`): there is no audio yet, and the card
+says so where a waveform will go.
+
+## 💡 The Problem & Solution
+
+### The Problem
 
 An operator radios *"Close valve two-oh-three, line Bravo."* The field technician answers *"Copy, closing two-oh-eight,
 line Bravo."* Valve XV-208 is on a different line. The read-back exists so the operator catches this, and sometimes
 nobody does.
 
-## The design (being built)
+### The Solution
 
-SayAgain will transcribe both turns and ask a language model to **point at the words** that carry the action, the
+SayAgain transcribes both turns and asks a language model to **point at the words** that carry the action, the
 equipment tag and the line. **Plain code** then decides: the words must really be in the transcript, every safety word
 must be accounted for, spoken digits and NATO letters become plant tags through alias tables, and a pure function returns
 `VERIFIED`, `MISMATCH`, `NO-READBACK` or `ABSTAIN`. A shift supervisor confirms or dismisses every card. Nothing is ever
 sent to the plant.
 
-The referee half of that design exists and is tested today; the speech half does not yet.
+The referee half of that design exists and is tested today; the speech half waits for the recordings.
 
-## Status (2026-10-14)
+## 🏗️ Architecture & Tech Stack
+
+```mermaid
+flowchart LR
+    W["one WAV per card"] --> V["VAD: split into turns"]
+    V --> A["speech-to-text<br/>(waiting for recordings)"]
+    T["card script<br/>(text·scripted rows)"] --> X
+    A --> X["span extraction<br/>AMD Token Factory, JSON mode"]
+    X --> G["grounding + coverage<br/>(plain code)"]
+    G --> R["referee: aliases, registry, pairing"]
+    R --> Q["supervisor queue<br/>FastAPI + SSE"]
+    X -. "a receipt per call" .-> C[("bench/results/receipts")]
+    Q --> D["Confirm / Dismiss"]
+```
+
+| Layer | Choice |
+|---|---|
+| Language, runtime | Python 3.11, `uv` |
+| Server | FastAPI, server-sent events, SQLite for reviews |
+| Extraction | AMD Token Factory (OpenAI-compatible), `json_object` mode, validated locally, fails closed to `NOT_AUDITED` |
+| Referee | pure Python, imports no model code (`tests/test_verdict.py`) |
+| Front end | one static page, no framework: `web/` (live) and `docs/replay/` (static export of the same page) |
+| Quality | ruff, pytest, pip-audit, gitleaks, CodeQL |
+
+### Build status (2026-10-14)
 
 | Part | Where | State |
 |---|---|---|
@@ -37,11 +95,17 @@ The referee half of that design exists and is tested today; the speech half does
 | Model ladder, grounding ablation, LLM-judge baseline, offline re-scoring of every stored model output | `scripts/eval.py` | run on the card scripts (`text·scripted`), see below |
 | Speech path: one WAV per card → VAD turns → speech-to-text (local Whisper, labelled off-AMD; AMD notebook backend switched off until a notebook GPU is confirmed) → disagreement gate | `sayagain/ingest.py`, `sayagain/asr.py` | code + tests done, waiting for recordings |
 | Local kill test (Whisper-large-v3 on a laptop, off-AMD) | `scripts/kill_test_local.py` | harness ready, waiting for recordings |
-| Supervisor queue: FastAPI + server-sent events, the read-back strip card, confirm / dismiss (reason required), "Try the refused one", end-of-shift list (spot-checks, caught on channel, not audited), receipts per model call | `sayagain/server.py`, `sayagain/shift.py`, `web/` | done, over the stored text runs |
+| Supervisor queue: read-back strip card, confirm / dismiss (reason required), "Try the refused one", end-of-shift list (spot-checks, caught on channel, not audited), receipts per model call | `sayagain/server.py`, `sayagain/shift.py`, `web/` | done, over the stored text runs |
 | Static replay of stored runs (same page, GitHub Pages-ready, not published) | `scripts/export_run.py` → `docs/replay/` | done |
 | Human recordings, audio eval rows | — | not built yet |
 
-## First measurements: the card scripts, no audio yet (2026-10-14)
+## 🏆 AMD Token Factory Integration
+
+Span extraction is the one model job in the pipeline, and it runs on the AMD Token Factory: `sayagain/amd_client.py` is the
+client (paced, 429 back-off, a receipt per call with request id, model served, host, latency and cost),
+`sayagain/extract.py` the extraction stage (JSON mode, schema checked in code, fail closed).
+
+### First measurements: the card scripts, no audio yet (2026-10-14)
 
 These rows feed the **written words of the 145 recording cards** to each extractor (`text·scripted`): no microphone,
 no speech-to-text. They are each rung's ceiling on clean words, not the audio result the protocol pre-registers
@@ -76,15 +140,55 @@ temperature 0 gives no determinism guarantee at this gateway, so this is measure
 
 The access probe (bench/results/access-gate.json) found 8 instruct models on the AMD Token Factory whose span extraction
 of the hero read-back the referee reads as `CLOSE · XV-208 · line B`. The model list has no speech-to-text model, so
-transcription will run elsewhere, and every stage will be labelled with where it ran.
-
-501 tests (`uv run pytest`; one runs only with local Whisper weights), lint with ruff, a CI workflow for every push. Friction log:
+transcription will run elsewhere, and every stage will be labelled with where it ran. Friction log:
 [docs/DX-REPORT.md](docs/DX-REPORT.md).
 
-## Run it
+## 📊 Engineering Rigor
+
+501 tests (`uv run pytest`; one runs only with local Whisper weights), ruff lint and format, `pip-audit`, gitleaks over the
+full history, CodeQL, and a readiness gate (`scripts/check_submission_readiness.py`) that fails the build on an unfilled
+placeholder, a hardware or serving-stack name no receipt backs, or a number its cited file does not contain.
+
+### Attacks defeated
+
+| Control | Why it is load-bearing | Test |
+|---|---|---|
+| A model-invented span is ungrounded | The extractor may only point at words in the transcript | `tests/test_grounding_coverage.py:36` |
+| A real but wrong word fails coverage | Returning "line Alpha" and dropping the spoken correction to Bravo must not pass | `tests/test_grounding_coverage.py:60` |
+| A wide span cannot hide a safety word | A span that swallows a second command or a stray line is not accepted as one command | `tests/test_review_round2.py:70` |
+| A span that drops part of the tag or the equipment word cannot verify | "valve two-oh-three-eight" and "pump" for "valve" must not read as a match | `tests/test_review_round4.py:34` |
+| A negated command never verifies | "not closing", "will not close" or a negated order must reach a human | `tests/test_review_round1.py:31` |
+| Swapped actions between two commands cannot verify | A model that reports the swapped actions must not turn the error into a pass | `tests/test_review_round1.py:52` |
+| A retraction needs a spoken cue | A silent "correction" must not clear a wrong read-back | `tests/test_grounding_coverage.py:74` |
+| A correction without a new read-back keeps the wrong one live | The operator saying "Negative" is not the technician fixing it | `tests/test_review_round1.py:91` |
+| A `NOT_AUDITED` turn is never VERIFIED | A failed model call must not become a pass | `tests/test_verdict.py:196` |
+| A referee exception fails closed | A bug must reach a human, not a log | `tests/test_verdict.py:203` |
+| The verdict module imports no model code | The judgment cannot be moved into the model | `tests/test_verdict.py:215` |
+
+### Honest limits (9)
+
+1. No recorded speech has been measured. Every result is `text·scripted`, each rung's ceiling on clean words.
+2. The held-out set is 89 cards, so the intervals are wide: the best model's 2/48 false alarms is a 4.17 % rate with a Wilson interval of 1.15 % to 13.98 % (bench/results/text/RESULTS.md).
+3. On scripted words the plain regex rung meets the rule with no model, so what a language model adds is unproven until the audio rows exist.
+4. The plant, its 120 tags and every exchange are fictional; the error mix is seeded, not sampled from a real site.
+5. The first Gemma-4-31B-IT pass left 45 cards not audited; the headline row is a re-audit of those, and the as-run pass is kept next to it (bench/results/text/ladder-r1.json).
+6. Temperature 0 does not make the gateway deterministic; the repeat run agreed on 40/40 cards (bench/results/text/repro-dev-DeepSeek-V4-Flash.json), which is evidence and not a guarantee.
+7. The Token Factory is a hosted API: receipts name the model and host, never a GPU, so no page here claims one.
+8. The gateway ignores `logprobs`, so the audio confidence floor cannot use model probabilities; the disagreement gate between two transcription passes stands in.
+9. The static replay shows stored verdicts. The live queue calls the API only when `SAYAGAIN_LIVE_EXTRACT=1`, paced and capped per process.
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Python 3.11 and [`uv`](https://docs.astral.sh/uv/)
+- Optional, only to call the AMD Token Factory yourself: `AMD_TF_API_KEY` and `AMD_TF_BASE_URL` in
+  `~/.config/amd-tokenfactory/env` (the names are in `.env.example`; a key never goes in this tree)
+
+### Installation
 
 ```bash
-uv sync
+uv sync --locked
 uv run pytest -q
 uv run python scripts/seed.py --seed 1018          # registry + cards, byte-identical
 uv run python scripts/check_submission_readiness.py
@@ -99,10 +203,44 @@ uv run python scripts/export_run.py                # static replay of the stored
 
 The queue replays a shift from a stored run: the referee judges each exchange from the model output the run
 recorded, and every card shows the receipt of each model call (request id, model served, host, latency, cost).
-The words on these cards are the recording cards' scripts (`text·scripted`): there is no audio yet, and the card
-says so where a waveform will go. `SAYAGAIN_LIVE_EXTRACT=1` lets the server call the AMD Token Factory for each
-turn instead of replaying the stored output (paced, capped per process; a failed call is `NOT_AUDITED`).
+`SAYAGAIN_LIVE_EXTRACT=1` lets the server call the AMD Token Factory for each turn instead of replaying the stored output
+(paced, capped per process; a failed call is `NOT_AUDITED`).
 
-## License
+## 🧪 Testing & CI
+
+```bash
+make ci            # ruff, pytest with coverage, pip-audit, readiness: what the CI workflow runs
+make secrets       # gitleaks over the whole git history
+uv run python scripts/eval.py --rescore   # re-judge every stored model output offline
+```
+
+Workflows in `.github/workflows/`: `ci` (quality + security jobs), `gitleaks` (full history), `codeql` (Python and
+JavaScript), `release` (semantic version tag from conventional commits). Dependabot is grouped, monthly, with no major bumps.
+
+## 📁 Project Structure
+
+```
+referee/        pure-Python referee: aliases, grounding, coverage, pairing, registry, verdict
+sayagain/       AMD Token Factory client, extraction, speech path, queue server, shift list
+scripts/        seed, radio simulation, eval ladder, export, access probe, readiness gate
+web/            the queue page (one static page, no framework)
+docs/           static replay (docs/replay), screenshots, developer-experience report
+bench/          pre-registered protocol and every stored result and receipt
+data/           fictional plant registry and the 145 recording cards
+tests/          501 tests, with regression tests from four review rounds (`test_review_round*.py`)
+```
+
+## 🗺️ Roadmap
+
+- [x] Pre-registered protocol and frozen regex rung
+- [x] Referee with grounding, coverage, pairing and fail-closed verdicts
+- [x] Model ladder, grounding ablation and LLM-judge baseline on the AMD Token Factory (`text·scripted`)
+- [x] Supervisor queue and static replay
+- [ ] Human recordings, one WAV per card
+- [ ] Audio rows: local kill test, speech-to-text, headline row and failure case
+- [ ] Blind auditor set
+- [ ] Demo video and pitch deck
+
+## 📄 License
 
 MIT, see [LICENSE](LICENSE).
