@@ -1,0 +1,37 @@
+# recorded 2026-10-14T23:59:40+07:00 in build/ at 18cd4ae (macOS arm64); stdout kept verbatim
+$ uv run python -u scripts/eval.py --rescore
+OK   ablate-grounding-r1-reaudit.json :: without_grounding (rows, calls, meets_rule)
+OK   ablate-grounding-r1.json :: without_grounding (rows, calls, meets_rule)
+OK   dev-r1.json :: DeepSeek-V4-Flash (rows, calls, meets_rule)
+OK   dev-r1.json :: Gemma-4-31B-IT (rows, calls, meets_rule)
+OK   dev-r1.json :: MiMo-V2.6-Flash (rows, calls, meets_rule)
+OK   dev-r1.json :: MiniCPM5-2B (rows, calls, meets_rule)
+OK   dev-r1.json :: Qwen3.8-27B (rows, calls, meets_rule)
+OK   dev-r1.json :: regex (rows, calls, meets_rule)
+OK   dev-r2-repro-reaudit.json :: DeepSeek-V4-Flash (rows, calls, meets_rule)
+OK   dev-r2-repro-reaudit.json :: regex (rows, calls, meets_rule)
+OK   dev-r2-repro.json :: DeepSeek-V4-Flash (rows, calls, meets_rule)
+OK   dev-r2-repro.json :: regex (rows, calls, meets_rule)
+OK   ladder-r1-reaudit.json :: DeepSeek-V4-Flash (rows, calls, meets_rule)
+OK   ladder-r1-reaudit.json :: Gemma-4-31B-IT (rows, calls, meets_rule)
+OK   ladder-r1-reaudit.json :: MiniCPM5-2B (rows, calls, meets_rule)
+OK   ladder-r1-reaudit.json :: Qwen3.8-27B (rows, calls, meets_rule)
+OK   ladder-r1-reaudit.json :: regex (rows, calls, meets_rule)
+OK   ladder-r1.json :: DeepSeek-V4-Flash (rows, calls, meets_rule)
+OK   ladder-r1.json :: Gemma-4-31B-IT (rows, calls, meets_rule)
+OK   ladder-r1.json :: MiniCPM5-2B (rows, calls, meets_rule)
+OK   ladder-r1.json :: Qwen3.8-27B (rows, calls, meets_rule)
+OK   ladder-r1.json :: regex (rows, calls, meets_rule)
+OK   llm-judge-r1-reaudit.json :: llm_judge (rows, calls, meets_rule)
+OK   llm-judge-r1.json :: llm_judge (rows, calls, meets_rule)
+# exit 0 · wall 2.8 s
+$ uv run pytest -q -p no:cacheprovider
+........................................................................ [ 14%]
+........................................................................ [ 28%]
+........s............................................................... [ 43%]
+........................................................................ [ 57%]
+........................................................................ [ 71%]
+........................................................................ [ 86%]
+.....................................................................    [100%]
+500 passed, 1 skipped in 6.83s
+# exit 0 · wall 7.2 s
