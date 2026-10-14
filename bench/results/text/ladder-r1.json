@@ -1,0 +1,1580 @@
+{
+ "budget_usd": 0.3,
+ "canonical_prompt_sha256": "22f984e087c93f49c4c7e7fdcb808a4320b75fb66672de0ecc6e035b52e309fb",
+ "cards_sha256": "02766dc15ff4edb90933fbef2ee85b87de7c1fb7b8c3103598d6623416e0f724",
+ "finished_at": "2026-10-14T06:23:22+00:00",
+ "git_head": "d426292",
+ "headline_note": "the pre-registered headline is the 0 dB audio row (bench/PROTOCOL.md §5): not run",
+ "judge_prompt_sha256": "0b62697b10c61b979446141b1635c1ddc16f80aa9677d7548cf4e6da39d31927",
+ "ladder_order": [
+  "regex",
+  "MiniCPM5-2B",
+  "Qwen3.8-27B",
+  "Gemma-4-31B-IT",
+  "DeepSeek-V4-Flash"
+ ],
+ "n_cards": 145,
+ "provenance": "text·scripted",
+ "provenance_note": "turn transcripts are the card scripts (no audio, no ASR): the ASR-free ceiling per rung",
+ "rule": "smallest rung with 0 false-VERIFIED AND false-alarm load <= 5 % (held_out row, text·scripted)",
+ "run": "ladder-r1",
+ "rungs": {
+  "DeepSeek-V4-Flash": {
+   "cache_hits": 333,
+   "calls": {
+    "calls": 298,
+    "calls_failed": 3,
+    "calls_ok": 295,
+    "completion_tokens": 18432,
+    "cost_usd": 0.015131,
+    "hosts": [
+     "developer.amd.com.cn"
+    ],
+    "latency_s_p50": 4.0574,
+    "latency_s_p95": 11.1292,
+    "model_served": [
+     "self-dploy/DeepSeek-V4-Flash"
+    ],
+    "on_amd": [
+     true
+    ],
+    "prompt_tokens": 71218,
+    "rate_limited_attempts": 2,
+    "reasoning_tokens_reported": 0,
+    "schema_invalid": 0
+   },
+   "cards": "bench/results/text/ladder-r1/DeepSeek-V4-Flash.cards.jsonl",
+   "distinct_transcripts": 296,
+   "extractions": "bench/results/text/ladder-r1/DeepSeek-V4-Flash.extractions.jsonl",
+   "meets_rule": {
+    "fully_audited": true,
+    "literal": false,
+    "strict": false
+   },
+   "mode": "spans",
+   "receipts": "bench/results/receipts/text-ladder-r1-DeepSeek-V4-Flash.jsonl",
+   "rows": {
+    "chatter": {
+     "false_card_exchanges": [],
+     "false_cards": 0,
+     "n_cards": 15,
+     "n_turns": 30,
+     "per_channel_hour": "not measurable on text rows (no audio duration); measured on the audio rows"
+    },
+    "dev": {
+     "abstain_rate": {
+      "ci95": [
+       0.0044,
+       0.1288
+      ],
+      "k": 1,
+      "n": 40,
+      "rate": 0.025
+     },
+     "cards_per_shift_assumption": {
+      "2_errors_per_180": 9.42,
+      "5_errors_per_180": 12.29
+     },
+     "caught_on_channel_detected": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "errors_flagged": {
+      "ci95": [
+       0.8064,
+       1.0
+      ],
+      "k": 16,
+      "n": 16,
+      "rate": 1.0
+     },
+     "false_alarm_exchanges": [
+      "A2-018: ABSTAIN · grounding"
+     ],
+     "false_alarm_load": {
+      "ci95": [
+       0.0074,
+       0.2024
+      ],
+      "k": 1,
+      "n": 24,
+      "rate": 0.0417
+     },
+     "false_verified": {
+      "ci95": [
+       0.0,
+       0.1936
+      ],
+      "count": 0,
+      "exchanges": [],
+      "k": 0,
+      "n": 16,
+      "rate": 0.0
+     },
+     "label_exact": {
+      "ci95": [
+       0.8712,
+       0.9956
+      ],
+      "k": 39,
+      "n": 40,
+      "rate": 0.975
+     },
+     "label_misses": [
+      "A2-018: expected 'VERIFIED', got 'ABSTAIN · grounding'"
+     ],
+     "mismatch_only_recall": {
+      "ci95": [
+       0.7961,
+       1.0
+      ],
+      "k": 15,
+      "n": 15,
+      "rate": 1.0
+     },
+     "missed_no_card": {
+      "count": 0,
+      "exchanges": []
+     },
+     "n_cards": 40,
+     "n_correct": 24,
+     "n_seeded_errors": 16,
+     "not_audited": {
+      "ci95": [
+       0.0,
+       0.0876
+      ],
+      "k": 0,
+      "n": 40,
+      "rate": 0.0
+     },
+     "precision_at_1pct_prevalence": 0.1951,
+     "precision_at_corpus_prevalence": 0.9412,
+     "ungrounded_rate": {
+      "ci95": [
+       0.0022,
+       0.0675
+      ],
+      "k": 1,
+      "n": 80,
+      "rate": 0.0125
+     }
+    },
+    "held_out": {
+     "abstain_rate": {
+      "ci95": [
+       0.0541,
+       0.1811
+      ],
+      "k": 9,
+      "n": 89,
+      "rate": 0.1011
+     },
+     "cards_per_shift_assumption": {
+      "2_errors_per_180": 16.83,
+      "5_errors_per_180": 19.58
+     },
+     "caught_on_channel_detected": {
+      "ci95": [
+       0.6457,
+       1.0
+      ],
+      "k": 7,
+      "n": 7,
+      "rate": 1.0
+     },
+     "errors_flagged": {
+      "ci95": [
+       0.9143,
+       1.0
+      ],
+      "k": 41,
+      "n": 41,
+      "rate": 1.0
+     },
+     "false_alarm_exchanges": [
+      "A2-030: ABSTAIN · retraction cue missing",
+      "A2-035: ABSTAIN · grounding",
+      "A2-037: ABSTAIN · unknown tag",
+      "A2-051: ABSTAIN · grounding"
+     ],
+     "false_alarm_load": {
+      "ci95": [
+       0.0329,
+       0.1955
+      ],
+      "k": 4,
+      "n": 48,
+      "rate": 0.0833
+     },
+     "false_verified": {
+      "ci95": [
+       0.0,
+       0.0857
+      ],
+      "count": 0,
+      "exchanges": [],
+      "k": 0,
+      "n": 41,
+      "rate": 0.0
+     },
+     "label_exact": {
+      "ci95": [
+       0.8189,
+       0.9459
+      ],
+      "k": 80,
+      "n": 89,
+      "rate": 0.8989
+     },
+     "label_misses": [
+      "A2-030: expected 'VERIFIED', got 'ABSTAIN · retraction cue missing'",
+      "A2-031: expected 'MISMATCH · line: A ≠ C', got 'ABSTAIN · grounding'",
+      "A2-035: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-037: expected 'VERIFIED', got 'ABSTAIN · unknown tag'",
+      "A2-051: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-056: expected 'MISMATCH · line: missing (expected A)', got 'ABSTAIN · coverage'",
+      "A2-068: expected 'MISMATCH · line: D ≠ A', got 'ABSTAIN · grounding'",
+      "A2-076: expected 'MISMATCH · line: B ≠ C', got 'ABSTAIN · grounding'",
+      "A2-085: expected 'MISMATCH · line: B ≠ C', got 'ABSTAIN · grounding'"
+     ],
+     "mismatch_only_recall": {
+      "ci95": [
+       0.7267,
+       0.9425
+      ],
+      "k": 33,
+      "n": 38,
+      "rate": 0.8684
+     },
+     "missed_no_card": {
+      "count": 0,
+      "exchanges": []
+     },
+     "n_cards": 89,
+     "n_correct": 48,
+     "n_seeded_errors": 41,
+     "not_audited": {
+      "ci95": [
+       0.0,
+       0.0414
+      ],
+      "k": 0,
+      "n": 89,
+      "rate": 0.0
+     },
+     "precision_at_1pct_prevalence": 0.1081,
+     "precision_at_corpus_prevalence": 0.9111,
+     "ungrounded_rate": {
+      "ci95": [
+       0.0143,
+       0.0662
+      ],
+      "k": 6,
+      "n": 193,
+      "rate": 0.0311
+     }
+    },
+    "refusal": [
+     {
+      "exchange_id": "R-01",
+      "expected": "ABSTAIN · unknown tag",
+      "got": "ABSTAIN · unknown tag"
+     }
+    ]
+   },
+   "rung": {
+    "max_tokens": 512,
+    "model": "DeepSeek-V4-Flash",
+    "name": "DeepSeek-V4-Flash",
+    "params_b": null,
+    "reasoning_effort": "none",
+    "thinking": "off"
+   },
+   "wall_s": 3470.8
+  },
+  "Gemma-4-31B-IT": {
+   "cache_hits": 333,
+   "calls": {
+    "calls": 300,
+    "calls_failed": 122,
+    "calls_ok": 178,
+    "completion_tokens": 10287,
+    "cost_usd": 0.000895,
+    "hosts": [
+     "developer.amd.com.cn"
+    ],
+    "latency_s_p50": 4.304,
+    "latency_s_p95": 35.8702,
+    "model_served": [
+     "self-dploy/Gemma-4-31B-IT"
+    ],
+    "on_amd": [
+     true
+    ],
+    "prompt_tokens": 46647,
+    "rate_limited_attempts": 4,
+    "reasoning_tokens_reported": 0,
+    "schema_invalid": 0
+   },
+   "cards": "bench/results/text/ladder-r1/Gemma-4-31B-IT.cards.jsonl",
+   "distinct_transcripts": 296,
+   "extractions": "bench/results/text/ladder-r1/Gemma-4-31B-IT.extractions.jsonl",
+   "meets_rule": {
+    "fully_audited": false,
+    "literal": false,
+    "strict": false
+   },
+   "mode": "spans",
+   "receipts": "bench/results/receipts/text-ladder-r1-Gemma-4-31B-IT.jsonl",
+   "rows": {
+    "chatter": {
+     "false_card_exchanges": [],
+     "false_cards": 0,
+     "n_cards": 15,
+     "n_turns": 30,
+     "per_channel_hour": "not measurable on text rows (no audio duration); measured on the audio rows"
+    },
+    "dev": {
+     "abstain_rate": {
+      "ci95": [
+       0.0044,
+       0.1288
+      ],
+      "k": 1,
+      "n": 40,
+      "rate": 0.025
+     },
+     "cards_per_shift_assumption": {
+      "2_errors_per_180": 9.29,
+      "5_errors_per_180": 11.98
+     },
+     "caught_on_channel_detected": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "errors_flagged": {
+      "ci95": [
+       0.7167,
+       0.9889
+      ],
+      "k": 15,
+      "n": 16,
+      "rate": 0.9375
+     },
+     "false_alarm_exchanges": [
+      "KT-06: ABSTAIN · coverage"
+     ],
+     "false_alarm_load": {
+      "ci95": [
+       0.0074,
+       0.2024
+      ],
+      "k": 1,
+      "n": 24,
+      "rate": 0.0417
+     },
+     "false_verified": {
+      "ci95": [
+       0.0,
+       0.1936
+      ],
+      "count": 0,
+      "exchanges": [],
+      "k": 0,
+      "n": 16,
+      "rate": 0.0
+     },
+     "label_exact": {
+      "ci95": [
+       0.7093,
+       0.9294
+      ],
+      "k": 34,
+      "n": 40,
+      "rate": 0.85
+     },
+     "label_misses": [
+      "A2-019: expected 'VERIFIED', got 'NOT-AUDITED · timeout'",
+      "KT-01: expected 'VERIFIED', got 'NOT-AUDITED · server error'",
+      "KT-02: expected 'VERIFIED', got 'NOT-AUDITED · server error'",
+      "KT-03: expected 'MISMATCH · tag: XV-203 ≠ XV-208', got 'NOT-AUDITED · server error'",
+      "KT-06: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "KT-20: expected 'VERIFIED', got 'NOT-AUDITED · server error'"
+     ],
+     "mismatch_only_recall": {
+      "ci95": [
+       0.7018,
+       0.9881
+      ],
+      "k": 14,
+      "n": 15,
+      "rate": 0.9333
+     },
+     "missed_no_card": {
+      "count": 0,
+      "exchanges": []
+     },
+     "n_cards": 40,
+     "n_correct": 24,
+     "n_seeded_errors": 16,
+     "not_audited": {
+      "ci95": [
+       0.0546,
+       0.2611
+      ],
+      "k": 5,
+      "n": 40,
+      "rate": 0.125
+     },
+     "precision_at_1pct_prevalence": 0.1852,
+     "precision_at_corpus_prevalence": 0.9375,
+     "ungrounded_rate": {
+      "ci95": [
+       0.0,
+       0.0507
+      ],
+      "k": 0,
+      "n": 72,
+      "rate": 0.0
+     }
+    },
+    "held_out": {
+     "abstain_rate": {
+      "ci95": [
+       0.002,
+       0.0609
+      ],
+      "k": 1,
+      "n": 89,
+      "rate": 0.0112
+     },
+     "cards_per_shift_assumption": {
+      "2_errors_per_180": 4.73,
+      "5_errors_per_180": 6.21
+     },
+     "caught_on_channel_detected": {
+      "ci95": [
+       0.3589,
+       0.9178
+      ],
+      "k": 5,
+      "n": 7,
+      "rate": 0.7143
+     },
+     "errors_flagged": {
+      "ci95": [
+       0.3648,
+       0.6575
+      ],
+      "k": 21,
+      "n": 41,
+      "rate": 0.5122
+     },
+     "false_alarm_exchanges": [
+      "A2-030: ABSTAIN · retraction cue missing"
+     ],
+     "false_alarm_load": {
+      "ci95": [
+       0.0037,
+       0.109
+      ],
+      "k": 1,
+      "n": 48,
+      "rate": 0.0208
+     },
+     "false_verified": {
+      "ci95": [
+       0.0,
+       0.0857
+      ],
+      "count": 0,
+      "exchanges": [],
+      "k": 0,
+      "n": 41,
+      "rate": 0.0
+     },
+     "label_exact": {
+      "ci95": [
+       0.3822,
+       0.5855
+      ],
+      "k": 43,
+      "n": 89,
+      "rate": 0.4831
+     },
+     "label_misses": [
+      "A2-030: expected 'VERIFIED', got 'ABSTAIN · retraction cue missing'",
+      "A2-039: expected 'MISMATCH · action: STOP ≠ START', got 'NOT-AUDITED · timeout'",
+      "A2-048: expected 'VERIFIED', got 'NOT-AUDITED · timeout'",
+      "A2-049: expected 'VERIFIED', got 'NOT-AUDITED · timeout'",
+      "A2-050: expected 'VERIFIED', got 'NOT-AUDITED · server error'",
+      "A2-051: expected 'VERIFIED', got 'NOT-AUDITED · server error'",
+      "A2-052: expected 'MISMATCH · command: omitted', got 'NOT-AUDITED · server error'",
+      "A2-053: expected 'MISMATCH · line: C ≠ A', got 'NOT-AUDITED · server error'",
+      "A2-054: expected 'VERIFIED', got 'NOT-AUDITED · server error'",
+      "A2-055: expected 'MISMATCH · tag: XV-203 ≠ XV-208', got 'NOT-AUDITED · server error'",
+      "A2-056: expected 'MISMATCH · line: missing (expected A)', got 'NOT-AUDITED · server error'",
+      "A2-057: expected 'VERIFIED', got 'NOT-AUDITED · server error'",
+      "A2-058: expected 'VERIFIED', got 'NOT-AUDITED · server error'",
+      "A2-059: expected 'VERIFIED', got 'NOT-AUDITED · server error'",
+      "A2-060: expected 'VERIFIED', got 'NOT-AUDITED · server error'",
+      "A2-061: expected 'MISMATCH · line: B ≠ A', got 'NOT-AUDITED · timeout'",
+      "A2-062: expected 'VERIFIED', got 'NOT-AUDITED · server error'",
+      "A2-074: expected 'MISMATCH · line: A ≠ C', got 'NOT-AUDITED · timeout'",
+      "A2-075: expected 'NO-READBACK', got 'NOT-AUDITED · server error'",
+      "A2-076: expected 'MISMATCH · line: B ≠ C', got 'NOT-AUDITED · timeout'",
+      "A2-077: expected 'VERIFIED', got 'NOT-AUDITED · server error'",
+      "A2-078: expected 'MISMATCH · line: missing (expected D)', got 'NOT-AUDITED · server error'",
+      "A2-079: expected 'VERIFIED', got 'NOT-AUDITED · server error'",
+      "A2-080: expected 'MISMATCH · line: A ≠ D', got 'NOT-AUDITED · server error'",
+      "A2-082: expected 'NO-READBACK', got 'NOT-AUDITED · server error'",
+      "A2-083: expected 'VERIFIED', got 'NOT-AUDITED · server error'",
+      "A2-084: expected 'VERIFIED', got 'NOT-AUDITED · server error'",
+      "A2-085: expected 'MISMATCH · line: B ≠ C', got 'NOT-AUDITED · server error'",
+      "A2-086: expected 'VERIFIED', got 'NOT-AUDITED · server error'",
+      "A2-087: expected 'VERIFIED', got 'NOT-AUDITED · server error'",
+      "A2-088: expected 'VERIFIED', got 'NOT-AUDITED · server error'",
+      "A2-089: expected 'MISMATCH · tag: P-140 ≠ P-114', got 'NOT-AUDITED · server error'",
+      "A2-090: expected 'VERIFIED', got 'NOT-AUDITED · server error'",
+      "A2-091: expected 'NO-READBACK', got 'NOT-AUDITED · server error'",
+      "A2-092: expected 'MISMATCH · tag: P-140 ≠ P-114', got 'NOT-AUDITED · server error'",
+      "A2-095: expected 'VERIFIED', got 'NOT-AUDITED · server error'",
+      "A2-098: expected 'MISMATCH · action: ISOLATE ≠ START', got 'NOT-AUDITED · timeout'",
+      "A2-099: expected 'VERIFIED', got 'NOT-AUDITED · timeout'",
+      "A2-100: expected 'VERIFIED', got 'NOT-AUDITED · server error'",
+      "A2-101: expected 'MISMATCH · action: CLOSE ≠ OPEN', got 'NOT-AUDITED · server error'",
+      "A2-102: expected 'VERIFIED', got 'NOT-AUDITED · server error'",
+      "A2-103: expected 'VERIFIED', got 'NOT-AUDITED · server error'",
+      "A2-104: expected 'VERIFIED', got 'NOT-AUDITED · server error'",
+      "A2-105: expected 'MISMATCH · tag: XV-203 ≠ XV-208', got 'NOT-AUDITED · server error'",
+      "A2-106: expected 'VERIFIED', got 'NOT-AUDITED · server error'",
+      "A2-107: expected 'MISMATCH · command: omitted', got 'NOT-AUDITED · server error'"
+     ],
+     "mismatch_only_recall": {
+      "ci95": [
+       0.3971,
+       0.6985
+      ],
+      "k": 21,
+      "n": 38,
+      "rate": 0.5526
+     },
+     "missed_no_card": {
+      "count": 0,
+      "exchanges": []
+     },
+     "n_cards": 89,
+     "n_correct": 48,
+     "n_seeded_errors": 41,
+     "not_audited": {
+      "ci95": [
+       0.4037,
+       0.6071
+      ],
+      "k": 45,
+      "n": 89,
+      "rate": 0.5056
+     },
+     "precision_at_1pct_prevalence": 0.1989,
+     "precision_at_corpus_prevalence": 0.9545,
+     "ungrounded_rate": {
+      "ci95": [
+       0.0,
+       0.034
+      ],
+      "k": 0,
+      "n": 109,
+      "rate": 0.0
+     }
+    },
+    "refusal": [
+     {
+      "exchange_id": "R-01",
+      "expected": "ABSTAIN · unknown tag",
+      "got": "ABSTAIN · unknown tag"
+     }
+    ]
+   },
+   "rung": {
+    "max_tokens": 512,
+    "model": "Gemma-4-31B-IT",
+    "name": "Gemma-4-31B-IT",
+    "params_b": 31.0,
+    "reasoning_effort": null,
+    "thinking": "off"
+   },
+   "wall_s": 4375.7
+  },
+  "MiniCPM5-2B": {
+   "cache_hits": 333,
+   "calls": {
+    "calls": 297,
+    "calls_failed": 1,
+    "calls_ok": 296,
+    "completion_tokens": 23527,
+    "cost_usd": 0.001896,
+    "hosts": [
+     "developer.amd.com.cn"
+    ],
+    "latency_s_p50": 1.3975,
+    "latency_s_p95": 6.9094,
+    "model_served": [
+     "self-dploy/MiniCPM5-2B"
+    ],
+    "on_amd": [
+     true
+    ],
+    "prompt_tokens": 76275,
+    "rate_limited_attempts": 1,
+    "reasoning_tokens_reported": 0,
+    "schema_invalid": 182
+   },
+   "cards": "bench/results/text/ladder-r1/MiniCPM5-2B.cards.jsonl",
+   "distinct_transcripts": 296,
+   "extractions": "bench/results/text/ladder-r1/MiniCPM5-2B.extractions.jsonl",
+   "meets_rule": {
+    "fully_audited": true,
+    "literal": false,
+    "strict": false
+   },
+   "mode": "spans",
+   "receipts": "bench/results/receipts/text-ladder-r1-MiniCPM5-2B.jsonl",
+   "rows": {
+    "chatter": {
+     "false_card_exchanges": [],
+     "false_cards": 0,
+     "n_cards": 15,
+     "n_turns": 30,
+     "per_channel_hour": "not measurable on text rows (no audio duration); measured on the audio rows"
+    },
+    "dev": {
+     "abstain_rate": {
+      "ci95": [
+       0.9124,
+       1.0
+      ],
+      "k": 40,
+      "n": 40,
+      "rate": 1.0
+     },
+     "cards_per_shift_assumption": {
+      "2_errors_per_180": 180.0,
+      "5_errors_per_180": 180.0
+     },
+     "caught_on_channel_detected": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "errors_flagged": {
+      "ci95": [
+       0.8064,
+       1.0
+      ],
+      "k": 16,
+      "n": 16,
+      "rate": 1.0
+     },
+     "false_alarm_exchanges": [
+      "A2-001: ABSTAIN · coverage",
+      "A2-004: ABSTAIN · coverage",
+      "A2-006: ABSTAIN · grounding",
+      "A2-009: ABSTAIN · grounding",
+      "A2-010: ABSTAIN · grounding",
+      "A2-012: ABSTAIN · grounding",
+      "A2-016: ABSTAIN · grounding",
+      "A2-018: ABSTAIN · grounding",
+      "A2-019: ABSTAIN · coverage",
+      "KT-01: ABSTAIN · coverage",
+      "KT-02: ABSTAIN · grounding",
+      "KT-04: ABSTAIN · grounding",
+      "KT-05: ABSTAIN · coverage",
+      "KT-06: ABSTAIN · grounding",
+      "KT-07: ABSTAIN · coverage",
+      "KT-09: ABSTAIN · grounding",
+      "KT-10: ABSTAIN · grounding",
+      "KT-11: ABSTAIN · coverage",
+      "KT-12: ABSTAIN · coverage",
+      "KT-14: ABSTAIN · coverage",
+      "KT-15: ABSTAIN · grounding",
+      "KT-17: ABSTAIN · grounding",
+      "KT-19: ABSTAIN · coverage",
+      "KT-20: ABSTAIN · coverage"
+     ],
+     "false_alarm_load": {
+      "ci95": [
+       0.862,
+       1.0
+      ],
+      "k": 24,
+      "n": 24,
+      "rate": 1.0
+     },
+     "false_verified": {
+      "ci95": [
+       0.0,
+       0.1936
+      ],
+      "count": 0,
+      "exchanges": [],
+      "k": 0,
+      "n": 16,
+      "rate": 0.0
+     },
+     "label_exact": {
+      "ci95": [
+       0.0,
+       0.0876
+      ],
+      "k": 0,
+      "n": 40,
+      "rate": 0.0
+     },
+     "label_misses": [
+      "A2-001: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "A2-002: expected 'MISMATCH · action: OPEN ≠ CLOSE', got 'ABSTAIN · grounding'",
+      "A2-003: expected 'MISMATCH · tag: P-114 ≠ P-140', got 'ABSTAIN · coverage'",
+      "A2-004: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "A2-005: expected 'NO-READBACK', got 'ABSTAIN · coverage'",
+      "A2-006: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-007: expected 'MISMATCH · line: B ≠ D', got 'ABSTAIN · coverage'",
+      "A2-008: expected 'MISMATCH · line: missing (expected A)', got 'ABSTAIN · grounding'",
+      "A2-009: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-010: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-011: expected 'MISMATCH · line: C ≠ A', got 'ABSTAIN · coverage'",
+      "A2-012: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-013: expected 'MISMATCH · tag: P-114 ≠ P-140', got 'ABSTAIN · coverage'",
+      "A2-014: expected 'MISMATCH · tag: P-114 ≠ P-140', got 'ABSTAIN · grounding'",
+      "A2-015: expected 'MISMATCH · action: START ≠ STOP', got 'ABSTAIN · grounding'",
+      "A2-016: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-017: expected 'MISMATCH · tag: MOV-31H ≠ MOV-31A', got 'ABSTAIN · grounding'",
+      "A2-018: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-019: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "A2-020: expected 'MISMATCH · tag: P-140 ≠ P-114', got 'ABSTAIN · coverage'",
+      "KT-01: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "KT-02: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "KT-03: expected 'MISMATCH · tag: XV-203 ≠ XV-208', got 'ABSTAIN · coverage'",
+      "KT-04: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "KT-05: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "KT-06: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "KT-07: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "KT-08: expected 'MISMATCH · tag: MOV-31A ≠ MOV-31H', got 'ABSTAIN · grounding'",
+      "KT-09: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "KT-10: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "KT-11: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "KT-12: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "KT-13: expected 'MISMATCH · tag: P-114 ≠ P-140', got 'ABSTAIN · coverage'",
+      "KT-14: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "KT-15: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "KT-16: expected 'MISMATCH · line: C ≠ B', got 'ABSTAIN · grounding'",
+      "KT-17: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "KT-18: expected 'MISMATCH · tag: XV-203 ≠ XV-208', got 'ABSTAIN · grounding'",
+      "KT-19: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "KT-20: expected 'VERIFIED', got 'ABSTAIN · coverage'"
+     ],
+     "mismatch_only_recall": {
+      "ci95": [
+       0.0,
+       0.2039
+      ],
+      "k": 0,
+      "n": 15,
+      "rate": 0.0
+     },
+     "missed_no_card": {
+      "count": 0,
+      "exchanges": []
+     },
+     "n_cards": 40,
+     "n_correct": 24,
+     "n_seeded_errors": 16,
+     "not_audited": {
+      "ci95": [
+       0.0,
+       0.0876
+      ],
+      "k": 0,
+      "n": 40,
+      "rate": 0.0
+     },
+     "precision_at_1pct_prevalence": 0.01,
+     "precision_at_corpus_prevalence": 0.4,
+     "ungrounded_rate": {
+      "ci95": [
+       0.6326,
+       0.8251
+      ],
+      "k": 57,
+      "n": 77,
+      "rate": 0.7403
+     }
+    },
+    "held_out": {
+     "abstain_rate": {
+      "ci95": [
+       0.9586,
+       1.0
+      ],
+      "k": 89,
+      "n": 89,
+      "rate": 1.0
+     },
+     "cards_per_shift_assumption": {
+      "2_errors_per_180": 180.0,
+      "5_errors_per_180": 180.0
+     },
+     "caught_on_channel_detected": {
+      "ci95": [
+       0.6457,
+       1.0
+      ],
+      "k": 7,
+      "n": 7,
+      "rate": 1.0
+     },
+     "errors_flagged": {
+      "ci95": [
+       0.9143,
+       1.0
+      ],
+      "k": 41,
+      "n": 41,
+      "rate": 1.0
+     },
+     "false_alarm_exchanges": [
+      "A2-021: ABSTAIN · grounding",
+      "A2-022: ABSTAIN · grounding",
+      "A2-024: ABSTAIN · coverage",
+      "A2-025: ABSTAIN · grounding",
+      "A2-026: ABSTAIN · grounding",
+      "A2-028: ABSTAIN · coverage",
+      "A2-030: ABSTAIN · grounding",
+      "A2-035: ABSTAIN · coverage",
+      "A2-036: ABSTAIN · coverage",
+      "A2-037: ABSTAIN · coverage",
+      "A2-038: ABSTAIN · grounding",
+      "A2-040: ABSTAIN · grounding",
+      "A2-041: ABSTAIN · grounding",
+      "A2-042: ABSTAIN · grounding",
+      "A2-045: ABSTAIN · grounding",
+      "A2-047: ABSTAIN · grounding",
+      "A2-048: ABSTAIN · grounding",
+      "A2-049: ABSTAIN · coverage",
+      "A2-050: ABSTAIN · grounding",
+      "A2-051: ABSTAIN · grounding",
+      "A2-054: ABSTAIN · grounding",
+      "A2-057: ABSTAIN · coverage",
+      "A2-058: ABSTAIN · grounding",
+      "A2-059: ABSTAIN · grounding",
+      "A2-060: ABSTAIN · grounding",
+      "A2-062: ABSTAIN · coverage",
+      "A2-067: ABSTAIN · grounding",
+      "A2-070: ABSTAIN · grounding",
+      "A2-072: ABSTAIN · coverage",
+      "A2-073: ABSTAIN · grounding",
+      "A2-077: ABSTAIN · grounding",
+      "A2-079: ABSTAIN · grounding",
+      "A2-081: ABSTAIN · coverage",
+      "A2-083: ABSTAIN · grounding",
+      "A2-084: ABSTAIN · coverage",
+      "A2-086: ABSTAIN · grounding",
+      "A2-087: ABSTAIN · grounding",
+      "A2-088: ABSTAIN · coverage",
+      "A2-090: ABSTAIN · grounding",
+      "A2-094: ABSTAIN · coverage",
+      "A2-095: ABSTAIN · grounding",
+      "A2-096: ABSTAIN · coverage",
+      "A2-099: ABSTAIN · grounding",
+      "A2-100: ABSTAIN · grounding",
+      "A2-102: ABSTAIN · grounding",
+      "A2-103: ABSTAIN · grounding",
+      "A2-104: ABSTAIN · grounding",
+      "A2-106: ABSTAIN · grounding"
+     ],
+     "false_alarm_load": {
+      "ci95": [
+       0.9259,
+       1.0
+      ],
+      "k": 48,
+      "n": 48,
+      "rate": 1.0
+     },
+     "false_verified": {
+      "ci95": [
+       0.0,
+       0.0857
+      ],
+      "count": 0,
+      "exchanges": [],
+      "k": 0,
+      "n": 41,
+      "rate": 0.0
+     },
+     "label_exact": {
+      "ci95": [
+       0.0,
+       0.0414
+      ],
+      "k": 0,
+      "n": 89,
+      "rate": 0.0
+     },
+     "label_misses": [
+      "H-01: expected 'MISMATCH · tag: XV-203 ≠ XV-208', got 'ABSTAIN · grounding'",
+      "H-02: expected 'MISMATCH · line: B ≠ A', got 'ABSTAIN · grounding'",
+      "A2-021: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-022: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-023: expected 'MISMATCH · line: B ≠ C', got 'ABSTAIN · grounding'",
+      "A2-024: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "A2-025: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-026: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-027: expected 'MISMATCH · tag: MOV-31A ≠ MOV-31H', got 'ABSTAIN · coverage'",
+      "A2-028: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "A2-029: expected 'MISMATCH · line: missing (expected B)', got 'ABSTAIN · grounding'",
+      "A2-030: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-031: expected 'MISMATCH · line: A ≠ C', got 'ABSTAIN · grounding'",
+      "A2-032: expected 'MISMATCH · action: OPEN ≠ CLOSE', got 'ABSTAIN · grounding'",
+      "A2-033: expected 'MISMATCH · action: OPEN ≠ CLOSE', got 'ABSTAIN · coverage'",
+      "A2-034: expected 'MISMATCH · tag: MOV-31A ≠ MOV-31H', got 'ABSTAIN · coverage'",
+      "A2-035: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "A2-036: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "A2-037: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "A2-038: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-039: expected 'MISMATCH · action: STOP ≠ START', got 'ABSTAIN · grounding'",
+      "A2-040: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-041: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-042: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-043: expected 'MISMATCH · line: C ≠ B', got 'ABSTAIN · grounding'",
+      "A2-044: expected 'MISMATCH · action: missing (expected ISOLATE)', got 'ABSTAIN · grounding'",
+      "A2-045: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-046: expected 'MISMATCH · line: A ≠ C', got 'ABSTAIN · grounding'",
+      "A2-047: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-048: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-049: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "A2-050: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-051: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-052: expected 'MISMATCH · command: omitted', got 'ABSTAIN · coverage'",
+      "A2-053: expected 'MISMATCH · line: C ≠ A', got 'ABSTAIN · coverage'",
+      "A2-054: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-055: expected 'MISMATCH · tag: XV-203 ≠ XV-208', got 'ABSTAIN · coverage'",
+      "A2-056: expected 'MISMATCH · line: missing (expected A)', got 'ABSTAIN · grounding'",
+      "A2-057: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "A2-058: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-059: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-060: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-061: expected 'MISMATCH · line: B ≠ A', got 'ABSTAIN · coverage'",
+      "A2-062: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "A2-063: expected 'MISMATCH · line: C ≠ B', got 'ABSTAIN · coverage'",
+      "A2-064: expected 'MISMATCH · tag: P-114 ≠ P-140', got 'ABSTAIN · grounding'",
+      "A2-065: expected 'MISMATCH · line: A ≠ B', got 'ABSTAIN · grounding'",
+      "A2-066: expected 'MISMATCH · action: missing (expected START)', got 'ABSTAIN · grounding'",
+      "A2-067: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-068: expected 'MISMATCH · line: D ≠ A', got 'ABSTAIN · coverage'",
+      "A2-069: expected 'MISMATCH · tag: P-140 ≠ P-114', got 'ABSTAIN · grounding'",
+      "A2-070: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-071: expected 'MISMATCH · command: omitted', got 'ABSTAIN · coverage'",
+      "A2-072: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "A2-073: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-074: expected 'MISMATCH · line: A ≠ C', got 'ABSTAIN · grounding'",
+      "A2-075: expected 'NO-READBACK', got 'ABSTAIN · grounding'",
+      "A2-076: expected 'MISMATCH · line: B ≠ C', got 'ABSTAIN · coverage'",
+      "A2-077: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-078: expected 'MISMATCH · line: missing (expected D)', got 'ABSTAIN · coverage'",
+      "A2-079: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-080: expected 'MISMATCH · line: A ≠ D', got 'ABSTAIN · grounding'",
+      "A2-081: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "A2-082: expected 'NO-READBACK', got 'ABSTAIN · grounding'",
+      "A2-083: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-084: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "A2-085: expected 'MISMATCH · line: B ≠ C', got 'ABSTAIN · grounding'",
+      "A2-086: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-087: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-088: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "A2-089: expected 'MISMATCH · tag: P-140 ≠ P-114', got 'ABSTAIN · grounding'",
+      "A2-090: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-091: expected 'NO-READBACK', got 'ABSTAIN · coverage'",
+      "A2-092: expected 'MISMATCH · tag: P-140 ≠ P-114', got 'ABSTAIN · grounding'",
+      "A2-093: expected 'MISMATCH · command: omitted', got 'ABSTAIN · coverage'",
+      "A2-094: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "A2-095: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-096: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "A2-097: expected 'MISMATCH · action: OPEN ≠ CLOSE', got 'ABSTAIN · coverage'",
+      "A2-098: expected 'MISMATCH · action: ISOLATE ≠ START', got 'ABSTAIN · grounding'",
+      "A2-099: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-100: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-101: expected 'MISMATCH · action: CLOSE ≠ OPEN', got 'ABSTAIN · coverage'",
+      "A2-102: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-103: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-104: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-105: expected 'MISMATCH · tag: XV-203 ≠ XV-208', got 'ABSTAIN · grounding'",
+      "A2-106: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-107: expected 'MISMATCH · command: omitted', got 'ABSTAIN · coverage'"
+     ],
+     "mismatch_only_recall": {
+      "ci95": [
+       0.0,
+       0.0918
+      ],
+      "k": 0,
+      "n": 38,
+      "rate": 0.0
+     },
+     "missed_no_card": {
+      "count": 0,
+      "exchanges": []
+     },
+     "n_cards": 89,
+     "n_correct": 48,
+     "n_seeded_errors": 41,
+     "not_audited": {
+      "ci95": [
+       0.0,
+       0.0414
+      ],
+      "k": 0,
+      "n": 89,
+      "rate": 0.0
+     },
+     "precision_at_1pct_prevalence": 0.01,
+     "precision_at_corpus_prevalence": 0.4607,
+     "ungrounded_rate": {
+      "ci95": [
+       0.7244,
+       0.8382
+      ],
+      "k": 155,
+      "n": 197,
+      "rate": 0.7868
+     }
+    },
+    "refusal": [
+     {
+      "exchange_id": "R-01",
+      "expected": "ABSTAIN · unknown tag",
+      "got": "ABSTAIN · coverage"
+     }
+    ]
+   },
+   "rung": {
+    "max_tokens": 512,
+    "model": "MiniCPM5-2B",
+    "name": "MiniCPM5-2B",
+    "params_b": 2.0,
+    "reasoning_effort": null,
+    "thinking": "none"
+   },
+   "wall_s": 3037.3
+  },
+  "Qwen3.8-27B": {
+   "cache_hits": 333,
+   "calls": {
+    "calls": 298,
+    "calls_failed": 8,
+    "calls_ok": 290,
+    "completion_tokens": 78370,
+    "cost_usd": 0.010921,
+    "hosts": [
+     "developer.amd.com.cn"
+    ],
+    "latency_s_p50": 14.1714,
+    "latency_s_p95": 62.5185,
+    "model_served": [
+     "self-dploy/Qwen3.8-27B"
+    ],
+    "on_amd": [
+     true
+    ],
+    "prompt_tokens": 77598,
+    "rate_limited_attempts": 2,
+    "reasoning_tokens_reported": 66761,
+    "schema_invalid": 0
+   },
+   "cards": "bench/results/text/ladder-r1/Qwen3.8-27B.cards.jsonl",
+   "distinct_transcripts": 296,
+   "extractions": "bench/results/text/ladder-r1/Qwen3.8-27B.extractions.jsonl",
+   "meets_rule": {
+    "fully_audited": false,
+    "literal": false,
+    "strict": false
+   },
+   "mode": "spans",
+   "receipts": "bench/results/receipts/text-ladder-r1-Qwen3.8-27B.jsonl",
+   "rows": {
+    "chatter": {
+     "false_card_exchanges": [],
+     "false_cards": 0,
+     "n_cards": 15,
+     "n_turns": 30,
+     "per_channel_hour": "not measurable on text rows (no audio duration); measured on the audio rows"
+    },
+    "dev": {
+     "abstain_rate": {
+      "ci95": [
+       0.0,
+       0.0876
+      ],
+      "k": 0,
+      "n": 40,
+      "rate": 0.0
+     },
+     "cards_per_shift_assumption": {
+      "2_errors_per_180": 2.0,
+      "5_errors_per_180": 5.0
+     },
+     "caught_on_channel_detected": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "errors_flagged": {
+      "ci95": [
+       0.8064,
+       1.0
+      ],
+      "k": 16,
+      "n": 16,
+      "rate": 1.0
+     },
+     "false_alarm_exchanges": [],
+     "false_alarm_load": {
+      "ci95": [
+       0.0,
+       0.138
+      ],
+      "k": 0,
+      "n": 24,
+      "rate": 0.0
+     },
+     "false_verified": {
+      "ci95": [
+       0.0,
+       0.1936
+      ],
+      "count": 0,
+      "exchanges": [],
+      "k": 0,
+      "n": 16,
+      "rate": 0.0
+     },
+     "label_exact": {
+      "ci95": [
+       0.8712,
+       0.9956
+      ],
+      "k": 39,
+      "n": 40,
+      "rate": 0.975
+     },
+     "label_misses": [
+      "KT-09: expected 'VERIFIED', got 'NOT-AUDITED · timeout'"
+     ],
+     "mismatch_only_recall": {
+      "ci95": [
+       0.7961,
+       1.0
+      ],
+      "k": 15,
+      "n": 15,
+      "rate": 1.0
+     },
+     "missed_no_card": {
+      "count": 0,
+      "exchanges": []
+     },
+     "n_cards": 40,
+     "n_correct": 24,
+     "n_seeded_errors": 16,
+     "not_audited": {
+      "ci95": [
+       0.0044,
+       0.1288
+      ],
+      "k": 1,
+      "n": 40,
+      "rate": 0.025
+     },
+     "precision_at_1pct_prevalence": 1.0,
+     "precision_at_corpus_prevalence": 1.0,
+     "ungrounded_rate": {
+      "ci95": [
+       0.0,
+       0.0464
+      ],
+      "k": 0,
+      "n": 79,
+      "rate": 0.0
+     }
+    },
+    "held_out": {
+     "abstain_rate": {
+      "ci95": [
+       0.0062,
+       0.0783
+      ],
+      "k": 2,
+      "n": 89,
+      "rate": 0.0225
+     },
+     "cards_per_shift_assumption": {
+      "2_errors_per_180": 16.74,
+      "5_errors_per_180": 19.34
+     },
+     "caught_on_channel_detected": {
+      "ci95": [
+       0.6457,
+       1.0
+      ],
+      "k": 7,
+      "n": 7,
+      "rate": 1.0
+     },
+     "errors_flagged": {
+      "ci95": [
+       0.8386,
+       0.9865
+      ],
+      "k": 39,
+      "n": 41,
+      "rate": 0.9512
+     },
+     "false_alarm_exchanges": [
+      "A2-037: MISMATCH · line: B ≠ A",
+      "A2-050: ABSTAIN · unknown tag",
+      "A2-088: MISMATCH · line: A ≠ B",
+      "A2-094: MISMATCH · line: A ≠ D"
+     ],
+     "false_alarm_load": {
+      "ci95": [
+       0.0329,
+       0.1955
+      ],
+      "k": 4,
+      "n": 48,
+      "rate": 0.0833
+     },
+     "false_verified": {
+      "ci95": [
+       0.0,
+       0.0857
+      ],
+      "count": 0,
+      "exchanges": [],
+      "k": 0,
+      "n": 41,
+      "rate": 0.0
+     },
+     "label_exact": {
+      "ci95": [
+       0.8189,
+       0.9459
+      ],
+      "k": 80,
+      "n": 89,
+      "rate": 0.8989
+     },
+     "label_misses": [
+      "A2-037: expected 'VERIFIED', got 'MISMATCH · line: B ≠ A'",
+      "A2-044: expected 'MISMATCH · action: missing (expected ISOLATE)', got 'ABSTAIN · unmapped: Siap'",
+      "A2-050: expected 'VERIFIED', got 'ABSTAIN · unknown tag'",
+      "A2-051: expected 'VERIFIED', got 'NOT-AUDITED · timeout'",
+      "A2-074: expected 'MISMATCH · line: A ≠ C', got 'NOT-AUDITED · timeout'",
+      "A2-076: expected 'MISMATCH · line: B ≠ C', got 'NOT-AUDITED · timeout'",
+      "A2-088: expected 'VERIFIED', got 'MISMATCH · line: A ≠ B'",
+      "A2-093: expected 'MISMATCH · command: omitted', got 'MISMATCH · command: omitted; line: missing (expected B)'",
+      "A2-094: expected 'VERIFIED', got 'MISMATCH · line: A ≠ D'"
+     ],
+     "mismatch_only_recall": {
+      "ci95": [
+       0.792,
+       0.9728
+      ],
+      "k": 35,
+      "n": 38,
+      "rate": 0.9211
+     },
+     "missed_no_card": {
+      "count": 0,
+      "exchanges": []
+     },
+     "n_cards": 89,
+     "n_correct": 48,
+     "n_seeded_errors": 41,
+     "not_audited": {
+      "ci95": [
+       0.0115,
+       0.0945
+      ],
+      "k": 3,
+      "n": 89,
+      "rate": 0.0337
+     },
+     "precision_at_1pct_prevalence": 0.1034,
+     "precision_at_corpus_prevalence": 0.907,
+     "ungrounded_rate": {
+      "ci95": [
+       0.0,
+       0.0199
+      ],
+      "k": 0,
+      "n": 189,
+      "rate": 0.0
+     }
+    },
+    "refusal": [
+     {
+      "exchange_id": "R-01",
+      "expected": "ABSTAIN · unknown tag",
+      "got": "ABSTAIN · unknown tag"
+     }
+    ]
+   },
+   "rung": {
+    "max_tokens": 6144,
+    "model": "Qwen3.8-27B",
+    "name": "Qwen3.8-27B",
+    "params_b": 27.0,
+    "reasoning_effort": "low",
+    "thinking": "on"
+   },
+   "wall_s": 2509.1
+  },
+  "regex": {
+   "cache_hits": 37,
+   "calls": null,
+   "cards": "bench/results/text/ladder-r1/regex.cards.jsonl",
+   "distinct_transcripts": 296,
+   "extractions": "bench/results/text/ladder-r1/regex.extractions.jsonl",
+   "meets_rule": {
+    "fully_audited": true,
+    "literal": true,
+    "strict": true
+   },
+   "mode": "spans",
+   "receipts": null,
+   "rows": {
+    "chatter": {
+     "false_card_exchanges": [],
+     "false_cards": 0,
+     "n_cards": 15,
+     "n_turns": 30,
+     "per_channel_hour": "not measurable on text rows (no audio duration); measured on the audio rows"
+    },
+    "dev": {
+     "abstain_rate": {
+      "ci95": [
+       0.0,
+       0.0876
+      ],
+      "k": 0,
+      "n": 40,
+      "rate": 0.0
+     },
+     "cards_per_shift_assumption": {
+      "2_errors_per_180": 2.0,
+      "5_errors_per_180": 5.0
+     },
+     "caught_on_channel_detected": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "errors_flagged": {
+      "ci95": [
+       0.8064,
+       1.0
+      ],
+      "k": 16,
+      "n": 16,
+      "rate": 1.0
+     },
+     "false_alarm_exchanges": [],
+     "false_alarm_load": {
+      "ci95": [
+       0.0,
+       0.138
+      ],
+      "k": 0,
+      "n": 24,
+      "rate": 0.0
+     },
+     "false_verified": {
+      "ci95": [
+       0.0,
+       0.1936
+      ],
+      "count": 0,
+      "exchanges": [],
+      "k": 0,
+      "n": 16,
+      "rate": 0.0
+     },
+     "label_exact": {
+      "ci95": [
+       0.9124,
+       1.0
+      ],
+      "k": 40,
+      "n": 40,
+      "rate": 1.0
+     },
+     "label_misses": [],
+     "mismatch_only_recall": {
+      "ci95": [
+       0.7961,
+       1.0
+      ],
+      "k": 15,
+      "n": 15,
+      "rate": 1.0
+     },
+     "missed_no_card": {
+      "count": 0,
+      "exchanges": []
+     },
+     "n_cards": 40,
+     "n_correct": 24,
+     "n_seeded_errors": 16,
+     "not_audited": {
+      "ci95": [
+       0.0,
+       0.0876
+      ],
+      "k": 0,
+      "n": 40,
+      "rate": 0.0
+     },
+     "precision_at_1pct_prevalence": 1.0,
+     "precision_at_corpus_prevalence": 1.0
+    },
+    "held_out": {
+     "abstain_rate": {
+      "ci95": [
+       0.0,
+       0.0414
+      ],
+      "k": 0,
+      "n": 89,
+      "rate": 0.0
+     },
+     "cards_per_shift_assumption": {
+      "2_errors_per_180": 2.0,
+      "5_errors_per_180": 5.0
+     },
+     "caught_on_channel_detected": {
+      "ci95": [
+       0.6457,
+       1.0
+      ],
+      "k": 7,
+      "n": 7,
+      "rate": 1.0
+     },
+     "errors_flagged": {
+      "ci95": [
+       0.9143,
+       1.0
+      ],
+      "k": 41,
+      "n": 41,
+      "rate": 1.0
+     },
+     "false_alarm_exchanges": [],
+     "false_alarm_load": {
+      "ci95": [
+       0.0,
+       0.0741
+      ],
+      "k": 0,
+      "n": 48,
+      "rate": 0.0
+     },
+     "false_verified": {
+      "ci95": [
+       0.0,
+       0.0857
+      ],
+      "count": 0,
+      "exchanges": [],
+      "k": 0,
+      "n": 41,
+      "rate": 0.0
+     },
+     "label_exact": {
+      "ci95": [
+       0.9586,
+       1.0
+      ],
+      "k": 89,
+      "n": 89,
+      "rate": 1.0
+     },
+     "label_misses": [],
+     "mismatch_only_recall": {
+      "ci95": [
+       0.9082,
+       1.0
+      ],
+      "k": 38,
+      "n": 38,
+      "rate": 1.0
+     },
+     "missed_no_card": {
+      "count": 0,
+      "exchanges": []
+     },
+     "n_cards": 89,
+     "n_correct": 48,
+     "n_seeded_errors": 41,
+     "not_audited": {
+      "ci95": [
+       0.0,
+       0.0414
+      ],
+      "k": 0,
+      "n": 89,
+      "rate": 0.0
+     },
+     "precision_at_1pct_prevalence": 1.0,
+     "precision_at_corpus_prevalence": 1.0
+    },
+    "refusal": [
+     {
+      "exchange_id": "R-01",
+      "expected": "ABSTAIN · unknown tag",
+      "got": "ABSTAIN · unknown tag"
+     }
+    ]
+   },
+   "rung": {
+    "max_tokens": 512,
+    "model": null,
+    "name": "regex",
+    "params_b": 0.0,
+    "reasoning_effort": null,
+    "thinking": "none"
+   },
+   "wall_s": 0.2
+  }
+ },
+ "shift_assumption": "180 exchanges per shift, 2-5 real errors",
+ "smallest_rung_meeting_rule": "regex",
+ "span_prompt_sha256": "b79578f3acc9d4301958637513f2ead0848bf9c2a286a4a1947bc75aa0016d97",
+ "spent_usd": 0.153844,
+ "started_at": "2026-10-14T05:10:26+00:00",
+ "subset": "all",
+ "usage_before": {
+  "daily_cost_limit_usd": 1,
+  "daily_cost_used_usd": 0.01599418744444847,
+  "daily_reset_at": "2026-10-14T16:00:00.000Z",
+  "rpm_limit": 20
+ }
+}
