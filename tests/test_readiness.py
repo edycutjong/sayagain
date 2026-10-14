@@ -168,3 +168,25 @@ def test_every_public_page_is_scanned(tmp_path: Path) -> None:
 def test_stated_test_counts_anywhere_must_match(tmp_path: Path) -> None:
     root = site(tmp_path, "341 passing tests.\n", files={"docs/x.md": "We have 12 unit tests.\n"})
     assert checks(root, n=341) == ["tests"]
+
+
+def test_submit_stage_scans_every_page_and_wants_the_live_site(tmp_path: Path) -> None:
+    files = {
+        "bench/results/text/ladder-r1.json": "{}",
+        "bench/results/access-gate.json": "{}",
+        "docs/index.html": "<p>Replay (not published)</p>",
+    }
+    # a link to the repository folder, not to the published site
+    readme = "3 tests. Code: https://github.com/edycutjong/sayagain/tree/main/docs/replay/\n"
+    assert sorted(checks(site(tmp_path, readme, files=files), stage="submit")) == ["submit", "submit"]
+
+
+def test_submit_stage_refuses_a_dated_slot_on_any_page(tmp_path: Path) -> None:
+    files = {
+        "bench/results/text/ladder-r1.json": "{}",
+        "bench/results/access-gate.json": "{}",
+        "docs/pitch/index.html": "<p>Next · audio eval scheduled Oct 16</p>",
+    }
+    readme = "3 tests. Live replay: https://example.github.io/sayagain/replay/\n"
+    assert checks(site(tmp_path, readme, files=files), stage="submit") == ["submit"]
+    assert checks(site(tmp_path / "b", readme, files=files), stage="build") == []

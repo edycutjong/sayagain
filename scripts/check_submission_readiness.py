@@ -14,8 +14,9 @@ Checks every public page (all .md / .html outside tests/, .github/ and caches):
   hero              the hero is the tag error (XV-203 read back as XV-208); the old line-swap hero strings fail
   number            a percentage, fraction, latency, p50/p95/p99 or "Nx faster" must appear in the file the line cites,
                     or the line says target / threshold / assumption (bench/PROTOCOL.md: thresholds, exempt)
-  submit            (--stage submit only) measured result files exist, and README.md links the live replay over https
-                    and no longer says "under construction" or "not published"
+  submit            (--stage submit only) measured result files exist; README.md links the live replay over https (the
+                    published site, not the repository folder); no page says "under construction" / "not published" or
+                    carries a dated slot ("scheduled Oct 16")
 Exit 1 on any failure.
 """
 
@@ -87,6 +88,12 @@ class Finding:
 
     def __str__(self) -> str:
         return f"FAIL [{self.check}] {self.file}:{self.line}: {self.text}"
+
+
+# a promise with a date ("audio eval scheduled Oct 16"): stale by the time judges read it
+FUTURE_SLOT = re.compile(
+    r"\bscheduled\s+(?:for\s+|on\s+)?(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+\d{1,2}\b", re.I
+)
 
 
 def judged_files(root: Path) -> list[Path]:
@@ -258,15 +265,20 @@ def check_files(root: Path, stage: str, collected_tests: int | None = None) -> l
             findings.append(Finding("results", "bench/results", 0, "no measured results (eval-*.json or text/*.json)"))
         if not (res / "access-gate.json").exists():
             findings.append(Finding("results", "bench/results", 0, "no access-gate.json"))
-        # the README a judge opens first: the live replay linked, nothing left saying it is unfinished or unpublished
+        # the README a judge opens first links the live replay: the published site, not the repository folder
         readme = root / "README.md"
         body = readme.read_text(encoding="utf-8") if readme.exists() else ""
-        if not re.search(r"https://\S+/replay/", body):
+        if not re.search(r"https://(?!github\.com/)\S+/replay/", body):
             findings.append(Finding("submit", "README.md", 0, "no https link to the live replay (…/replay/)"))
-        for n, line in enumerate(body.splitlines(), 1):
-            for phrase in ("under construction", "not published"):
-                if phrase in line.lower():
-                    findings.append(Finding("submit", "README.md", n, f"still says '{phrase}'"))
+        # no public page still calls itself unfinished or unpublished, or carries a dated promise judges read too late
+        for f in judged_files(root):
+            rel = str(f.relative_to(root))
+            for n, line in enumerate(f.read_text(encoding="utf-8").splitlines(), 1):
+                for phrase in ("under construction", "not published"):
+                    if phrase in line.lower():
+                        findings.append(Finding("submit", rel, n, f"still says '{phrase}'"))
+                for m in FUTURE_SLOT.finditer(line):
+                    findings.append(Finding("submit", rel, n, f"dated slot '{m.group(0)}'"))
     return findings
 
 
