@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SayAgain · every read-back of a radioed safety order, checked</title>
-<meta name="description" content="SayAgain checks each read-back of a radioed safety order against the order and the plant registry, and sends only the wrong ones to the shift supervisor. Measured so far on written scripts (text·scripted).">
+<meta name="description" content="SayAgain checks each read-back of a radioed safety order against the order and the plant registry, and sends the wrong ones, and any it cannot check, to the shift supervisor. Measured so far on written scripts, no audio yet.">
 <meta name="theme-color" content="#272A2B">
 <meta name="color-scheme" content="dark">
 <meta property="og:type" content="website">
@@ -123,7 +123,7 @@
 <div class="fold-h">
 <p class="lab">CH-01 · AMD Hackathon ACT III · Intelligent Industry</p>
 <h1 id="h1"><span class="s1">Nobody on the channel noticed.</span> <span class="s2"><span class="chipline">The radio<br class="cb"> log did.</span></span></h1>
-<p class="def-sm">SayAgain checks each read-back of a radioed safety order and sends only the wrong ones to the shift supervisor.</p>
+<p class="def-sm">SayAgain checks each read-back of a radioed safety order and sends the wrong ones, and any it cannot check, to the shift supervisor. A model on the <b>AMD Token Factory</b> points at the words; plain code decides.</p>
 </div>
 <div class="fold-card" id="opening">
 <article class="xcard v-MISMATCH" id="x-open" data-x="H-01" data-ins="H-01-0" data-rb="H-01-1">
@@ -161,16 +161,16 @@
 </div>
 </div>
 <div class="fold-l">
-<p class="lede"><span class="lede-def"><b>SayAgain checks each read-back of a radioed safety order</b> against the order and the plant registry, and sends only the wrong ones to the shift supervisor. </span>A model on the AMD Token Factory points at the words; plain code decides.</p>
+<p class="lede"><span class="lede-def"><b>SayAgain checks each read-back of a radioed safety order</b> against the order and the plant registry, and sends the wrong ones, and any it cannot check, to the shift supervisor. </span><span class="lede-amd">A model on the <b>AMD Token Factory</b> points at the words; plain code decides.</span></p>
 <div class="cta">
 <a class="btn lg" href="https://github.com/edycutjong/sayagain"><svg class="gh" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.8c-2.8.6-3.4-1.2-3.4-1.2-.5-1.1-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.4 1.1 2.9.8.1-.7.4-1.1.6-1.3-2.2-.3-4.6-1.1-4.6-5a3.9 3.9 0 0 1 1-2.7c-.1-.2-.4-1.3.1-2.7 0 0 .8-.3 2.7 1a9.4 9.4 0 0 1 5 0c1.9-1.3 2.7-1 2.7-1 .5 1.4.2 2.5.1 2.7a3.9 3.9 0 0 1 1 2.7c0 3.9-2.4 4.7-4.6 5 .4.3.7.9.7 1.9V21c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg>GitHub</a>
 <a class="btn lg" href="pitch/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18v12H3zM12 16v4M8 20h8"/></svg>Pitch deck</a>
 <a class="btn ink lg" href="replay/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 3-6.2M4 4v4h4"/><path d="M10 9l5 3-5 3z"/></svg>Open the replay</a>
 </div>
 <div class="receipts" role="group" aria-label="Receipts">
-<p class="lab">Receipts · 89 held-out exchanges · text·scripted</p>
+<p class="lab">Receipts · 89 held-out exchanges · written scripts, no audio yet</p>
 <ul>
-<li data-src="bench/results/text/llm-judge-r1-reaudit.json bench/results/text/ladder-r1-reaudit.json"><b class="num"><span class="was">2</span><span class="arw" aria-hidden="true">→</span><span>0</span></b><span>wrong read-backs passed · LLM judge 2, referee 0</span></li>
+<li data-src="bench/results/text/llm-judge-r1-reaudit.json bench/results/text/ladder-r1-reaudit.json"><b class="num"><span class="was">2</span><span class="arw" aria-hidden="true">→</span><span>0</span></b><span>wrong read-backs passed<br>LLM&nbsp;judge&nbsp;2, referee&nbsp;0</span></li>
 <li data-src="bench/results/text/ladder-r1-reaudit.json"><b class="num"><span data-count="41">41</span>/41</b><span>seeded errors caught, Gemma-4-31B-IT</span></li>
 <li data-src="bench/results/text/ladder-r1-reaudit.json"><b class="num"><span data-count="2">2</span>/48</b><span>false alarms on correct read-backs, same rung</span></li>
 <li data-src="evidence/terminal-2026-10-14.log"><b class="num">24<small>× OK</small></b><span>result rows re-derived offline in 2.9 s</span></li>
@@ -198,7 +198,8 @@
 <g class="vl nb" transform="translate(930 110)"><path class="body" d="M-36 -24 L36 24 L36 -24 L-36 24 Z"/><path class="stem" d="M0 -24 V-60 M-22 -60 H22"/><text x="50" y="-36" class="tg">XV-209</text><text x="50" y="-14" class="ar">press station</text></g>
 <g class="vl nb" transform="translate(470 240)"><path class="body" d="M-36 -24 L36 24 L36 -24 L-36 24 Z"/><path class="stem" d="M0 -24 V-60 M-22 -60 H22"/><text x="50" y="-36" class="tg">XV-202</text><text x="50" y="-14" class="ar">sterilizer</text></g>
 <g class="vl from" transform="translate(930 240)"><path class="body" d="M-36 -24 L36 24 L36 -24 L-36 24 Z"/><path class="stem" d="M0 -24 V-60 M-22 -60 H22"/><text x="50" y="-36" class="tg">XV-203</text><text x="50" y="-14" class="ar">press station</text><text x="0" y="52" class="nt">ordered</text></g>
-<path class="hop" d="M898 218 C 840 196, 720 170, 652 132"/><text x="650" y="214" class="hl">the crew walks here</text>
+<defs><marker id="hop-head" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="hop-head"/></marker></defs>
+<path class="hop" d="M898 218 C 840 196, 720 170, 652 132" marker-end="url(#hop-head)"/><path id="hop-text" d="M652 132 C 720 170, 840 196, 898 218" fill="none" stroke="none"/><text class="hl" dy="-10"><textPath href="#hop-text" startOffset="140" text-anchor="middle">the crew walks here</textPath></text>
 </svg>
 <figcaption><code>data/registry.csv</code> · fictional plant, 120 tags; the valves drawn are the registry’s own on lines A and B: <span class="nw"><span class="nw">XV-203</span> · on/off valve · line B · press station</span> · <span class="nw"><span class="nw">XV-208</span> · on/off valve · line A · clarification</span></figcaption>
 </figure>
@@ -229,7 +230,7 @@
 <div class="rescore" data-src="evidence/terminal-2026-10-14.log">
 <p class="lab">Re-derived offline</p>
 <p class="big"><b>24 × OK</b></p>
-<p data-src="evidence/terminal-2026-10-14.log">Every stored model output re-judged by the referee, and every result row re-derived, in 2.9 s with no network: <code>uv run python scripts/eval.py --rescore</code></p>
+<p data-src="evidence/terminal-2026-10-14.log">The stored model outputs behind 24 result rows re-scored by the referee code (the LLM-judge rows from the stored judge outputs), in 2.9 s with no network: <code>uv run python scripts/eval.py --rescore</code></p>
 <button type="button" class="copy" data-copy="uv run python scripts/eval.py --rescore">Copy the command</button>
 </div>
 </div>
@@ -749,10 +750,10 @@
 <div class="sec-head">
 <p class="lab" data-src="bench/results/text/ladder-r1-reaudit.json">Model ladder · 89 held-out exchanges · text·scripted</p>
 <h2 id="h-lad">Climb only as high as the rule needs.</h2>
-<p class="lede">The rule was pre-registered before the first model call: the smallest rung with 0 false-VERIFIED and at most 5 % false-alarm load. Every model rung extracts spans on the AMD Token Factory; the referee makes each one fail toward a human.</p>
+<p class="lede">The rule was pre-registered before the first model call, for the audio headline row (bench/PROTOCOL.md logs its use on these written-word rows as a deviation): the smallest rung with 0 false-VERIFIED (wrong read-backs passed) and at most 5 % false-alarm load (correct read-backs sent to a human). Every model rung extracts spans on the AMD Token Factory; the referee makes each one fail toward a human.</p>
 </div>
 <div class="rungs" role="table" aria-label="Model ladder results, held-out exchanges">
-<div class="rg-h" role="row"><span role="columnheader">Rung</span><span role="columnheader">False-VERIFIED</span><span role="columnheader">Seeded errors flagged</span><span role="columnheader">False alarms, <span class="nw">48 correct read-backs</span></span><span role="columnheader">Latency, median / 95th pct</span><span role="columnheader">Meets the rule</span></div>
+<div class="rg-h" role="row"><span role="columnheader">Rung</span><span role="columnheader">False-VERIFIED</span><span role="columnheader">Seeded errors flagged</span><span role="columnheader">False alarms, <span class="nw">48 correct read-backs</span></span><span role="columnheader">Latency, median / <span class="nw">95th pct</span></span><span role="columnheader">Meets the rule</span></div>
 <div class="rg meets" role="row" data-rung="regex">
 <span role="cell" class="nm"><b>regex</b><small>rung 0 · no model</small></span>
 <span role="cell" class="fv" data-src="bench/results/text/ladder-r1-reaudit.json"><b class="num">0</b></span>
@@ -762,7 +763,7 @@
 <span role="cell" class="mr" data-src="bench/results/text/ladder-r1-reaudit.json"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>meets</span>
 </div>
 <div class="rg allhuman" role="row" data-rung="MiniCPM5-2B">
-<span role="cell" class="nm"><b>MiniCPM5-2B</b><small>smallest rung</small></span>
+<span role="cell" class="nm"><b>MiniCPM5-2B</b><small>smallest on the ladder</small></span>
 <span role="cell" class="fv" data-src="bench/results/text/ladder-r1-reaudit.json"><b class="num">0</b></span>
 <span role="cell" class="ef" data-src="bench/results/text/ladder-r1-reaudit.json">41/41</span>
 <span role="cell" class="fa" data-src="bench/results/text/ladder-r1-reaudit.json"><span class="cells"><i class="on" title="A2-021: false alarm"></i><i class="on" title="A2-022: false alarm"></i><i class="on" title="A2-024: false alarm"></i><i class="on" title="A2-025: false alarm"></i><i class="on" title="A2-026: false alarm"></i><i class="on" title="A2-028: false alarm"></i><i class="on" title="A2-030: false alarm"></i><i class="on" title="A2-035: false alarm"></i><i class="on" title="A2-036: false alarm"></i><i class="on" title="A2-037: false alarm"></i><i class="on" title="A2-038: false alarm"></i><i class="on" title="A2-040: false alarm"></i><i class="on" title="A2-041: false alarm"></i><i class="on" title="A2-042: false alarm"></i><i class="on" title="A2-045: false alarm"></i><i class="on" title="A2-047: false alarm"></i><i class="on" title="A2-048: false alarm"></i><i class="on" title="A2-049: false alarm"></i><i class="on" title="A2-050: false alarm"></i><i class="on" title="A2-051: false alarm"></i><i class="on" title="A2-054: false alarm"></i><i class="on" title="A2-057: false alarm"></i><i class="on" title="A2-058: false alarm"></i><i class="on" title="A2-059: false alarm"></i><i class="on" title="A2-060: false alarm"></i><i class="on" title="A2-062: false alarm"></i><i class="on" title="A2-067: false alarm"></i><i class="on" title="A2-070: false alarm"></i><i class="on" title="A2-072: false alarm"></i><i class="on" title="A2-073: false alarm"></i><i class="on" title="A2-077: false alarm"></i><i class="on" title="A2-079: false alarm"></i><i class="on" title="A2-081: false alarm"></i><i class="on" title="A2-083: false alarm"></i><i class="on" title="A2-084: false alarm"></i><i class="on" title="A2-086: false alarm"></i><i class="on" title="A2-087: false alarm"></i><i class="on" title="A2-088: false alarm"></i><i class="on" title="A2-090: false alarm"></i><i class="on" title="A2-094: false alarm"></i><i class="on" title="A2-095: false alarm"></i><i class="on" title="A2-096: false alarm"></i><i class="on" title="A2-099: false alarm"></i><i class="on" title="A2-100: false alarm"></i><i class="on" title="A2-102: false alarm"></i><i class="on" title="A2-103: false alarm"></i><i class="on" title="A2-104: false alarm"></i><i class="on" title="A2-106: false alarm"></i></span><b>48/48</b></span>
@@ -864,7 +865,7 @@
 <p>token log-probs: returned by none of the models probed</p>
 <p>/audio/transcriptions: “Transcription model not found: whisper-1”</p>
 </div>
-<p class="probe-src" data-src="bench/results/access-gate.json"><code>bench/results/access-gate.json</code> · Gemma-4-31B-IT’s probe answer was not valid JSON; it meets the rule in the ladder re-audit · friction log: <a href="DX-REPORT.md">docs/DX-REPORT.md</a></p>
+<p class="probe-src" data-src="bench/results/access-gate.json"><code>bench/results/access-gate.json</code> · Gemma-4-31B-IT’s probe answer was not valid JSON; it meets the rule in the ladder re-audit · friction log: <a href="https://github.com/edycutjong/sayagain/blob/main/docs/DX-REPORT.md">docs/DX-REPORT.md</a></p>
 <p class="why-amd">The ladder is also the sizing step for a plant: the smallest model that never waves a wrong read-back through is the one a site would run on its own servers. That benchmark is the next step, not a claim on this page.</p>
 </section>
 
@@ -882,10 +883,10 @@
 <p class="calc total"><span class="op">≈</span><span class="n">USD 5.7 M</span><span class="u">a year from Indonesian mills alone: an estimate built from the labelled assumptions</span></p>
 </div>
 <ul class="pay-facts">
-<li data-src="evidence/sources.json"><b>Buyer.</b> The HSE / K3 manager and the mill manager. Under PP 50/2012 a company with at least 100 workers or a high hazard potential must run SMK3, which is audited; a timestamped record of order, read-back, verdict and supervisor decision is audit evidence.</li>
+<li data-src="evidence/sources.json"><b>Buyer.</b> The HSE / K3 manager and the mill manager. Under PP 50/2012 a company with at least 100 workers or a high hazard potential must run SMK3, which is audited; a timestamped record of order, read-back, verdict and supervisor decision can serve as audit evidence.</li>
 <li><b>Wedge.</b> A free 30-day listen-only baseline at one mill: measure the plant’s own read-back error rate, the number nobody has published.</li>
 <li data-src="evidence/sources.json"><b>Privacy.</b> Voice that identifies a person is personal data under Indonesia’s UU PDP 27/2022. Planned for production: run inside the company network, keep audio only for queue cards, score procedures, never people. Today the exchanges carry roles, not names, and no audio has been processed.</li>
-<li data-src="bench/results/text/ladder-r1.json bench/results/text/ladder-r1-reaudit.json"><b>Compute.</b> Gemma-4-31B-IT’s first pass over the shift: 300 calls, 178 answered (the rest failed at the gateway: server errors and time-outs), USD 0.000895 at the Token Factory’s price; the re-audit’s 118 calls for the cards they left cost USD 0.000512.</li>
+<li data-src="bench/results/text/ladder-r1.json bench/results/text/ladder-r1-reaudit.json"><b>Compute.</b> Gemma-4-31B-IT’s first pass over the shift: 300 calls, 178 answered (the other 122 failed at the gateway: server errors, time-outs and 4 rate-limited attempts), USD 0.000895 at the Token Factory’s price; the re-audit’s 118 calls for the cards they left cost USD 0.000512.</li>
 </ul>
 </div>
 </section>
@@ -922,7 +923,7 @@
 <details><summary>Where does the AMD Token Factory sit in the pipeline?</summary>
 <p>It does the one model job: span extraction. Each call returns the words for action, tag and line, and its receipt records the request id, the model served, the host and the cost.</p>
 <p>Speech-to-text has not run on a recording yet; the Token Factory lists no transcription model. The referee and the queue are plain Python on the operator’s side.</p></details>
-<details><summary>Couldn’t an LLM just judge the read-back?</summary>
+<details open><summary>Couldn’t an LLM just judge the read-back?</summary>
 <p data-src="bench/results/text/llm-judge-r1-reaudit.json">We measured that. DeepSeek-V4.1-Flash, given the whole exchange and no plant registry, passed 2 wrong read-backs as VERIFIED and passed the <span class="nw">XV-205</span> order, a valve the plant does not have. In SayAgain the model only points at words; the verdict is code.</p></details>
 <details><summary>A regex already meets the rule. Why a model at all?</summary>
 <p>On clean written words it does: that is our own result, and the page says so. Real speech is not clean: recognition errors, code-switched Bahasa, other people’s phrasing. The audio rows decide whether a model earns its place; if they say it does not, the report will say that.</p></details>
@@ -951,7 +952,7 @@
 <li><a href="https://github.com/edycutjong/sayagain">GitHub</a></li>
 <li><a href="pitch/">Pitch deck</a></li>
 <li><a href="replay/">Replay</a></li>
-<li><a href="DX-REPORT.md">DX report</a></li>
+<li><a href="https://github.com/edycutjong/sayagain/blob/main/docs/DX-REPORT.md">DX report</a></li>
 <li><a href="https://github.com/edycutjong/sayagain/blob/main/LICENSE">MIT licence</a></li>
 </ul>
 <p class="ver">replay data from commit cf3769a · page built 2026-10-14</p>

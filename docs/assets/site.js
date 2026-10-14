@@ -155,16 +155,19 @@
   }
   if (list) {
     // the opening row sits mid-list at laptop heights: bring it into the list's own view (never the page's)
-    var sel0 = $('.row[aria-selected="true"]', list), rows0 = $$('.row', list), head0 = $('.log-h', list);
-    if (sel0 && list.scrollHeight > list.clientHeight) {
-      var k = rows0.indexOf(sel0), top = k, h = head0 ? head0.offsetHeight : 0;
+    var placeSelected = function () {
+      var sel0 = $('.row[aria-selected="true"]', list), rows0 = $$('.row', list), head0 = $('.log-h', list);
+      if (!sel0 || list.scrollHeight <= list.clientHeight) return;
+      var top = rows0.indexOf(sel0), h = head0 ? head0.offsetHeight : 0;
       while (top > 0 && sel0.offsetTop + sel0.offsetHeight - rows0[top - 1].offsetTop <= list.clientHeight - h) top--;
-      list.scrollTop = Math.max(0, rows0[top].offsetTop - h);  // whole rows, the selected one last in view
-    }
+      var want = Math.max(0, rows0[top].offsetTop - h);  // whole rows, the selected one last in view
+      if (sel0.offsetTop < list.scrollTop + h || sel0.offsetTop + sel0.offsetHeight > list.scrollTop + list.clientHeight) list.scrollTop = want;
+    };
+    placeSelected();
     var edge = function () { list.classList.toggle('more', list.scrollHeight - list.clientHeight - list.scrollTop > 2); };
     edge();
     list.addEventListener('scroll', edge, { passive: true });
-    window.addEventListener('resize', edge);
+    window.addEventListener('resize', function () { placeSelected(); edge(); });
     list.addEventListener('click', function (e) { var r = e.target.closest('.row'); if (r) pick(r.getAttribute('data-pick')); });
     list.addEventListener('keydown', function (e) {
       if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
@@ -260,6 +263,7 @@
       });
     }, { rootMargin: '-40% 0px -55% 0px' });
     Object.keys(map).forEach(function (id) { var s = doc.getElementById(id); if (s) io.observe(s); });
+    var fold = $('.fold'); if (fold) io.observe(fold);  // back on the fold: no section is current
   }
   root.classList.add('ready');
 })();

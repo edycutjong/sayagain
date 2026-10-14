@@ -106,7 +106,9 @@ svg.connectors line.amb{stroke:var(--abstain);stroke-dasharray:6 6}
 .tcard .cmd{color:var(--ink)}.tcard .cmd::before{content:"$ ";color:var(--mid)}
 .tcard b{color:var(--ink)}
 .tcard b.bad{color:var(--after-text)}
-.s-cover .xcard .xc-act,.s-cover .xcard .xc-badges{display:none}
+.s-cover .xcard .xc-act{display:none}
+.s-cover .xcard .xc-badges li:not(.amd){display:none}
+.s-cover .xcard .xc-badges{margin-top:14px}
 .s-cover .xc-turn.rb{border-bottom:0}
 .tcard .com{color:var(--mid)}
 @media (hover:none){.hint{display:none}}
@@ -126,14 +128,15 @@ svg.connectors line.amb{stroke:var(--abstain);stroke-dasharray:6 6}
 .plain{margin-top:50px;max-width:1500px;border-top:1px solid var(--rule)}
 .pl{display:grid;grid-template-columns:260px 1fr;align-items:baseline;margin:0;padding:26px 0;border-bottom:1px solid var(--rule)}
 .pl .who{font:600 20px var(--font-data);letter-spacing:.14em;color:var(--mid)}
-.pl .said{font-size:42px;color:var(--before);white-space:nowrap}
+.pl .said{font-size:42px;color:color-mix(in srgb,var(--before) 86%,var(--bg));white-space:nowrap}
+.pl .said b{font-weight:400;color:var(--ink)}
 .none{margin:24px 0 0;font:500 26px var(--font-data);color:var(--mid);letter-spacing:.04em}
 .foot-note{margin-top:18px;max-width:1500px;font-size:24px;color:var(--mid)}
 .mini{margin-top:auto;margin-bottom:10px;width:100%;height:auto}
 .mini .lt{font:500 20px var(--font-data);fill:var(--mid);letter-spacing:.12em}
 .mini .pipe{stroke:var(--before);stroke-width:4;fill:none}
 .mini .vb{fill:var(--panel);stroke:var(--before);stroke-width:3}
-.mini .tg{font:400 30px var(--font-display);fill:var(--before);letter-spacing:.04em}
+.mini .tg{font:400 40px var(--font-display);fill:var(--before);letter-spacing:.04em}
 .mini .route{fill:none;stroke:var(--before);stroke-width:2.5;stroke-dasharray:8 8}
 
 /* 3 · gap: two 100-cell strips and the missing plant number */
@@ -142,7 +145,7 @@ svg.connectors line.amb{stroke:var(--abstain);stroke-dasharray:6 6}
 .strip{display:grid;grid-template-columns:170px 1fr 120px;align-items:center;gap:24px;margin:0 0 30px}
 .strip .who{font:600 22px var(--font-data);letter-spacing:.08em;text-transform:uppercase;color:var(--mid)}
 .c100{display:grid;grid-template-columns:repeat(50,1fr);gap:3px}
-.c100 i{height:30px;border-radius:1px;background:rgba(169,174,166,.14)}
+.c100 i{height:30px;border-radius:1px;background:rgba(169,174,166,.10);box-shadow:inset 0 0 0 1.5px rgba(169,174,166,.42)}
 .c100 i.on{background:var(--before)}
 .strip b{font:400 84px/1 var(--font-display);color:var(--ink)}
 .strips .sk{margin:14px 0 0 194px;font:400 20px var(--font-data);color:var(--mid)}
@@ -185,8 +188,10 @@ svg.connectors line.amb{stroke:var(--abstain);stroke-dasharray:6 6}
 .flow3 .json{margin:0;padding:18px 20px;background:var(--sunk);border:1px solid var(--rule);border-radius:6px;font:400 19px/1.55 var(--font-data);color:var(--before);white-space:pre-wrap}
 .flow3 .json .k{color:var(--mid)}.flow3 .json .s{color:var(--ink)}
 .flow3 .tr{margin:0;padding-left:28px;font:400 18px/1.6 var(--font-data);color:var(--before)}
-.flow3 .vd{margin:20px 0 0;font:600 24px var(--font-data);color:var(--ink)}
-.flow3 .vd span{color:var(--after-text)}
+.flow3 .f3{display:flex;flex-direction:column}
+.flow3 .vd{display:flex;align-items:center;gap:16px;margin:auto 0 0;padding-top:22px;font:400 56px/1 var(--font-display);color:var(--ink)}
+.flow3 .vd .ring{width:22px;height:22px;border-radius:50%;border:4px solid var(--after)}
+.flow3 .vd2{margin:12px 0 0;font:500 26px var(--font-data);color:var(--after-text)}
 .rcpt{margin:10px 0 auto;font:400 19px/1.45 var(--font-data);color:var(--mid);overflow-wrap:anywhere}
 .rchips{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 0;padding:0;list-style:none}
 .rchips li{font:500 18px var(--font-data);color:var(--ink);border:1px dashed var(--rule);border-radius:4px;padding:6px 10px}

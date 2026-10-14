@@ -116,6 +116,8 @@ h1 .chipline{display:inline-block;max-width:100%;background:var(--ink);color:var
 .fold-cap{display:flex;align-items:flex-start;gap:14px;margin-top:14px;color:var(--mid);font-size:14px;line-height:1.45}
 .fold-cap p{margin:0}
 .fold-cap p b{color:var(--ink);font-size:16px}
+.steps .ev code{white-space:nowrap}
+.lede b{color:var(--ink);font-weight:600}
 .fold-cap .btn{flex:none}
 
 /* ---------- the read-back card (the queue's own card, same anatomy) ---------- */
@@ -198,6 +200,8 @@ svg.connectors line.amb{stroke:var(--abstain);stroke-dasharray:4 4}
 .receipts li:nth-child(even){padding-left:20px;border-left:1px solid var(--line)}
 .receipts .num{font-size:clamp(40px,3.6vw,52px);line-height:1;color:var(--ink);white-space:nowrap}
 .receipts .num .was{color:var(--after-display)}
+.receipts li:not(:first-child) .num{font-size:clamp(28px,2.5vw,38px);color:var(--before)}
+.receipts li > span{text-wrap:balance}
 .receipts .num .arw{margin:0 .14em;font:400 .6em/1 var(--font-body);color:var(--mid);vertical-align:.2em}
 .receipts .num.cost{font-size:clamp(30px,2.7vw,40px);padding-top:.25em}
 .receipts .num small{font:600 .34em/1 var(--font-data);letter-spacing:.06em;color:var(--mid);margin-left:.25em}
@@ -229,6 +233,7 @@ h3{margin:0;font:600 22px/1.2 var(--font-body);letter-spacing:.01em}
 .mimic .vl.to .body{stroke:var(--after);fill:color-mix(in srgb,var(--after) 22%,var(--panel));stroke-width:4}
 .mimic .vl.to .nt{fill:var(--after-text)}
 .mimic .hop{fill:none;stroke:var(--after);stroke-width:2.5;stroke-dasharray:7 7}
+.mimic .hop-head{fill:var(--after)}
 .js .mimic.armed .vl.to .body{stroke:var(--before);fill:var(--panel);stroke-width:3}
 .js .mimic.armed .vl.to .nt{fill:var(--mid);opacity:0}
 .js .mimic.armed .hop,.js .mimic.armed .hl{opacity:0}
@@ -239,7 +244,7 @@ h3{margin:0;font:600 22px/1.2 var(--font-body);letter-spacing:.01em}
 .mimic .vl.to .body{transform-box:fill-box;transform-origin:center}
 .mimic figcaption{margin-top:10px;font-size:14px;color:var(--mid);line-height:1.6}
 .context{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;margin-top:40px}
-.context.band{gap:0;padding:6px 0;background:var(--ink);border-radius:6px;box-shadow:0 30px 60px -36px rgba(0,0,0,.8)}
+.context.band{gap:0;padding:6px 0;background:color-mix(in srgb,var(--ink) 86%,var(--bg));border-radius:6px;box-shadow:0 30px 60px -36px rgba(0,0,0,.8)}
 .context.band blockquote{padding:26px 30px 24px;border-top:0}
 .context.band blockquote+blockquote{border-left:1px solid rgba(39,42,43,.22)}
 .context.band .fig .num{color:var(--bg)}
@@ -526,7 +531,8 @@ summary::-webkit-details-marker{display:none}
   :root{--pad:20px}
   html{scroll-padding-top:128px}
   .def-sm{display:block;margin:16px 0 0;font-size:18px;line-height:1.45;color:var(--ink)}
-  .lede-def{display:none}
+  .lede-def,.lede-amd{display:none}
+  .fold-l .lede{display:none}
   .quotes{grid-template-columns:minmax(0,1fr)}
   body{font-size:18px}
   .nav{height:64px;gap:12px}
@@ -581,7 +587,7 @@ summary::-webkit-details-marker{display:none}
   .mimic .lt{font-size:26px}.mimic .tg{font-size:34px}.mimic .nt{font-size:24px}.mimic .ar,.mimic .hl{display:none}
 }
 @media (max-width:640px){
-  .mimic .lt{font-size:44px}.mimic .tg{font-size:56px}.mimic .nt{font-size:44px}.mimic .vl.nb .tg{display:none}
+  .mimic .lt{font-size:50px}.mimic .tg{font-size:58px}.mimic .nt{font-size:50px}.mimic .vl.nb .tg{display:none}
 }
 @media (max-width:420px){
   .rg .lt{white-space:normal}

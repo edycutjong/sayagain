@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SayAgain · pitch deck</title>
-<meta name="description" content="SayAgain pitch deck: checks each read-back of a radioed safety order against the plant registry and sends only the wrong ones to the supervisor.">
+<meta name="description" content="SayAgain pitch deck: checks each read-back of a radioed safety order against the plant registry and sends the wrong ones, and any it cannot check, to the supervisor.">
 <meta name="theme-color" content="#272A2B">
 <meta name="color-scheme" content="dark">
 <meta property="og:type" content="website">
@@ -68,7 +68,7 @@
 <p class="lab">AMD Developer Hackathon ACT III · Intelligent Industry</p>
 <p class="wm"><img src="../assets/icon.svg" alt="" width="64" height="64"><span>SAYAGAIN</span></p>
 <h1><span class="g">Nobody on the channel noticed.</span> <span class="k"><span class="chipline">The radio<br> log did.</span></span></h1>
-<p class="sub wide">Checks each read-back of a radioed safety order against the plant registry; only the wrong ones reach the supervisor.</p>
+<p class="sub wide">Checks each read-back of a radioed safety order against the plant registry; wrong ones, and any it cannot check, reach the supervisor.</p>
 </div>
 <div class="cv-r render">
 <article class="xcard v-MISMATCH" id="x-open" data-x="H-01" data-ins="H-01-0" data-rb="H-01-1">
@@ -109,16 +109,16 @@
 <p class="lab">CH-01 · how the channel hears it today</p>
 <h2>Two lines. Nobody flags them.</h2>
 <div class="plain render">
-<p class="pl"><span class="who">OPERATOR</span><span class="said">Close valve two-oh-three, line Bravo.</span></p>
-<p class="pl"><span class="who">FIELD TECH</span><span class="said">Copy, closing two-oh-eight, line Bravo.</span></p>
+<p class="pl"><span class="who">OPERATOR</span><span class="said">Close valve <b>two-oh-three</b>, line Bravo.</span></p>
+<p class="pl"><span class="who">FIELD TECH</span><span class="said">Copy, closing <b>two-oh-eight</b>, line Bravo.</span></p>
 <p class="none">no flag · no card · the crew walks to <span class="nw">XV-208</span></p>
 </div>
 <svg class="mini render" viewBox="0 0 1680 230" role="img" aria-label="Line A with XV-208 and line B with XV-203, all grey: nothing on the channel marks the wrong valve">
 <text x="0" y="40" class="lt">LINE A · CLARIFICATION</text><path class="pipe" d="M0 80 H1680"/>
 <text x="0" y="160" class="lt">LINE B · PRESS STATION</text><path class="pipe" d="M0 200 H1680"/>
-<g transform="translate(1000 80)"><path class="vb" d="M-24 -16 L24 16 L24 -16 L-24 16 Z"/><text x="40" y="-24" class="tg">XV-208</text></g>
-<g transform="translate(1000 200)"><path class="vb" d="M-24 -16 L24 16 L24 -16 L-24 16 Z"/><text x="40" y="-24" class="tg">XV-203</text></g>
-<path class="route" d="M960 186 C 900 160, 900 120, 962 94"/>
+<g transform="translate(1000 80)"><path class="vb" d="M-36 -24 L36 24 L36 -24 L-36 24 Z"/><text x="52" y="-26" class="tg">XV-208</text></g>
+<g transform="translate(1000 200)"><path class="vb" d="M-36 -24 L36 24 L36 -24 L-36 24 Z"/><text x="52" y="-26" class="tg">XV-203</text></g>
+<path class="route" d="M952 178 C 890 156, 890 124, 954 102"/>
 </svg>
 <p class="foot-note">In the registry the demo runs on, <span class="nw">XV-203</span> is on line B at the press station; <span class="nw">XV-208</span> is on line A, in clarification.</p>
 <aside class="speaker-notes">This is the read-back as the channel hears it. Both lines sound routine. The read-back exists so the operator catches the wrong digit, and when the operator misses it too, nothing else on the channel checks it.</aside>
@@ -136,7 +136,7 @@
 </div>
 <div class="norate"><p class="big">No rate</p><p>published for plant radio</p></div>
 </div>
-<aside class="speaker-notes" data-src="evidence/sources.json">In aviation, tower controllers catch 63 percent of pilots' wrong read-backs and approach controllers half; the rest go through. Nobody has published that number for plant radio, so a pilot's first job is to measure it. And a wrong valve state is not abstract: at Goodyear in 2008 an isolation valve left closed after maintenance, then a blocked relief path, led to a heat-exchanger rupture that killed one worker and injured six, according to the Chemical Safety Board.</aside>
+<aside class="speaker-notes" data-src="evidence/sources.json">In aviation, tower controllers catch 63 percent of pilots' wrong read-backs and approach controllers half; the rest go through. Nobody has published that number for plant radio, so the pilot study's first job is to measure it. And a wrong valve state is not abstract: at Goodyear in 2008 an isolation valve left closed after maintenance, then a blocked relief path, led to a rupture that killed one worker and injured six, according to the Chemical Safety Board.</aside>
 </section>
 
 <section class="slide s-product" data-title="The product" aria-label="Slide 4, the product">
@@ -171,9 +171,9 @@
   ],
   <span class="k">&quot;kind&quot;</span>: <span class="s">&quot;readback&quot;</span>,
   <span class="k">&quot;retracted_spans&quot;</span>: []
-}</pre><ul class="rchips" data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json bench/results/text/ladder-r1.json"><li class="amd">AMD Token Factory</li><li>developer.amd.com.cn</li><li>median 4.304 s</li><li>USD 4.8937e-06</li></ul></div>
+}</pre><ul class="rchips" data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json bench/results/text/ladder-r1.json"><li class="amd">AMD Token Factory</li><li>developer.amd.com.cn</li><li>median latency 4.304 s, first pass</li><li>cost USD 4.8937e-06</li></ul></div>
 <div class="arr" aria-hidden="true">→</div>
-<div class="f3"><p class="h">3 · what code decided</p><ol class="tr"><li>instruction: grounded + covered (1 command(s))</li><li>read-back: grounded + covered (1 command(s))</li><li>audio: no gate (no token probabilities, no unprompted pass)</li><li>instruction: <span class="nw">XV-203</span> line B (registry ok)</li><li>compare: tag: <span class="nw">XV-203</span> ≠ <span class="nw">XV-208</span></li></ol><p class="vd">MISMATCH · <span>tag: <span class="nw">XV-203</span> ≠ <span class="nw">XV-208</span></span></p></div>
+<div class="f3"><p class="h">3 · what code decided</p><ol class="tr"><li>instruction: grounded + covered (1 command(s))</li><li>read-back: grounded + covered (1 command(s))</li><li>audio: no gate (no token probabilities, no unprompted pass)</li><li>instruction: <span class="nw">XV-203</span> line B (registry ok)</li><li>compare: tag: <span class="nw">XV-203</span> ≠ <span class="nw">XV-208</span></li></ol><p class="vd"><i class="ring" aria-hidden="true"></i>MISMATCH</p><p class="vd2">tag: <span class="nw">XV-203</span> ≠ <span class="nw">XV-208</span></p></div>
 </div>
 <p class="stl render">speech-to-text: not run yet · <b>span extraction: AMD Token Factory</b> · referee: local, plain Python · queue: local</p>
 <p class="rcpt render" data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json bench/results/text/ladder-r1.json">receipt, as stored · request_id c9647a04cfcc4eeaadbfa965a4d74c6d · model_served self-dploy/Gemma-4-31B-IT (sic, as served) · host developer.amd.com.cn · latency_s 35.4972 (a slow call; the first pass’s median was 4.304 s) · cost_usd 4.8937e-06</p>
@@ -227,7 +227,7 @@
 <div class="ld render">
 <p class="hd" data-src="bench/results/text/ladder-r1-reaudit.json"><span>rung</span><span>false-VERIFIED</span><span>false alarms on 48 correct read-backs · dashed: 5 % budget</span><span></span><span>rule</span></p>
 <div class="lr meets"><span class="nm">regex<small>rung 0 · no model</small></span><span class="fv" data-src="bench/results/text/ladder-r1-reaudit.json">0</span><span class="cells"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="fa" data-src="bench/results/text/ladder-r1-reaudit.json">0/48</span><span class="mr">meets</span></div>
-<div class="lr allhuman"><span class="nm">MiniCPM5-2B<small>smallest rung</small></span><span class="fv" data-src="bench/results/text/ladder-r1-reaudit.json">0</span><span class="cells"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="fa" data-src="bench/results/text/ladder-r1-reaudit.json">48/48</span><span class="mr">all 48 to a human</span></div>
+<div class="lr allhuman"><span class="nm">MiniCPM5-2B<small>smallest on the ladder</small></span><span class="fv" data-src="bench/results/text/ladder-r1-reaudit.json">0</span><span class="cells"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="fa" data-src="bench/results/text/ladder-r1-reaudit.json">48/48</span><span class="mr">all 48 to a human</span></div>
 <div class="lr meets"><span class="nm">Gemma-4-31B-IT<small>thinking off · <i class="ra">re-audit</i></small></span><span class="fv" data-src="bench/results/text/ladder-r1-reaudit.json">0</span><span class="cells"><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="fa" data-src="bench/results/text/ladder-r1-reaudit.json">2/48</span><span class="mr">meets</span></div>
 <div class="lr"><span class="nm">DeepSeek-V4-Flash<small>thinking off · <i class="ra">re-audit</i></small></span><span class="fv" data-src="bench/results/text/ladder-r1-reaudit.json">0</span><span class="cells"><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i class="on"></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="fa" data-src="bench/results/text/ladder-r1-reaudit.json">4/48</span><span class="mr">over budget</span></div>
 <div class="lr"><span class="nm">Qwen3.8-27B<small>thinking on · <i class="ra">re-audit</i></small></span><span class="fv" data-src="bench/results/text/ladder-r1-reaudit.json">0</span><span class="cells"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="fa" data-src="bench/results/text/ladder-r1-reaudit.json">4/48</span><span class="mr">over budget</span></div>
@@ -244,7 +244,7 @@
 <h2>Priced per channel. Bought by HSE.</h2>
 <div class="calc" data-src="evidence/sources.json"><p><span class="n">1,318</span><span>mills, Indonesia 2022 (Trase)</span></p><p><span class="n">× 30 %</span><span>addressable*</span></p><p><span class="n">× 6</span><span>channels per mill*</span></p><p><span class="n">× USD 2,400</span><span>per channel-year*</span></p><p class="tot"><span class="n">≈ USD 5.7 M</span><span>a year, mills only (estimate)</span></p><p class="ast">* assumption</p></div>
 <div class="wedge"><p class="wl">Wedge</p><p class="wb">Free <span class="nw">30-day</span> <span class="nw">listen-only</span> baseline</p></div>
-<aside class="speaker-notes">We sell an on-prem licence per monitored radio channel to the HSE or K3 manager, who needs audit evidence for the SMK3 audit. The wedge is a free thirty-day listen-only baseline at one mill; after Indonesian mills come the Malaysian mills, refineries, mines and ports, none of them sized yet. The mills line alone, from our labelled assumptions, is an estimate of about 5.7 million dollars a year in Indonesia.</aside>
+<aside class="speaker-notes">We sell an on-prem licence per monitored radio channel to the HSE or K3 manager, for whom the record can serve as evidence in the SMK3 audit. The wedge is a free thirty-day listen-only baseline at one mill; after Indonesian mills come the Malaysian mills, refineries, mines and ports, none of them sized yet. The mills line alone, from our labelled assumptions, is an estimate of about 5.7 million dollars a year in Indonesia.</aside>
 </section>
 
 <section class="slide s-comp" data-title="Competition" aria-label="Slide 9, competition">
@@ -312,7 +312,7 @@
 <p class="phone">This deck is 16:9. On a phone, open the <a href="sayagain-pitch-deck.pdf">PDF</a> or turn the phone sideways.</p>
 <div class="notes-panel" id="notesPanel" aria-live="polite"><div class="nt" id="noteText"></div><div class="meta" id="noteMeta"></div></div>
 <div class="overview" id="overview" role="dialog" aria-label="Slide overview"></div>
-<script>window.DECK_VERSION = "built on 557ff47 · 2026-10-14";</script>
+<script>window.DECK_VERSION = "built on d9ce44e · 2026-10-14";</script>
 <script src="deck.js" defer></script>
 </body>
 </html>
