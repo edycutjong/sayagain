@@ -78,7 +78,9 @@ CANDIDATES: dict[str, Rung] = {
     "Gemma-4-31B-IT": Rung("Gemma-4-31B-IT", "Gemma-4-31B-IT", None, "off", 31.0),
     "DeepSeek-V4-Flash": Rung("DeepSeek-V4-Flash", "DeepSeek-V4-Flash", "none", "off", None),
     "MiMo-V2.6-Flash": Rung("MiMo-V2.6-Flash", "MiMo-V2.6-Flash", "none", "off", None),
-    "DeepSeek-V4.1-Flash": Rung("DeepSeek-V4.1-Flash", "DeepSeek-V4.1-Flash", "none", "off", None),
+    # the LLM-judge baseline: the newest, highest-priced general model in the catalog, served as-is (no
+    # reasoning parameter sent) — the baseline gets its best shot
+    "DeepSeek-V4.1-Flash": Rung("DeepSeek-V4.1-Flash", "DeepSeek-V4.1-Flash", None, "default", None, max_tokens=2048),
 }
 DEFAULT_LADDER = ("regex", "MiniCPM5-2B", "Qwen3.8-27B", "Gemma-4-31B-IT", "DeepSeek-V4-Flash")
 
@@ -626,8 +628,16 @@ def cmd_single(args, kind: str) -> int:
     run = args.run or f"{kind}-{datetime.now(UTC).strftime('%Y%m%dT%H%M%SZ')}"
     meta = metadata(run, cards, {"subset": args.subset, "budget_usd": round(allowed, 4), "usage_before": snap})
     if kind == "ablate-grounding":
+        if args.reuse:  # "with grounding" = that model's rung in a ladder run on the same cards (no second call)
+            ladder = json.loads(Path(args.reuse).read_text(encoding="utf-8"))
+            if ladder["cards_sha256"] != meta["cards_sha256"] or ladder["subset"] != args.subset:
+                print("--reuse: the ladder run used other cards", file=sys.stderr)
+                return 2
+            with_g = {**ladder["rungs"][rung.name], "reused_from": str(Path(args.reuse).relative_to(ROOT))}
+        else:
+            with_g = run_extraction_rung(run, rung, cards, registry, pacer, budget, "spans")
         res = {
-            "with_grounding": run_extraction_rung(run, rung, cards, registry, pacer, budget, "spans"),
+            "with_grounding": with_g,
             "without_grounding": run_extraction_rung(run, rung, cards, registry, pacer, budget, "canonical"),
         }
     else:
@@ -718,6 +728,7 @@ def main(argv: list[str] | None = None) -> int:
         "--budget", type=float, default=0.50, help="USD this run may spend (also capped by the daily guard)"
     )
     ap.add_argument("--run", help="run name (default: subset + UTC time)")
+    ap.add_argument("--reuse", help="--ablate: take the with-grounding side from this ladder result file")
     ap.add_argument("files", nargs="*", help="--rescore: result files (default: all of bench/results/text/*.json)")
     args = ap.parse_args(argv)
     try:
