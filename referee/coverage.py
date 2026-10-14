@@ -48,7 +48,7 @@ def check(transcript: str, g: Grounded) -> None:
         operative = same[0] if same else (later[0] if later else None)
         if operative is None:
             raise CoverageError("retraction cue missing", f"nothing replaces the retracted {transcript[r[0] : r[1]]!r}")
-        if not any(t.norm in al.RETRACTION_CUES and t.start >= r[1] and t.end <= operative[0] for t in toks):
+        if not any(t.start >= r[1] and t.end <= operative[0] for t in al.retraction_cues(toks)):
             raise CoverageError(
                 "retraction cue missing",
                 f"no correction word between {transcript[r[0] : r[1]]!r} and "
@@ -61,7 +61,7 @@ def check(transcript: str, g: Grounded) -> None:
                 "coverage", f"negated command: {transcript[m.start : m.end]!r} — never read as the command"
             )
 
-    mentions = al.all_mentions(transcript)
+    mentions = [m for m in al.all_mentions(transcript) if not (m.field == "action" and al.report_back(toks, m))]
     # field purity: a span holds words of its own field only — a wide span ("closing two-oh-eight" as the action,
     # "line Bravo and opening two-oh-eight" as the line) cannot swallow a tag or a verb the model did not report
     for f, sp in command_spans:

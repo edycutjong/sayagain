@@ -178,6 +178,22 @@ BAHASA_LETTERS: dict[str, str] = {
 
 # retraction cues inside one transmission. Never "say again": that is the technician asking for a repeat.
 RETRACTION_CUES: frozenset[str] = frozenset({"correction", "koreksi", "ralat", "bukan", "no"})
+# "no" / "bukan" are ordinary words too ("no leaks", "valve no 203", "bukan masalah"): the referee accepts them as a
+# retraction cue only when punctuation follows ("line Alpha, no, line Bravo")
+WEAK_RETRACTION_CUES: frozenset[str] = frozenset({"no", "bukan"})
+
+
+def retraction_cues(tokens: list[Token]) -> list[Token]:
+    out = []
+    for i, t in enumerate(tokens):
+        if t.norm not in RETRACTION_CUES:
+            continue
+        if t.norm in WEAK_RETRACTION_CUES and not (i + 1 < len(tokens) and tokens[i + 1].pre_punct):
+            continue
+        out.append(t)
+    return out
+
+
 # an operator turn that opens with one of these after a read-back is a correction of that read-back
 OPERATOR_CORRECTION_CUES: frozenset[str] = frozenset(
     {"negative", "koreksi", "correction", "bukan", "salah", "ralat", "no", "tidak"}
@@ -342,11 +358,21 @@ class Token:
     norm: str  # lower-cased
     start: int  # char offsets into the transcript
     end: int
+    pre_punct: bool = False  # a comma / full stop / … (not a hyphen) separates it from the previous token
 
 
 def tokenize(text: str) -> list[Token]:
     """Word / number tokens with char offsets. Hyphens and punctuation separate tokens ("two-oh-three" -> 3)."""
-    return [Token(m.group(0), m.group(0).lower(), m.start(), m.end()) for m in _TOKEN_RE.finditer(text)]
+    out: list[Token] = []
+    prev_end = 0
+    for m in _TOKEN_RE.finditer(text):
+        gap = text[prev_end : m.start()]
+        out.append(Token(m.group(0), m.group(0).lower(), m.start(), m.end(), bool(_PUNCT.search(gap)) and bool(out)))
+        prev_end = m.end()
+    return out
+
+
+_PUNCT = re.compile(r"[,.;:!?…—–()]")
 
 
 def _is_digits(tok: Token) -> bool:
@@ -354,7 +380,8 @@ def _is_digits(tok: Token) -> bool:
 
 
 def _is_time(tok: Token) -> bool:
-    return bool(re.fullmatch(r"\d+[:.]\d+", tok.norm))
+    """Clock-shaped: H:MM / H.MM only ("2:03", "14.30"); "20.3" or "203.5" is a decimal, never a tag."""
+    return bool(re.fullmatch(r"\d{1,2}[:.]\d{2}", tok.norm))
 
 
 def _number_word(tokens: list[Token], i: int, in_run: bool) -> bool:
@@ -370,11 +397,18 @@ def _number_word(tokens: list[Token], i: int, in_run: bool) -> bool:
     if w == "and":
         return in_run and i > 0 and tokens[i - 1].norm == "hundred"
     if w in HOMOPHONES:
+        # a homophone is a digit only between number words: "to oh three", "one for zero" — never the trailing
+        # "for" of "two-oh-three for line Bravo"
+        nxt_tok = tokens[i + 1] if i + 1 < len(tokens) else None
+        nxt_is_number = nxt_tok is not None and not nxt_tok.pre_punct and _plain_number_word(nxt_tok.norm)
         if in_run:
-            return True
-        nxt = tokens[i + 1].norm if i + 1 < len(tokens) else ""
-        return w in ("to", "too") and nxt in ZERO_LIKE
+            return nxt_is_number
+        return w in ("to", "too") and nxt_is_number and nxt_tok is not None and nxt_tok.norm in ZERO_LIKE
     return False
+
+
+def _plain_number_word(w: str) -> bool:
+    return w in EN_UNITS or w in EN_TEENS or w in EN_TENS or w in ID_UNITS or w in ID_SPECIAL or w[:1].isdigit()
 
 
 def _compose(words: list[str]) -> str | None:
@@ -487,7 +521,12 @@ def number_runs(tokens: list[Token]) -> list[NumberRun]:
         if _is_digits(tok) or _number_word(tokens, i, in_run=False):
             j = i
             words: list[str] = []
-            while j < len(tokens) and (_is_digits(tokens[j]) or _number_word(tokens, j, in_run=bool(words))):
+            # a run never crosses punctuation: "two-oh-three, two minutes" is a tag, then a quantity
+            while (
+                j < len(tokens)
+                and (j == i or not tokens[j].pre_punct)
+                and (_is_digits(tokens[j]) or _number_word(tokens, j, in_run=bool(words)))
+            ):
                 words.append(tokens[j].norm)
                 j += 1
             digits = _compose(words)
@@ -495,7 +534,12 @@ def number_runs(tokens: list[Token]) -> list[NumberRun]:
                 i = j
                 continue
             # "thirty-one alpha" / "3 1 A": a letter right after a 2-digit run completes an MOV-style suffix
-            if re.fullmatch(r"\d{2}", digits) and j < len(tokens) and _letter_word(tokens[j]) is not None:
+            if (
+                re.fullmatch(r"\d{2}", digits)
+                and j < len(tokens)
+                and not tokens[j].pre_punct
+                and _letter_word(tokens[j]) is not None
+            ):
                 digits += _letter_word(tokens[j])  # type: ignore[operator]
                 j += 1
             runs.append(NumberRun(i, j, digits, False))
@@ -571,7 +615,15 @@ def _noun_before(tokens: list[Token], idx: int) -> tuple[str, int] | None:
             return prefix, idx - k
     if idx - 1 >= 0 and tokens[idx - 1].norm in TAG_NOUNS:
         return TAG_NOUNS[tokens[idx - 1].norm], idx - 1
+    # "valve no. 203" / "pompa nomor satu empat nol": a number word between noun and number
+    if idx - 2 >= 0 and tokens[idx - 1].norm in NUMBER_FILLERS:
+        inner = _noun_before(tokens, idx - 1)
+        if inner is not None:
+            return inner
     return None
+
+
+NUMBER_FILLERS = frozenset({"no", "nomor", "number", "nr", "num"})
 
 
 def _action_before(tokens: list[Token], idx: int) -> bool:
@@ -675,6 +727,33 @@ def _cue_then_imperative(tokens: list[Token], text: str) -> bool:
         return False
     nxt = tokens[1].norm
     return nxt in IMPERATIVE_ACTIONS or nxt in TAG_NOUNS or nxt in ("i", "saya", "tolong", "please")
+
+
+# "I'll confirm when closed", "report closed", "lapor kalau sudah ditutup": an action word that reports back, not one
+# that commands (not a bare imperative, right after one of these words)
+REPORT_BACK_WORDS = frozenset(
+    {
+        "when",
+        "once",
+        "report",
+        "confirm",
+        "after",
+        "until",
+        "kalau",
+        "setelah",
+        "sesudah",
+        "lapor",
+        "konfirmasi",
+        "sudah",
+    }
+)
+
+
+def report_back(tokens: list[Token], m: Mention) -> bool:
+    idx = next((i for i, t in enumerate(tokens) if t.start == m.start), None)
+    if idx is None or tokens[idx].norm in IMPERATIVE_ACTIONS:
+        return False
+    return any(t.norm in REPORT_BACK_WORDS for t in tokens[max(0, idx - 2) : idx])
 
 
 def all_mentions(text: str) -> list[Mention]:
