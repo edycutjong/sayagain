@@ -92,8 +92,8 @@ def _pair_channel(turns: list[TurnAnalysis], window_s: float, out: Paired) -> No
             # the exchange is then NOT_AUDITED (end-of-shift list)
             ex = Exchange(t.turn.channel, instruction=t, turn_ids=[t.id])
             state, deadline = _AWAIT_RB, t.turn.t_end + window_s
-        elif t.readback_shaped and t.status == "ok" and t.commands:
-            out.orphans.append(t)  # a read-back with no instruction heard: end-of-shift list, not a live card
+        elif t.readback_shaped and ((t.status == "ok" and t.commands) or (t.status == "abstain" and t.safety_words)):
+            out.orphans.append(t)  # a read-back with no instruction heard (readable or not): end-of-shift list
         else:
             out.other.append(t)
 
@@ -189,7 +189,11 @@ def _pair_channel(turns: list[TurnAnalysis], window_s: float, out: Paired) -> No
                 ex.events.append("second read-back")
                 deadline = t.turn.t_end + window_s
             elif (
-                t.status == "abstain" and (t.readback_shaped or t.verb_first) and not t.opens_window and not t.say_again
+                t.status == "abstain"
+                and t.safety_words
+                and (t.readback_shaped or t.verb_first)
+                and not t.opens_window
+                and not t.say_again
             ):
                 # the same shape as above, but the referee could not read it: judged (it abstains), never taken as
                 # the acknowledgement that closes the exchange on the first read-back

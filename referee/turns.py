@@ -57,6 +57,7 @@ class TurnAnalysis:
     verb_first: bool = False  # opens (after copy / roger / siap) with an action verb that is not a past participle
     opens_window: bool = False
     disagrees: bool = False  # prompted vs unprompted ASR read differently (only with an unprompted pass)
+    safety_words: bool = False  # code hears an action or a tag in the turn (alias tables), whatever the model returned
 
     @property
     def id(self) -> str:
@@ -230,6 +231,8 @@ def _code_kinds(turn: Turn, registry: Registry) -> tuple[TurnAnalysis, bool]:
     a.ack_only = is_ack_only(text)
     a.verb_first = verb_first(text)
     a.stand_by = is_stand_by(text)
+    toks = al.tokenize(text)
+    a.safety_words = bool(al.action_mentions(toks) or al.tag_mentions(toks))
     if turn.alt_transcript is not None:
         a.disagrees = canonical_tuples(text, registry) != canonical_tuples(turn.alt_transcript, registry)
     return a, opens_with_correction(text)
@@ -311,15 +314,17 @@ def analyze(turn: Turn, registry: Registry) -> TurnAnalysis:
                 return fail(r_unmapped(st.word), "state words not in the alias tables")
             vals["state"] = st
         cmds.append(CanonCommand(**vals))
-    a.commands = cmds
     # a turn opens a pairing window only with >= 1 grounded command that has an action and a tag that resolves to a
     # full tag (spoken prefix, or a bare number the registry knows); chatter and status talk ("pump one-forty is
     # running") never open one
-    a.opens_window = (
-        not a.readback_shaped
-        and has_order_verb(text)
-        and any(c.action is not None and _full_tag(c.tag, c.tag_status) for c in cmds)
-    )
+    order_shaped = not a.readback_shaped and has_order_verb(text)
+    carried = any(c.action is not None and _full_tag(c.tag, c.tag_status) for c in cmds)
+    if order_shaped and not carried and _scan_opens_window(text, registry):
+        # code hears an order (an order verb and a tag that names equipment) that no command carries whole: the model
+        # split the verb from the tag, or dropped one; the order must not vanish as chatter
+        return fail(R_COVERAGE, "an order no command carries whole: the verb and the tag sit in different commands")
+    a.commands = cmds
+    a.opens_window = order_shaped and carried
     a.operator_correction = correction_cue and (cue_only(text) or a.opens_window)
     return a
 

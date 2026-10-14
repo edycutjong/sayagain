@@ -29,6 +29,9 @@ class Judged:
     verdict: Verdict
     caught: list[Verdict] = field(default_factory=list)  # verdicts of the read-backs corrected on the channel
     spot_check: bool = False
+    # every referee error met while judging this exchange (its verdict, a caught read-back, a further read-back), even
+    # one a worse verdict hides: the queue fails closed on them, the benchmark stops on them
+    referee_errors: list[str] = field(default_factory=list)
 
     @property
     def live(self) -> bool:
@@ -146,7 +149,13 @@ def audit(
         trace = [f"referee error (pairing): {type(e).__name__}: {e}"]
         return ShiftReport(
             [
-                Judged(Exchange(a.turn.channel, a), Verdict(NOT_AUDITED, "referee error", trace=list(trace)))
+                Judged(
+                    Exchange(a.turn.channel, a),
+                    Verdict(NOT_AUDITED, "referee error", trace=list(trace)),
+                    [],
+                    False,
+                    trace,
+                )
                 for a in analyses
             ],
             [],
@@ -157,12 +166,15 @@ def audit(
     for ex in paired.exchanges:
         caught = [judge(Exchange(ex.channel, i, r), floor=floor, audio_gate=audio_gate) for i, r in ex.caught]
         v = judge(ex, floor=floor, audio_gate=audio_gate)
+        seen = [v, *caught]
         for extra in ex.more_readbacks:  # every read-back in the exchange is judged; the worst one stands
             v2 = judge(Exchange(ex.channel, ex.instruction, extra), floor=floor, audio_gate=audio_gate)
+            seen.append(v2)
             if _SEVERITY[v2.verdict] > _SEVERITY[v.verdict]:
                 v2.trace = [*v2.trace, f"second read-back {extra.id} (first was {v.label})"]
                 v = v2
-        judged.append(Judged(ex, v, caught))
+        errors = [x.trace[0] if x.trace else str(x.reason) for x in seen if x.reason == "referee error"]
+        judged.append(Judged(ex, v, caught, referee_errors=errors))
     verified = [j for j in judged if j.verdict.verdict == VERIFIED]
     for j in random.Random(seed).sample(verified, max(0, min(spot_checks, len(verified)))):
         j.spot_check = True

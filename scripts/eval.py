@@ -131,11 +131,7 @@ def judge_card(card: dict, extract: Callable[[str], Extraction], registry: Regis
     # the queue fails closed on a referee crash; the benchmark must not count one as a measured NOT_AUDITED
     referee_errors = sorted(
         {f"{a.turn.id}: {a.detail}" for a in analyses if a.reason == "referee error"}
-        | {
-            f"{j.exchange.instruction.id}: {j.verdict.trace[0]}"
-            for j in rep.judged
-            if j.verdict.reason == "referee error"
-        }
+        | {f"{j.exchange.instruction.id}: {e}" for j in rep.judged for e in j.referee_errors}
     )
     return {
         "exchange_id": card["exchange_id"],
@@ -175,7 +171,8 @@ def stop_on_referee_errors(records: list[dict], where: str) -> None:
     crashed = [r["exchange_id"] for r in records if r.get("referee_errors")]
     if crashed:
         raise SystemExit(
-            f"{where}: referee error on {len(crashed)} card(s) {crashed[:5]}: fix the referee, then --rescore"
+            f"{where}: referee error on {len(crashed)} card(s) {crashed[:5]}. Fix the referee and run again under a new"
+            " --run name: no result file was written, so --rescore cannot see this run (a full ladder costs cents)"
         )
 
 

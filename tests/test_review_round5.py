@@ -205,7 +205,7 @@ def test_an_unreadable_second_readback_is_judged_not_taken_as_the_ack() -> None:
     assert audit(turns, REG, spot_checks=0).judged[0].verdict.verdict == "ABSTAIN"
 
 
-def test_a_status_report_after_the_readback_still_closes_the_exchange() -> None:
+def test_control_correct_after_the_readback_closes_the_exchange_before_and_after_the_fix() -> None:
     from referee.regex_extractor import extract as regex_extract
 
     texts = ("Close valve two-oh-three, line Bravo.", "Copy, closing valve two-oh-three, line Bravo.", "Correct.")
@@ -327,3 +327,85 @@ def test_a_page_on_another_local_port_cannot_drive_the_queue(tmp_path) -> None:
     body = {"run": shift.DEFAULT_RUN, "rung": shift.DEFAULT_RUNG, "exchange_id": "H-01", "decision": "confirmed"}
     assert c.post("/api/review", json=body, headers=same_site).status_code == 403
     assert c.post("/api/review", json=body, headers={"sec-fetch-site": "same-origin"}).status_code == 201
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Loop-QA round 1 of this review: nothing the referee cannot read may vanish, and no harmless turn may raise an alarm.
+
+
+def test_a_retracted_span_holding_verb_and_tag_needs_both_replaced() -> None:
+    text = "Stop pump one-seven-four, correction, start, line Charlie."
+    g = ground(text, ex(("start", None, None, "line Charlie"), retracted=["Stop pump one-seven-four"]))
+    with pytest.raises(CoverageError) as e:  # first-field-only checking accepted this: the tag was dropped silently
+        check(text, g)
+    assert "nothing replaces the retracted tag" in e.value.detail
+
+
+def test_an_order_split_across_commands_reaches_the_supervisor() -> None:
+    instr = "Close valve two-oh-eight, line Alpha, correction, open."
+    split = ex((None, "valve two-oh-eight", None, "line Alpha"), ("open", None, None, None), retracted=["Close"])
+    rb_text = "Copy, closing valve two-oh-eight, line Alpha."
+    rb = {**ex(("closing", "valve two-oh-eight", None, "line Alpha")), "kind": "readback"}
+    rep = audit(
+        [Turn("i", "CH-01", 0.0, 2.5, instr, split), Turn("r", "CH-01", 3.5, 6.0, rb_text, rb)], REG, spot_checks=0
+    )
+    assert [j.verdict.verdict for j in rep.judged] == ["ABSTAIN"] and not rep.orphans  # before: no card, an orphan
+
+
+def test_an_unreadable_readback_with_no_order_heard_is_an_orphan_not_chatter() -> None:
+    text = "Copy, closing two-oh-three, no, two-oh-eight, correction, line Bravo."
+    rb = {**ex(("closing", "two-oh-three", None, "line Bravo"), retracted=["two-oh-eight"]), "kind": "readback"}
+    rep = audit([Turn("r", "CH-01", 0.0, 2.5, text, rb)], REG, spot_checks=0)
+    assert [o.id for o in rep.orphans] == ["r"] and not rep.other  # before: dropped as chatter, on no list
+
+
+def test_an_unreadable_bare_ack_after_the_readback_raises_no_alarm() -> None:
+    from referee.regex_extractor import extract as regex_extract
+
+    for ack in ("Roger.", "Copy, thanks.", "Siap."):
+        texts = ("Close valve two-oh-three, line Bravo.", "Copy, closing valve two-oh-three, line Bravo.", ack)
+        turns = [Turn(f"t{k}", "CH-01", 3.5 * k, 3.5 * k + 2.5, x, regex_extract(x)) for k, x in enumerate(texts)]
+        turns[2].extraction = {"_invalid": "not JSON"}  # no action, no tag: it cannot hide a wrong read-back
+        assert audit(turns, REG, spot_checks=0).judged[0].verdict.verdict == "VERIFIED", ack
+
+
+def test_a_crash_judging_a_caught_readback_stops_the_benchmark(monkeypatch) -> None:
+    from referee import audit as audit_mod
+
+    ev = _eval_module()
+    card = next(c for c in ev.load_cards() if c["exchange_id"] == "A2-021")  # a read-back corrected on the channel
+    assert ev.judge_card(card, ev.regex_extraction, REG)["caught"]
+    real, wrong = audit_mod._judge, card["turns"][1]["text"]
+
+    def crash_on_the_wrong_readback(ins, rb, **kw):
+        if rb is not None and rb.turn.transcript == wrong:
+            raise RuntimeError("injected")
+        return real(ins, rb, **kw)
+
+    monkeypatch.setattr(audit_mod, "_judge", crash_on_the_wrong_readback)
+    assert ev.judge_card(card, ev.regex_extraction, REG)["referee_errors"]  # before: only the final verdict was read
+
+
+def test_a_pairing_crash_makes_every_turn_its_own_not_audited_exchange(monkeypatch) -> None:
+    from referee import audit as audit_mod
+    from referee.regex_extractor import extract as regex_extract
+
+    monkeypatch.setattr(audit_mod, "pair", _boom)
+    texts = ("Close valve two-oh-three, line Bravo.", "Copy, closing valve two-oh-three, line Bravo.", "Correct.")
+    turns = [Turn(f"t{k}", "CH-01", 3.5 * k, 3.5 * k + 2.5, x, regex_extract(x)) for k, x in enumerate(texts)]
+    rep = audit(turns, REG, spot_checks=0)
+    assert [j.exchange.instruction.id for j in rep.judged] == ["t0", "t1", "t2"]
+    assert all(j.verdict.verdict == "NOT_AUDITED" and j.referee_errors for j in rep.judged)
+
+
+def test_try_the_refused_one_refuses_another_origin(tmp_path) -> None:
+    r = _client(tmp_path).post("/api/try-refused", json={}, headers={"sec-fetch-site": "cross-site"})
+    assert r.status_code == 403
+
+
+def test_a_run_with_no_receipt_is_not_labelled_a_non_amd_host(monkeypatch) -> None:
+    from sayagain import shift
+
+    monkeypatch.setattr(shift, "run_receipts", lambda run, rung: [])
+    stage = shift.rung_stage("ladder-r1-reaudit", "Gemma-4-31B-IT")["extract"]
+    assert stage["where"] == "no receipt found for this run" and stage["on_amd"] is None
