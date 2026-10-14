@@ -25,6 +25,7 @@ import os
 import sqlite3
 import threading
 import time
+from contextlib import closing
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -42,7 +43,8 @@ from sayagain.extract import RUNGS, Cache, Extraction, Pacer, TokenFactoryExtrac
 ROOT = Path(__file__).resolve().parent.parent
 WEB = ROOT / "web"
 VAR = Path(os.environ.get("SAYAGAIN_VAR", ROOT / "var"))
-REFUSED_ID = "R-01"
+REFUSED_ID = shift.REFUSED_ID
+MAX_REASON = 500
 DECISIONS = ("confirmed", "dismissed")
 LIVE_BUDGET_USD = 0.05  # per server process; the account cap is $1/day
 PACE_S = 3.2  # 20 requests per minute per account
@@ -67,7 +69,7 @@ class Reviews:
         path.parent.mkdir(parents=True, exist_ok=True)
         self.path = path
         self._lock = threading.Lock()
-        with self._db() as db:
+        with closing(self._db()) as db, db:
             db.execute(
                 "CREATE TABLE IF NOT EXISTS reviews (id INTEGER PRIMARY KEY, run TEXT, rung TEXT, exchange_id TEXT, "
                 "decision TEXT NOT NULL, reason TEXT, at TEXT NOT NULL)"
@@ -78,7 +80,7 @@ class Reviews:
 
     def add(self, run: str, rung: str, exchange_id: str, decision: str, reason: str | None) -> dict:
         at = datetime.now(UTC).isoformat(timespec="seconds")
-        with self._lock, self._db() as db:
+        with self._lock, closing(self._db()) as db, db:
             cur = db.execute(
                 "INSERT INTO reviews (run, rung, exchange_id, decision, reason, at) VALUES (?, ?, ?, ?, ?, ?)",
                 (run, rung, exchange_id, decision, reason, at),
@@ -88,7 +90,7 @@ class Reviews:
                 "at": at}  # fmt: skip
 
     def list(self, run: str, rung: str) -> list[dict]:
-        with self._db() as db:
+        with closing(self._db()) as db:
             rows = db.execute(
                 "SELECT id, run, rung, exchange_id, decision, reason, at FROM reviews WHERE run = ? AND rung = ? "
                 "ORDER BY id",
@@ -104,35 +106,47 @@ class Reviews:
 class LiveExtract:
     """Token Factory extraction for the live mode: one paced client per process, a hard spend cap, receipts in var/."""
 
-    def __init__(self, budget_usd: float = LIVE_BUDGET_USD):
+    RESERVE_USD = 0.001  # held against the cap while a call is in flight; the receipt's real cost replaces it
+
+    def __init__(self, var: Path, budget_usd: float = LIVE_BUDGET_USD):
+        self.var = var
         self.budget_usd = budget_usd
         self.spent = 0.0
         self.pacer = Pacer(PACE_S)
         self._lock = threading.Lock()
+        self._by_rung: dict[str, Cache] = {}
 
-    def for_rung(self, rung_name: str):
+    def for_rung(self, rung_name: str) -> Cache:
+        """One cached extractor per rung for the life of the process: a resumed stream never pays for a turn twice."""
         rung = RUNGS.get(rung_name)
         if rung is None or rung.model is None:
             raise HTTPException(400, f"no live extraction for rung {rung_name!r}")
-        receipts = VAR / "receipts" / f"live-{datetime.now(UTC):%Y-%m-%d}-{rung.name}.jsonl"
-        receipts.parent.mkdir(parents=True, exist_ok=True)
-        client = TokenFactory(load_config(), timeout=90.0, receipts_path=receipts, thinking_off=None)
-        client.context = {"run": "live", "rung": rung.name}
-        ext = TokenFactoryExtractor(client, rung, pacer=self.pacer)
+        with self._lock:
+            if rung.name in self._by_rung:
+                return self._by_rung[rung.name]
+            receipts = self.var / "receipts" / f"live-{datetime.now(UTC):%Y-%m-%d}-{rung.name}.jsonl"
+            receipts.parent.mkdir(parents=True, exist_ok=True)
+            client = TokenFactory(load_config(), timeout=90.0, receipts_path=receipts, thinking_off=None)
+            client.context = {"run": "live", "rung": rung.name}
+            ext = TokenFactoryExtractor(client, rung, pacer=self.pacer)
+            self._by_rung[rung.name] = cache = Cache(self._guarded(ext))
+            return cache
 
+    def _guarded(self, ext):
         def call(text: str) -> Extraction:
             with self._lock:
-                if self.spent >= self.budget_usd:
+                if self.spent + self.RESERVE_USD > self.budget_usd:
                     return Extraction(text, None, "live budget spent", None, 0)
+                self.spent += self.RESERVE_USD
             out = ext(text)
             cost = (out.receipt or {}).get("cost_usd")
             with self._lock:
-                self.spent += float(cost) if isinstance(cost, int | float) else 0.001
+                self.spent += (float(cost) if isinstance(cost, int | float) else self.RESERVE_USD) - self.RESERVE_USD
             if out.receipt is not None:
                 out.receipt = {**out.receipt, "live": True}
             return out
 
-        return Cache(call), client
+        return call
 
 
 # ------------------------------------------------------------------------------------------------- app
@@ -162,7 +176,7 @@ def _check_run(run: str, rung: str) -> None:
 def create_app(var: Path = VAR) -> FastAPI:
     app = FastAPI(title="SayAgain queue", docs_url=None, redoc_url=None)
     reviews = Reviews(var / "reviews.sqlite")
-    live = LiveExtract()
+    live = LiveExtract(var)
 
     @app.get("/", include_in_schema=False)
     def root():
@@ -198,34 +212,26 @@ def create_app(var: Path = VAR) -> FastAPI:
         _check_run(run, rung)
         if extract not in ("stored", "live"):
             raise HTTPException(400, "extract must be stored or live")
-        client = None
-        fn = None
         if extract == "live":
             if not live_allowed():
                 raise HTTPException(403, "live extraction is off (SAYAGAIN_LIVE_EXTRACT=1 and credentials needed)")
-            fn, client = live.for_rung(rung)
-        if extract == "live":  # never re-call the API for cards already shown: resume on wall time instead
-            cards = shift.run_cards(run, rung)[start:]
-            events = shift.shift_events(run, rung, extract=fn, cards=cards, check_stored=False)
+            # cards before `start` come from the process cache (already paid for): the end-of-shift list stays whole
+            events = shift.shift_events(run, rung, extract=live.for_rung(rung), start=start, check_stored=False)
         else:
             events = shift.shift_events(run, rung, start=start)
 
         async def gen():
             prev_at, t0 = None, time.monotonic()
-            try:
-                yield ": stream open\n\n"
-                async for ev in iterate_in_threadpool(events):
-                    ev = {**ev, "extract": extract}
-                    if extract == "stored" and speed > 0 and prev_at is not None:
-                        await asyncio.sleep(max(0.0, (ev["at"] - prev_at) / speed))
-                    if extract == "live":
-                        ev["at"] = round(time.monotonic() - t0, 2)
-                    prev_at = ev["at"]
-                    yield f"data: {json.dumps(ev, ensure_ascii=False)}\n\n"
-                yield 'data: {"type": "closed"}\n\n'
-            finally:
-                if client is not None:
-                    client.close()
+            yield ": stream open\n\n"
+            async for ev in iterate_in_threadpool(events):
+                ev = {**ev, "extract": extract}
+                if extract == "stored" and speed > 0 and prev_at is not None:
+                    await asyncio.sleep(max(0.0, (ev["at"] - prev_at) / speed))
+                if extract == "live":  # wall clock since this stream opened
+                    ev["at"] = round(time.monotonic() - t0, 2)
+                prev_at = ev["at"]
+                yield f"data: {json.dumps(ev, ensure_ascii=False)}\n\n"
+            yield 'data: {"type": "closed"}\n\n'
 
         return StreamingResponse(
             gen(), media_type="text/event-stream", headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no"}
@@ -234,21 +240,18 @@ def create_app(var: Path = VAR) -> FastAPI:
     @app.post("/api/try-refused")
     async def try_refused(body: Try):
         _check_run(body.run, body.rung)
-        card = next(c for c in shift.load_cards() if c["exchange_id"] == REFUSED_ID)
-        client = None
+        card = next((c for c in shift.run_cards(body.run, body.rung) if c["exchange_id"] == REFUSED_ID), None)
+        if card is None:
+            raise HTTPException(404, f"{REFUSED_ID} is not in run {body.run}")
         if body.extract == "live":
             if not live_allowed():
                 raise HTTPException(403, "live extraction is off")
-            fn, client = live.for_rung(body.rung)
+            fn = live.for_rung(body.rung)
         elif body.extract == "stored":
             fn = shift.stored_extractor(body.run, body.rung)
         else:
             raise HTTPException(400, "extract must be stored or live")
-        try:
-            rec = await run_in_threadpool(shift.judge_card, card, fn, Registry.load(), body.rung)
-        finally:
-            if client is not None:
-                client.close()
+        rec = await run_in_threadpool(shift.judge_card, card, fn, Registry.load(), body.rung)
         rec["baseline"] = shift.judge_baseline().get(REFUSED_ID)
         rec["at"] = None
         return {"card": rec, "extract": body.extract, "measured_on": shift.run_meta(body.run, body.rung)[
@@ -262,8 +265,10 @@ def create_app(var: Path = VAR) -> FastAPI:
         reason = (body.reason or "").strip() or None
         if body.decision == "dismissed" and not reason:
             raise HTTPException(422, "a dismissal needs a reason")
-        if not any(c["exchange_id"] == body.exchange_id for c in shift.load_cards()):
-            raise HTTPException(404, f"no exchange {body.exchange_id}")
+        if reason and len(reason) > MAX_REASON:
+            raise HTTPException(422, f"reason longer than {MAX_REASON} characters")
+        if not any(c["exchange_id"] == body.exchange_id for c in shift.run_cards(body.run, body.rung)):
+            raise HTTPException(404, f"no exchange {body.exchange_id} in run {body.run}")
         return reviews.add(body.run, body.rung, body.exchange_id, body.decision, reason)
 
     @app.get("/api/reviews")

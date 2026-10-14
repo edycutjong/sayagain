@@ -177,3 +177,33 @@ def test_export_writes_a_self_contained_replay(tmp_path):
     assert data["meta"]["run"] == RUN and data["events"][-1]["type"] == "end_of_shift"
     blob = (out / "data" / f"{RUN}--{RUNG}.json").read_text()
     assert "/Users/" not in blob and "AMD_TF_API_KEY" not in blob and "Bearer" not in blob
+
+
+def test_review_limits(client):
+    base = {"run": RUN, "rung": RUNG, "decision": "dismissed"}
+    assert client.post("/api/review", json={**base, "exchange_id": "H-01", "reason": "x" * 501}).status_code == 422
+    dev = {"run": "dev-r1", "rung": "regex", "decision": "confirmed"}
+    assert client.post("/api/review", json={**dev, "exchange_id": "H-01"}).status_code == 404  # H-01 is not in dev-r1
+
+
+def test_refused_only_where_the_run_has_it(client):
+    assert client.post("/api/try-refused", json={"run": "dev-r1", "rung": "regex"}).status_code == 404
+    assert shift.run_meta("dev-r1", "regex")["refused"] is None
+    assert shift.run_meta(RUN, RUNG)["refused"] == {"exchange_id": "R-01", "tag": "XV-205"}
+
+
+def test_meta_numbers_come_from_the_run():
+    m = shift.run_meta(RUN, RUNG)
+    s = json.loads((shift.RESULTS / f"{RUN}.json").read_text())["rungs"][RUNG]["rows"]["held_out"]
+    assert m["held_out"]["false_verified"] == {"k": s["false_verified"]["k"], "n": s["false_verified"]["n"]}
+    assert m["held_out"]["errors_flagged"] == {"k": s["errors_flagged"]["k"], "n": s["errors_flagged"]["n"]}
+    ex = m["stages"]["extract"]
+    recs = shift.run_receipts(RUN, RUNG)
+    assert ex["calls"] == len(recs) and ex["hosts"] == sorted({r["host"] for r in recs})
+    assert ex["where"] == "AMD-hosted API" and ex["latency_s_p50"] > 0
+    dev = shift.run_meta("dev-r1", "regex")["held_out"]
+    assert dev["errors_flagged"] is None  # no held-out row in a dev run: nothing to show, never 0/0
+
+
+def test_judge_baseline_names_its_model():
+    assert {b["model"] for b in shift.judge_baseline().values()} == {"DeepSeek-V4.1-Flash"}

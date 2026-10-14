@@ -140,8 +140,16 @@
   }
 
   // ------------------------------------------------------------------------------------------- runs + sources
+  function storedReviews() {
+    try { var v = JSON.parse(localStorage.getItem(reviewKey()) || '[]'); return Array.isArray(v) ? v : []; }
+    catch (e) { return []; }
+  }
   function loadRun() {
     stopSource();
+    S.gen = (S.gen || 0) + 1;
+    var gen = S.gen;
+    (S.timers || []).forEach(clearTimeout); S.timers = [];
+    $('refused').disabled = false;
     var v = $('rung').value.split('|');
     S.run = v[0]; S.rung = v[1];
     S.cards = {}; S.order = []; S.liveIds = []; S.eos = null; S.selected = null; setFollow(true);
@@ -161,8 +169,9 @@
       : getJSON('data/' + S.run + '--' + S.rung + '.json').then(function (d) { S.data = d; return d.meta; });
     var revP = S.mode === 'live'
       ? getJSON('api/reviews?run=' + encodeURIComponent(S.run) + '&rung=' + encodeURIComponent(S.rung))
-      : Promise.resolve(JSON.parse(localStorage.getItem(reviewKey()) || '[]'));
+      : Promise.resolve(storedReviews());
     Promise.all([metaP, revP]).then(function (res) {
+      if (gen !== S.gen) return;  // a newer rung was picked while this one loaded
       S.meta = res[0];
       S.reviews = {};
       res[1].forEach(function (r) { S.reviews[r.exchange_id] = r; });
@@ -180,7 +189,11 @@
       var es = new EventSource(url);
       // stored replays carry the shift clock; live model calls run on wall time from where the last stream stopped
       S.clockBase = S.extract === 'live' ? S.lastAt : 0;
-      es.onmessage = function (m) { onEvent(JSON.parse(m.data)); };
+      es.onmessage = function (m) {
+        var ev = JSON.parse(m.data);
+        if (ev.type === 'closed') es.close();  // or the browser reconnects and replays the tail into the next run
+        onEvent(ev);
+      };
       es.onerror = function () { if (!S.done) { es.close(); $('ch-sub').textContent = 'Stream interrupted. Press play to resume from the last judged card.'; S.paused = true; syncPlay(); } };
       S.src = { close: function () { es.close(); } };
     } else {
@@ -272,6 +285,8 @@
     } else if (ev.type === 'closed') {
       S.done = true; S.src = null; syncPlay();
       $('ch-line').classList.remove('tx');
+      $('ch-who').textContent = 'Shift over';
+      $('ch-txt').textContent = S.cardsDone + ' exchanges judged · ' + S.liveIds.length + ' sent to the supervisor';
       if (S.eos) $('clock').textContent = clock(S.clockBase + S.eos.at);
       renderSub();
     }
@@ -301,15 +316,16 @@
   }
 
   function renderSub() {
-    var total = S.meta && S.meta.n_cards ? S.meta.n_cards : 0;
+    var total = S.meta ? S.meta.n_cards_run || S.meta.n_cards || 0 : 0;
     var pct = total ? Math.min(100, S.cardsDone / total * 100) : 0;
     $('progbar').style.width = pct + '%';
     $('count').textContent = String(S.liveIds.length);
     $('n-live').textContent = String(openLive().length);
     $('n-all').textContent = String(S.order.length);
-    $('n-eos').textContent = S.eos ? String(S.eos.spot_checks.length + S.eos.caught_on_channel.length + S.eos.not_audited.length) : '·';
-    var speedTxt = S.mode === 'live' && S.extract === 'live' ? 'live model calls, real time'
-      : S.speed === 1 ? 'replay clock 1×' : 'replay clock ' + S.speed + '× faster than the radio';
+    $('n-eos').textContent = S.eos ? String(eosIds().length) : '·';
+    var step = S.meta && S.meta.replay_clock ? S.meta.replay_clock.turn_step_s : null;
+    var speedTxt = S.mode === 'live' && S.extract === 'live' ? 'live model calls, wall clock'
+      : 'scripted timing' + (step ? ' (' + step + ' s a turn)' : '') + ' played at ' + S.speed + '×';
     $('ch-sub').textContent = S.cardsDone + ' of ' + total + ' exchanges judged · ' + (S.done ? 'shift over' : speedTxt) +
       ' · a read-back that matches is logged, not queued';
   }
@@ -317,22 +333,40 @@
   // ------------------------------------------------------------------------------------------- stages banner
   function renderStages() {
     var m = S.meta, st = m.stages, ho = m.held_out || {};
-    var kn = function (w) { return w ? w.k + '/' + w.n : null; };
+    var kn = function (w) { return w && w.n ? w.k + '/' + w.n : null; };
     var parts = [];
-    if (ho.false_verified != null) parts.push('<span class="nw"><b>' + esc(ho.false_verified) + '</b> false-VERIFIED</span>');
-    if (ho.errors_flagged) parts.push('<span class="nw"><b>' + esc(kn(ho.errors_flagged)) + '</b> seeded errors flagged</span>');
-    if (ho.false_alarm_load) parts.push('<span class="nw"><b>' + esc(kn(ho.false_alarm_load)) + '</b> false alarms</span>');
+    if (kn(ho.false_verified)) parts.push('<span class="nw"><b>' + esc(kn(ho.false_verified)) + '</b> wrong read-backs passed (false-VERIFIED)</span>');
+    if (kn(ho.errors_flagged)) parts.push('<span class="nw"><b>' + esc(kn(ho.errors_flagged)) + '</b> seeded errors flagged</span>');
+    if (kn(ho.false_alarm_load)) parts.push('<span class="nw"><b>' + esc(kn(ho.false_alarm_load)) + '</b> false alarms</span>');
+    if (ho.not_audited && ho.not_audited.k) parts.push('<span class="nw"><b>' + esc(kn(ho.not_audited)) + '</b> not audited</span>');
     var lead = S.mode === 'live'
       ? 'Live queue over run <b>' + esc(m.run) + '</b>'
       : 'Replay of run <b>' + esc(m.run) + '</b>';
-    $('banner').innerHTML = lead + ' · ' + esc(m.provenance) + ': the turns are the recording cards’ written words, no audio' +
-      (parts.length ? ' · this rung on the held-out cards: ' + parts.join(' · ') : '') +
-      ' · <span class="data">' + esc(m.result_file) + '</span>';
+    var cps = m.cards_per_shift_assumption, cpsTxt = '';
+    if (cps) {
+      var lo = cps['2_errors_per_180'], hi = cps['5_errors_per_180'];
+      if (lo != null && hi != null) cpsTxt = ' The test corpus is dense with seeded errors; at the protocol\u2019s shift assumption (' + esc(m.shift_assumption || '') +
+        ') this rung would send about ' + esc(Math.round(lo)) + '\u2013' + esc(Math.round(hi)) + ' cards a shift.';
+    }
+    $('banner').innerHTML = lead + ' · fictional plant radio traffic · ' + esc(m.provenance) + ': each turn is the written script of a recording card, there is no recording yet' +
+      (parts.length ? ' · this rung on the ' + esc(ho.n || '') + ' held-out cards: ' + parts.join(' · ') : '') +
+      ' · <span class="data">' + esc(m.result_file) + '</span>.' + cpsTxt;
+    $('stage-sum').innerHTML = 'Run <b>' + esc(m.run) + '</b> · fictional radio, written scripts, <b>no audio</b> · extraction <b>' +
+      esc(st.extract.name) + '</b>' + (st.extract.on_amd ? ' on an <b>AMD-hosted API</b>' : '') + ' · referee <b>local</b>';
+    var rf = m.refused;
+    $('refused-tag').textContent = rf ? rf.tag : '';
+    $('refused').disabled = !rf;
+    $('refused').title = rf ? 'Judge ' + rf.exchange_id + ': ' + rf.tag + ' is not in the plant registry' : 'The refused exchange is not in this run';
+    var liveX = S.mode === 'live' && S.extract === 'live';
+    Array.prototype.forEach.call(document.querySelectorAll('.seg button'), function (b) { b.disabled = liveX; });
+    $('skip').disabled = liveX;
+    $('clock-lab').textContent = liveX ? 'Wall clock T+' : 'Replay T+';
     var ex = st.extract;
     var exVal = esc(ex.name) + (ex.model_served && ex.model_served.length ? ' <span class="data">(' + esc(ex.model_served.join(', ')) + ')</span>' : '') +
       (ex.hosts && ex.hosts.length ? ' · ' + esc(ex.where) + ' · ' + esc(ex.hosts.join(', ')) : ' · ' + esc(ex.where)) +
-      (ex.on_amd ? '<span class="where">AMD</span>' : '<span class="where off">local</span>');
-    var refVal = esc(st.referee.name) + ' · ' + (S.mode === 'live' ? 'judging in this server' : 'run at export, trace kept') + '<span class="where off">local</span>';
+      (ex.latency_s_p50 != null ? ' · p50 ' + esc(ex.latency_s_p50.toFixed(2)) + ' s over ' + esc(ex.calls) + ' calls' : '') +
+      (ex.on_amd ? '<span class="where">AMD-hosted API</span>' : '<span class="where off">local</span>');
+    var refVal = esc(st.referee.name) + ' · ' + (S.mode === 'live' ? 'judging in this server' : 'run at export (' + esc(m.referee_measured_on) + '), trace kept') + '<span class="where off">local</span>';
     $('stage-list').innerHTML =
       stage('1', 'Speech-to-text', esc(st.asr.name) + '<span class="where off">no audio</span>', true) +
       stage('2', 'Extraction', exVal, false) +
@@ -439,21 +473,25 @@
   }
 
   // ------------------------------------------------------------------------------------------- end of shift
-  function eosIds() { return S.eos ? S.eos.spot_checks.concat(S.eos.caught_on_channel, S.eos.not_audited) : []; }
+  function eosIds() {
+    if (!S.eos) return [];
+    var seen = {};
+    return S.eos.spot_checks.concat(S.eos.caught_on_channel, S.eos.not_audited).filter(function (id) { return !seen[id] && (seen[id] = 1); });
+  }
   function renderEos() {
     var box = $('eos');
     if (S.tab !== 'eos') { renderSub(); return; }
     if (!S.eos) {
       box.innerHTML = '<p class="pending">The end-of-shift list is drawn when the shift ends: ' + esc(S.meta ? S.meta.spot_checks_per_shift : '') +
-        ' random VERIFIED exchanges to listen to, the read-backs the operator corrected on the channel, and every exchange nobody audited.</p>' +
+        ' random VERIFIED exchanges to re-check, the read-backs the operator corrected on the channel, and every exchange nobody audited.</p>' +
         '<p class="pending"><button type="button" class="btn" id="eos-skip">Skip to end of shift</button></p>';
       $('eos-skip').addEventListener('click', function () { $('skip').click(); });
       return;
     }
     var e = S.eos;
     box.innerHTML =
-      section('Spot-checks', e.spot_checks, 'Random VERIFIED exchanges. Listen to these: they are how the shift learns whether the referee lets errors through.') +
-      section('Caught on channel', e.caught_on_channel, 'The operator heard the wrong read-back and corrected it on air. Logged here, never a live card.') +
+      section('Spot-checks', e.spot_checks, 'Random VERIFIED exchanges a human re-checks at the end of the shift: how the plant learns whether the referee lets errors through.') +
+      section('Caught on channel', e.caught_on_channel, 'The operator heard a wrong read-back and corrected it on air. The first, wrong read-back is listed here; the exchange itself is judged on what followed.') +
       section('Not audited', e.not_audited, 'A model call failed, so the referee never judged these. Nobody checked them: they are listed, never passed.');
     bindRows(box);
   }
@@ -469,10 +507,16 @@
     Array.prototype.forEach.call(document.querySelectorAll('.row'), function (b) {
       if (b.getAttribute('data-id') === id) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
     });
-    renderCard(S.cards[id], { enter: true });
+    // entrance motion only when cards arrive slower than it plays; at 32x it would keep restarting
+    var now = performance.now(), calm = now - (S.lastCardAt || 0) > 1500;
+    S.lastCardAt = now;
+    renderCard(S.cards[id], { enter: calm || !!fromClick });
+    $('card').scrollTop = 0;
     if (fromClick && window.matchMedia('(max-width: 767px)').matches) openCard();
   }
-  function openCard() { document.body.classList.add('card-open'); $('card').focus(); requestAnimationFrame(drawLinks); }
+  function openCard() {
+    if (!$('card-body').querySelector('.acard')) return;
+    document.body.classList.add('card-open'); $('card').focus(); requestAnimationFrame(drawLinks); }
   function closeCard() {
     document.body.classList.remove('card-open');
     var el = document.querySelector('.row[data-id="' + S.selected + '"]');
@@ -494,6 +538,9 @@
     return null;
   }
 
+  function insDiffers(c, field) {
+    return !!(c.verdict && c.verdict.diffs && c.verdict.diffs.some(function (d) { return d.field === field; }));
+  }
   function lineHTML(c, t, role) {
     var text = t.text, spans = t.spans.slice().sort(function (a, b) { return a.start - b.start; });
     var out = '', pos = 0, merged = [];
@@ -512,16 +559,17 @@
       if (s.ret) out += '<span class="ret" title="retracted on the channel">' + w + '</span>';
       else {
         var d = diffFor(c, t, s);
-        var attrs = ' data-f="' + s.field + '" data-c="' + s.cmd + '" data-side="' + role + '"';
+        var xi = role === 'ins' && insDiffers(c, s.field);
+        var attrs = ' data-f="' + esc(s.field) + '" data-c="' + esc(s.cmd) + '" data-side="' + role + '"';
         out += d ? '<mark class="blk sp"' + attrs + ' data-x="1">' + w + '</mark>'
-          : '<span class="sp' + (s.field === 'state' ? ' st' : '') + '"' + attrs + ' title="' + s.field + ' span">' + w + '</span>';
+          : '<span class="sp' + (s.field === 'state' ? ' st' : '') + (xi ? ' xi' : '') + '"' + attrs + ' title="' + esc(s.field) + ' span">' + w + '</span>';
       }
       pos = s.end;
     });
     out += esc(text.slice(pos));
     if (role === 'rb' && c.verdict && c.verdict.diffs) {
       c.verdict.diffs.forEach(function (d) {
-        if (d.got == null && d.field !== 'command') out += ' <span class="miss" data-f="' + esc(d.field) + '" data-c="0" data-side="rb" data-x="1">no ' + esc(d.field) + '</span>';
+        if (d.got == null && d.field !== 'command') out += ' <span class="miss" data-f="' + esc(d.field) + '" data-c="0" data-side="rb" data-x="1">no ' + esc(d.field) + ' read back</span>';
       });
     }
     return out;
@@ -535,13 +583,14 @@
       }).join('');
       return '<div class="lane"><svg viewBox="0 0 ' + w + ' 16" preserveAspectRatio="none" aria-hidden="true">' + bars + '</svg></div>';
     }
-    return '<div class="lane" title="This exchange has no recording: the transcript is the card script"><span>no audio · text·scripted</span></div>';
+    return '';  // no recording: the speaker label says so, nothing is drawn where audio would be
   }
 
   function stripLine(c, t, role) {
     var who = t.role === 'operator' ? 'Operator' : 'Field tech';
     var cls = 'sline' + (t.status === 'abstain' ? ' ab' : '') + (t.status === 'not_audited' ? ' na' : '');
-    return '<div class="' + cls + '"><span class="who">' + who + '<small>' + esc(t.id) + '</small></span><span class="w">' + lineHTML(c, t, role) + '</span>' + laneHTML(t) + '</div>';
+    var noRec = !(t.peaks && t.peaks.length) ? '<small class="norec" title="This exchange has no recording: the transcript is the card script">no recording</small>' : '';
+    return '<div class="' + cls + '"><span class="who">' + who + '<small>' + esc(t.id) + '</small>' + noRec + '</span><span class="w">' + lineHTML(c, t, role) + '</span>' + laneHTML(t) + '</div>';
   }
 
   function receiptLine(t) {
@@ -551,7 +600,7 @@
     else if (!r) bits = S.rung === 'regex' ? 'regex rung 0 · no model, no call' : 'no receipt';
     else {
       bits = (r.live ? '<b>live call</b> · ' : '') + '<b>' + esc(r.model_served || S.rung) + '</b> · ' + esc(r.host || '') +
-        (r.on_amd ? ' (AMD)' : '') + ' · <b>' + esc(secs(r.latency_s) || '') + '</b>' +
+        (r.on_amd ? ' (AMD-hosted API)' : '') + ' · <b>' + esc(secs(r.latency_s) || '') + '</b>' +
         (r.cost_usd != null ? ' · ' + esc(usdFixed(r.cost_usd)) : '') + ' · request <span title="' + esc(r.request_id) + '">' + esc(String(r.request_id || '').slice(0, 12)) + '…</span>' +
         (r.run ? ' · run ' + esc(r.run) : '');
     }
@@ -565,7 +614,7 @@
     var word = vk ? VERDICT_WORD[vk] : 'NO CARD';
     var h = '<article class="acard v-' + (vk || 'none') + (opts.enter ? ' enter' : '') + '" aria-live="polite">';
     h += '<header class="ac-h"><div class="vword">' + (vk === 'VERIFIED' ? TICK : '') + esc(spot ? 'SPOT-CHECK' : word) + '</div>' +
-      '<div class="ac-meta"><b>' + esc(c.exchange_id) + '</b> · ' + esc(S.meta.channel) + (c._at != null ? ' · T+' + clock(c._at) : '') + ' · ' + esc(c.lang) + '</div></header>';
+      '<div class="ac-meta"><b>' + esc(c.exchange_id) + '</b> · ' + esc(S.meta.channel) + (c._at != null ? ' · T+' + clock(c._at) : '') + '</div></header>';
     if (opts.timing) h += opts.timing;
     // the one-line verdict
     if (v && v.diffs && v.diffs.length) {
@@ -576,17 +625,19 @@
       h += '<div class="diffline"><span class="r">' + esc(v.reason) + '</span><span class="note">' + esc(reasonNote(v.reason)) + '</span></div>';
     } else if (vk === 'VERIFIED') {
       h += '<div class="diffline quiet"><span class="d">' + TICK + '</span><span class="note">Every field of the read-back matches the instruction, and the instruction matches the plant registry.' +
-        (spot ? ' Drawn as a spot-check: a human listens anyway.' : '') + '</span></div>';
+        (spot ? ' Drawn as a spot-check: a human re-checks it anyway.' : '') + '</span></div>';
     } else if (!v) {
       h += '<div class="diffline quiet"><span class="note">No instruction on the channel: no exchange was opened, so there is nothing to judge.</span></div>';
     }
+    if (vk === 'ABSTAIN') h += '<p class="listen">' + (v.reason === 'audio' ? 'Cannot hear: listen yourself.' : 'Cannot clear this exchange: a human must check it.') + '</p>';
     // the read-back strip
     var ins = c.strip && turnById(c, c.strip.instruction), rb = c.strip && c.strip.readback && turnById(c, c.strip.readback);
     if (ins) {
-      h += '<div class="strip" id="strip">' + stripLine(c, ins, 'ins') + (rb ? '<div class="gap"></div>' + stripLine(c, rb, 'rb') : '') +
+      h += '<div class="strip' + (vk === 'ABSTAIN' ? ' ab' : '') + '" id="strip">' + stripLine(c, ins, 'ins') + (rb ? '<div class="gap"></div>' + stripLine(c, rb, 'rb') : '') +
         '<svg class="links" aria-hidden="true"></svg></div>';
-      if (vk === 'ABSTAIN' && v.reason === 'audio') h += '<p class="listen">Cannot hear: listen yourself.</p>';
     }
+    // the supervisor's decision comes right after the evidence, before the detail
+    h += reviewHTML(c);
     // every turn on the channel for this exchange
     if (c.turns.length > 2 || !ins) {
       h += '<div class="sec"><span class="lab">On the channel</span><ol class="chan">' + c.turns.map(function (t) {
@@ -600,27 +651,33 @@
       }).join('') + '</ul></div>';
     }
     // provenance
+    var refWhere = S.mode === 'live' ? 'in this server' : 'at export, ' + (S.meta.referee_measured_on || '');
     h += '<div class="badges">' +
       '<span class="bdg">speaker <b>' + esc(c.provenance.speaker) + '</b></span>' +
       '<span class="bdg">radio <b>' + esc(c.provenance.radio) + '</b></span>' +
-      (S.meta.stages.extract.on_amd ? '<span class="bdg amd">extraction <b>' + esc(S.rung) + '</b> · AMD</span>' : '<span class="bdg">extraction <b>' + esc(S.rung === 'regex' ? 'regex, no model' : S.rung) + '</b></span>') +
-      '<span class="bdg">referee <b>local</b> · ' + esc(c.referee_ms != null ? c.referee_ms.toFixed(2) + ' ms' : '') + '</span>' +
+      (S.meta.stages.extract.on_amd ? '<span class="bdg amd">extraction <b>' + esc(S.rung) + '</b> · AMD-hosted API</span>' : '<span class="bdg">extraction <b>' + esc(S.rung === 'regex' ? 'regex, no model' : S.rung) + '</b></span>') +
+      '<span class="bdg">referee <b>local</b> · ' + esc(c.referee_ms != null ? c.referee_ms.toFixed(2) + ' ms ' + refWhere : '') + '</span>' +
       '</div>';
     // receipts
-    h += '<div class="sec"><span class="lab">Receipts: one model call per turn</span><ul class="rcpt">' + c.turns.map(receiptLine).join('') + '</ul></div>';
+    var nCalls = {};
+    c.turns.forEach(function (t) { if (t.receipt && t.receipt.request_id) nCalls[t.receipt.request_id] = 1; });
+    h += '<details class="sec"><summary><span class="lab">Receipts · ' + Object.keys(nCalls).length + ' model call' + (Object.keys(nCalls).length === 1 ? '' : 's') +
+      ' behind these turns</span></summary><ul class="rcpt">' + c.turns.map(receiptLine).join('') +
+      '</ul><p class="evalrow">Identical wording shares one stored call: the run extracted each distinct transcript once.</p></details>';
     // the baseline
     if (c.baseline) {
-      var b = c.baseline, wrongPass = b.verdict === 'VERIFIED' && c.expected && c.expected.indexOf('VERIFIED') !== 0;
-      h += '<div class="sec"><span class="lab">Same exchange, LLM-as-judge baseline</span><div class="base"><span class="bv' + (wrongPass ? ' bad' : '') + '">' +
+      var b = c.baseline, exp = c.expected || '';
+      var passedWrong = b.verdict === 'VERIFIED' && /^(MISMATCH|NO-READBACK)/.test(exp);
+      var passedUnknown = b.verdict === 'VERIFIED' && /unknown tag/.test(exp);
+      h += '<div class="sec"><span class="lab">Same exchange, LLM-as-judge baseline</span><div class="base"><span class="bv' + (passedWrong || passedUnknown ? ' bad' : '') + '">' +
         esc(b.label || b.verdict || 'not audited') + '</span><span>' + esc(b.model || 'the judge model') + ', given the whole exchange and no plant registry' +
-        (wrongPass ? ': <strong>it passed a read-back the card script seeded as wrong.</strong>' : '.') + '</span></div></div>';
+        (passedWrong ? ': <strong>it passed a read-back the card script seeded as wrong.</strong>'
+          : passedUnknown ? ': <strong>it passed an order for equipment the plant registry does not have.</strong>' : '.') + '</span></div></div>';
     }
     // trace + eval label
     h += '<div class="sec"><span class="lab">Verdict trace</span><ol class="trace">' + (c.trace || []).map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('') + '</ol></div>';
-    h += '<div class="sec evalrow">Card script seeded as <b>' + esc(c.expected || 'no card') + '</b> (' + esc(c.error_type) + ', ' + esc(c.row) + ' row)' +
+    h += '<div class="sec evalrow">Card script seeded as <b>' + esc(c.expected || 'no card') + '</b> (' + esc(c.error_type) + ', ' + esc(c.row) + ' row, language ' + esc(c.lang) + ')' +
       (c.matches_stored === false ? ' · <b>differs from the stored run</b>' : c.matches_stored ? ' · same label as the stored run' : '') + '</div>';
-    // review
-    h += reviewHTML(c);
     h += '</article>';
     $('card-body').innerHTML = h;
     bindReview(c);
@@ -630,14 +687,14 @@
   function reasonNote(r) {
     var m = {
       'unknown tag': 'The instruction names equipment the plant registry does not have, or a line it is not on. The referee will not guess: a human checks the order itself.',
-      'grounding': 'The model pointed at words that are not in the transcript. The referee does not trust it: a human listens.',
-      'coverage': 'A safety word in the transcript was not accounted for by any command. A human listens.',
+      'grounding': 'The model pointed at words that are not in the transcript. The referee does not trust it: a human checks the exchange.',
+      'coverage': 'A safety word in the transcript was not accounted for by any command. A human checks the exchange.',
       'retraction cue missing': 'Two values for one field and no correction word between them. The referee will not pick one for the crew.',
       'ambiguous tag': 'A bare number that more than one tag in the registry ends with.',
       'audio': 'The speech-to-text was not sure of the words that matter. Listen yourself.',
     };
     if (/^unmapped/.test(r)) return 'A word in a span maps to no action, tag or line in the alias tables.';
-    return m[r] || 'A human must listen to this exchange.';
+    return m[r] || 'A human must check this exchange.';
   }
 
   // ------------------------------------------------------------------------------------------- review
@@ -707,51 +764,55 @@
 
   // ------------------------------------------------------------------------------------------- the refused one
   function tryRefused() {
+    var rf = S.meta && S.meta.refused;
+    if (!rf) return;
+    if (S.mode === 'replay' && !S.data) return;
     setFollow(false);
-    var id = (S.cfg && S.cfg.refused) || 'R-01';
-    var btn = $('refused');
+    var gen = S.gen, btn = $('refused');
     btn.disabled = true;
     var p;
     if (S.mode === 'live') {
-      var t0 = performance.now();
       p = fetch('api/try-refused', { method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ run: S.run, rung: S.rung, extract: S.extract }) })
-        .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-        .then(function (j) { j.round_trip_ms = performance.now() - t0; return j; });
+        .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
     } else {
-      var ev = S.data.events.filter(function (e) { return e.type === 'judged' && e.card.exchange_id === id; })[0];
+      var ev = S.data.events.filter(function (e) { return e.type === 'judged' && e.card.exchange_id === rf.exchange_id; })[0];
       p = ev ? Promise.resolve({ card: JSON.parse(JSON.stringify(ev.card)), extract: 'stored', measured_on: S.meta.referee_measured_on, replay: true })
         : Promise.reject(new Error('the refused exchange is not in this run'));
     }
     p.then(function (j) {
+      if (gen !== S.gen) return;
       var c = j.card;
       c._at = null;
       S.tried = c;
       Array.prototype.forEach.call(document.querySelectorAll('.row[aria-current]'), function (b) { b.removeAttribute('aria-current'); });
       S.selected = null;
-      // play the two turns on the channel strip, then show the card
-      var turns = c.turns.slice();
-      var k = 0;
+      var turns = c.turns.slice(), k = 0;
+      var wait = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 700;
       (function next() {
-        if (k < turns.length) {
+        if (gen !== S.gen) return;
+        if (k < turns.length) {  // play the turns on the channel strip, then show the card
           var t = turns[k++];
           $('ch-who').textContent = t.role === 'operator' ? 'Operator' : 'Field tech';
           var tx = $('ch-txt'); tx.textContent = t.text; tx.classList.remove('in'); void tx.offsetWidth; tx.classList.add('in');
           $('ch-line').classList.add('tx');
-          setTimeout(next, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 700);
+          S.timers.push(setTimeout(next, wait));
           return;
         }
         $('ch-line').classList.remove('tx');
         var ext = c.turns.map(function (t) { return t.receipt && typeof t.receipt.latency_s === 'number' ? t.receipt.latency_s.toFixed(2) + ' s' : null; }).filter(Boolean);
         var live = c.turns.some(function (t) { return t.receipt && t.receipt.live; });
-        var where = S.meta.stages.extract;
+        var ex = S.meta.stages.extract;
         var exTxt = S.rung === 'regex' ? 'extraction: regex rung 0, no model call'
-          : (live ? 'extraction called now on ' : 'extraction replayed from receipts, ') + esc(where.where) + ': <b>' + esc(ext.join(' + ')) + '</b>';
-        var refTxt = j.replay ? 'referee <b>' + c.referee_ms.toFixed(2) + ' ms</b> when this replay was exported (' + esc(j.measured_on || '') + ')'
-          : 'referee <b>' + c.referee_ms.toFixed(2) + ' ms</b> just now in the server (' + esc(j.measured_on || '') + ')';
-        var timing = '<p class="timing"><b>You pressed “Try the refused one”.</b> XV-205 is not in the plant registry, so the referee refuses this exchange on every run. ' +
-          exTxt + ' · ' + refTxt + '</p>';
+          : (live ? 'extraction called just now on the ' : 'extraction replayed from its receipts, ') + esc(ex.where) + ': <b>' + esc(ext.join(' + ')) + '</b>' +
+            (ex.latency_s_p50 != null ? ' (this run’s p50 is ' + esc(ex.latency_s_p50.toFixed(2)) + ' s over ' + esc(ex.calls) + ' calls)' : '');
+        var refTxt = 'referee <b>' + c.referee_ms.toFixed(2) + ' ms</b> ' + (j.replay ? 'when this replay was exported' : 'just now in the server') + ' (' + esc(j.measured_on || '') + ')';
+        var why = c.verdict && c.verdict.reason === 'unknown tag'
+          ? esc(rf.tag) + ' is not in the plant registry, so the referee refuses to clear the order: <b>' + esc(c.verdict.label) + '</b>.'
+          : 'This rung’s output made the referee answer <b>' + esc(c.verdict ? c.verdict.label : 'no verdict') + '</b> before the registry check.';
+        var timing = '<p class="timing"><b>You pressed “Try the refused one”.</b> ' + why + ' ' + exTxt + ' · ' + refTxt + '</p>';
         renderCard(c, { enter: true, timing: timing });
+        $('card').scrollTop = 0;
         if (matchMedia('(max-width: 767px)').matches) openCard();
         btn.disabled = false;
       })();

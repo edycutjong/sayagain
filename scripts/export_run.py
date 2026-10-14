@@ -47,6 +47,8 @@ def git_head() -> str | None:
 
 
 def export(pairs: list[tuple[str, str]], out: Path) -> dict:
+    """Builds next to `out` and swaps it in only when every run checks out: a failed export leaves the old replay."""
+    final, out = out, out.with_name(out.name + ".tmp")
     if out.exists():
         shutil.rmtree(out)
     shutil.copytree(WEB, out, ignore=shutil.ignore_patterns(".DS_Store"))
@@ -58,7 +60,12 @@ def export(pairs: list[tuple[str, str]], out: Path) -> dict:
         judged = [e["card"] for e in events if e["type"] == "judged"]
         differs = [c["exchange_id"] for c in judged if not c.get("matches_stored")]
         if differs:  # the replay must show what the run measured: never ship a re-judged result that disagrees
+            shutil.rmtree(out)
             raise SystemExit(f"{run}/{rung}: re-judged label differs from the stored run on {differs[:5]}")
+        n_stored = len(shift.stored_labels(run, rung))
+        if len(judged) != n_stored:
+            shutil.rmtree(out)
+            raise SystemExit(f"{run}/{rung}: {len(judged)} cards replayed, the run stored {n_stored}")
         payload = {"meta": shift.run_meta(run, rung), "events": events}
         (out / "data" / f"{run}--{rung}.json").write_text(
             json.dumps(payload, ensure_ascii=False, separators=(",", ":")), encoding="utf-8"
@@ -71,11 +78,14 @@ def export(pairs: list[tuple[str, str]], out: Path) -> dict:
         "runs": [{"run": r, "rungs": rs, "n_cards": shift._summary(r).get("n_cards")} for r, rs in runs.items()],
         "default": {"run": first_run, "rung": first_rung},
         "live_extract": False,
-        "refused": "R-01",
+        "refused": shift.REFUSED_ID,
         "exported_at": datetime.now(UTC).isoformat(timespec="seconds"),
         "git_head": git_head(),
     }
     (out / "config.json").write_text(json.dumps(config, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    if final.exists():
+        shutil.rmtree(final)
+    out.rename(final)
     return report
 
 

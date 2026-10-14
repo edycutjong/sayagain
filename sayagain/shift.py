@@ -24,7 +24,7 @@ from collections.abc import Callable, Iterator
 from functools import lru_cache
 from pathlib import Path
 
-from referee.audit import _SEVERITY, LIVE, audit, judge
+from referee.audit import _SEVERITY, LIVE, SPOT_CHECKS_PER_SHIFT, audit, judge
 from referee.pairing import Exchange
 from referee.registry import Registry
 from referee.turns import Turn, TurnAnalysis, analyze
@@ -39,8 +39,9 @@ JUDGE_RUN = "llm-judge-r1-reaudit"  # the LLM-as-judge baseline shown beside eac
 DEFAULT_RUN, DEFAULT_RUNG = "ladder-r1-reaudit", "Gemma-4-31B-IT"
 CHANNEL = "CH-01"  # one channel: the cards are replayed one after another on a single radio channel
 TURN_STEP_S, TURN_LEN_S, CARD_GAP_S = 3.5, 2.5, 4.0  # replay clock: turn timing as in scripts/eval.py
-SPOT_CHECKS, SEED = 10, 1018
+SPOT_CHECKS, SEED = SPOT_CHECKS_PER_SHIFT, 1018  # same sample size + seed as referee.audit
 PROVENANCE = "text·scripted"
+REFUSED_ID = "R-01"  # the guaranteed refusal: its tag is not in the registry
 ROLE = {"operator": "operator", "tech": "field"}
 
 
@@ -147,8 +148,8 @@ def judge_baseline() -> dict[str, dict]:
     for f in sorted(p.glob("*.judge.cards.jsonl")):
         rows += read_jsonl(f)
     try:
-        model = next(iter(_summary(JUDGE_RUN)["rungs"]))
-    except (KeyError, StopIteration):
+        model = _summary(JUDGE_RUN)["results"]["llm_judge"]["rung"]["model"]
+    except (KeyError, TypeError):
         model = None
     return {r["exchange_id"]: {"verdict": r["verdict"], "label": r["label"], "model": model} for r in rows}
 
@@ -267,28 +268,46 @@ def judge_card(card: dict, extract: Callable[[str], Extraction], registry: Regis
 # ------------------------------------------------------------------------------------------------- the shift
 
 
+def _pct(values: list[float], q: float) -> float | None:
+    if not values:
+        return None
+    v = sorted(values)
+    return round(v[min(len(v) - 1, max(0, round(q * (len(v) - 1))))], 4)
+
+
+def run_receipts(run: str, rung: str) -> list[dict]:
+    """The receipts behind this run's stored extractions (re-audits reuse first-pass calls), one per distinct call."""
+    rows = read_jsonl(ROOT / _rung_info(run, rung)["extractions"])
+    by_id = receipts_by_request(rung)
+    ids = sorted({r["request_id"] for r in rows if r.get("request_id")})
+    return [by_id[i] for i in ids if i in by_id]
+
+
 def rung_stage(run: str, rung: str) -> dict:
-    """Where each stage ran for this rung, from the receipts (never from a fixed string)."""
-    info = _rung_info(run, rung)
+    """Where each stage ran for this run, from its own receipts (never from a fixed string)."""
     if rung == "regex":
         extract = {"name": "regex rung 0 (no model, no call)", "where": "local", "on_amd": None, "hosts": []}
     else:
-        recs = receipts_by_request(rung)
-        hosts = sorted({r.get("host") for r in recs.values() if r.get("host")})
-        served = sorted({r.get("model_served") for r in recs.values() if r.get("model_served")})
-        on_amd = sorted({bool(r.get("on_amd")) for r in recs.values()})
+        recs = run_receipts(run, rung)
+        hosts = sorted({r.get("host") for r in recs if r.get("host")})
+        served = sorted({r.get("model_served") for r in recs if r.get("model_served")})
+        on_amd = sorted({bool(r.get("on_amd")) for r in recs})
+        lat = [float(r["latency_s"]) for r in recs if isinstance(r.get("latency_s"), int | float)]
         extract = {
             "name": rung,
             "model_served": served,
-            "where": "AMD Token Factory API" if on_amd == [True] else "mixed / unknown",
+            # on_amd = the API host is AMD-operated (amd.com / amd.com.cn): where the API is hosted, never a GPU claim
+            "where": "AMD-hosted API" if on_amd == [True] else "API host not AMD-operated / mixed",
             "on_amd": True if on_amd == [True] else None,
             "hosts": hosts,
-            "receipts": info.get("receipts"),
+            "calls": len(recs),
+            "latency_s_p50": _pct(lat, 0.5),
+            "latency_s_p95": _pct(lat, 0.95),
         }
     return {
         "asr": {"name": "none: the transcript is the card script", "where": "n/a", "on_amd": None},
         "extract": extract,
-        "referee": {"name": "referee/ (plain Python, no model)", "where": "local", "on_amd": None},
+        "referee": {"name": "plain Python referee (referee/), no model", "where": "local", "on_amd": None},
     }
 
 
@@ -300,7 +319,9 @@ def run_meta(run: str = DEFAULT_RUN, rung: str = DEFAULT_RUNG) -> dict:
 
     def kn(m: str) -> dict | None:
         w = held.get(m)
-        return {"k": w["k"], "n": w["n"]} if isinstance(w, dict) and "k" in w else None
+        return {"k": w["k"], "n": w["n"]} if isinstance(w, dict) and "k" in w and w.get("n") else None
+
+    refused = next((c for c in run_cards(run, rung) if c["exchange_id"] == REFUSED_ID), None)
 
     return {
         "run": run,
@@ -313,12 +334,17 @@ def run_meta(run: str = DEFAULT_RUN, rung: str = DEFAULT_RUNG) -> dict:
         "n_cards": s.get("n_cards"),
         "channel": CHANNEL,
         "stages": rung_stage(run, rung),
+        "n_cards_run": len(run_cards(run, rung)),
         "held_out": {
-            "false_verified": (held.get("false_verified") or {}).get("count"),
+            "n": held.get("n_cards"),
+            "false_verified": kn("false_verified"),
             "errors_flagged": kn("errors_flagged"),
             "false_alarm_load": kn("false_alarm_load"),
             "not_audited": kn("not_audited"),
         },
+        "cards_per_shift_assumption": held.get("cards_per_shift_assumption"),
+        "shift_assumption": s.get("shift_assumption"),
+        "refused": {"exchange_id": REFUSED_ID, "tag": refused["instruction"][0]["tag"]} if refused else None,
         "meets_rule": info.get("meets_rule"),
         "rule": s.get("rule"),
         "judge_run": f"bench/results/text/{JUDGE_RUN}.json",

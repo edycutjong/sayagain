@@ -32,14 +32,17 @@
   </div>
   <span id="mode" class="mode"></span>
   <div class="counter">
-    <span class="lab">Cards<br>this shift</span>
+    <span class="lab" id="count-lab">Cards in<br>this replay</span>
     <output id="count" class="num" aria-live="polite">0</output>
   </div>
 </header>
 
 <section class="stages" id="stages" aria-label="Where each stage of this run ran">
-  <p class="banner" id="banner"></p>
-  <ol class="stage-list" id="stage-list"></ol>
+  <details id="stages-d">
+    <summary><span class="sum" id="stage-sum"></span><span class="more">How this run was made</span></summary>
+    <p class="banner" id="banner"></p>
+    <ol class="stage-list" id="stage-list"></ol>
+  </details>
 </section>
 
 <section class="channel" aria-label="Radio channel, replayed">
@@ -48,7 +51,7 @@
     <span class="who" id="ch-who">·</span>
     <span class="txt" id="ch-txt">Waiting for the first transmission.</span>
   </div>
-  <div class="ch-clock"><span class="lab">Replay T+</span><span id="clock" class="num">00:00</span></div>
+  <div class="ch-clock"><span class="lab" id="clock-lab">Replay T+</span><span id="clock" class="num">00:00</span></div>
   <div class="ch-ctl">
     <button id="play" class="btn" type="button" aria-pressed="false">
       <svg viewBox="0 0 20 20" aria-hidden="true"><path class="i-pause" d="M6 4h3v12H6zM11 4h3v12h-3z"/><path class="i-play" d="M6 4l10 6-10 6z"/></svg>
@@ -66,7 +69,7 @@
   </button>
     <button id="follow" class="btn btn-q" type="button" aria-pressed="true" title="Open each new card as it arrives">Follow new cards</button>
     <button id="refused" class="btn btn-ref" type="button">
-      <span>Try the refused one</span><span class="data">XV-205</span>
+      <span>Try the refused one</span><span class="data" id="refused-tag"></span>
     </button>
   </div>
   <div class="prog" aria-hidden="true"><i id="progbar"></i></div>
@@ -99,7 +102,7 @@
 
 <footer class="foot">
   <p id="foot-run"></p>
-  <p>Exchanges are fictional plant radio traffic from <span class="data">data/cards.jsonl</span>. A card leaves the live queue only when the supervisor confirms or dismisses it.</p>
+  <p>A card leaves the live queue only when the supervisor confirms or dismisses it.</p>
 </footer>
 
 <script src="app.js" defer></script>
