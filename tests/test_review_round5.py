@@ -284,3 +284,34 @@ def test_a_not_audited_turn_shows_the_receipt_of_the_call_that_failed() -> None:
     assert {(v["http_status"], v["error"]) for v in views} <= {(500, "server error"), (None, "timeout")}
     ok = next(r for r in rows if r["request_id"])
     assert "ok" not in shift._receipt_view(ext(ok["text"]), "Gemma-4-31B-IT")  # answered calls render as before
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# The benchmark fails loud: a referee crash stops the run (after the paid extractions are written), never a NOT_AUDITED.
+
+
+def _eval_module():
+    import sys
+    from pathlib import Path
+
+    scripts = str(Path(__file__).resolve().parent.parent / "scripts")
+    if scripts not in sys.path:
+        sys.path.insert(0, scripts)
+    import eval as ev
+
+    return ev
+
+
+def test_the_benchmark_stops_on_a_referee_error_after_writing_its_extractions(monkeypatch, tmp_path) -> None:
+    from referee import coverage
+    from sayagain.extract import REGEX, Pacer
+
+    ev = _eval_module()
+    card = next(c for c in ev.load_cards() if c["exchange_id"] == "H-01")
+    assert "referee_errors" not in ev.judge_card(card, ev.regex_extraction, REG)
+    monkeypatch.setattr(coverage, "check", _boom)
+    assert ev.judge_card(card, ev.regex_extraction, REG)["referee_errors"]  # before the fix: a quiet NOT_AUDITED
+    monkeypatch.setattr(ev, "OUT", tmp_path)
+    with pytest.raises(SystemExit, match="referee error"):
+        ev.run_extraction_rung("t", REGEX, [card], REG, Pacer(0.0), ev.Budget(0.0))
+    assert (tmp_path / "t" / "regex.extractions.jsonl").exists() and (tmp_path / "t" / "regex.cards.jsonl").exists()
