@@ -50,6 +50,7 @@ class TurnAnalysis:
     operator_correction: bool = False
     imperative: bool = False
     readback_shaped: bool = False  # opens with copy / roger / siap …: never opens a window of its own
+    stand_by: bool = False  # "stand by" / "wait one" / "tunggu" with no command: the reply is still coming
     opens_window: bool = False
     disagrees: bool = False  # prompted vs unprompted ASR read differently (only with an unprompted pass)
 
@@ -95,9 +96,39 @@ def cue_only(text: str) -> bool:
     return bool(toks) and all(t.norm in al.OPERATOR_CORRECTION_CUES or t.norm in _LEAD_FILLERS for t in toks)
 
 
-def readback_shaped(text: str) -> bool:
+def is_stand_by(text: str) -> bool:
     toks = al.tokenize(text)
-    return bool(toks) and toks[0].norm in al.READBACK_CUES
+    if al.tag_mentions(toks) or al.action_mentions(toks):
+        return False
+    return any(al.contains_phrase(toks, p) for p in _STAND_BY)
+
+
+_STAND_BY = (("stand", "by"), ("standby",), ("wait", "one"), ("wait",), ("tunggu",), ("sebentar",), ("hold", "on"))
+
+
+def readback_shaped(text: str) -> bool:
+    """Opens with copy / roger / siap … and does NOT continue with an order ("Okay, close valve …" is an order)."""
+    toks = al.tokenize(text)
+    return bool(toks) and toks[0].norm in al.READBACK_CUES and not _imperative_core(_strip_openers(toks[1:]))
+
+
+# verb forms that can carry an order: bare imperatives, plus the Bahasa passive used as a polite order
+# ("tolong valve dua nol tiga ditutup") — unless a status marker says it already happened
+_ORDER_PASSIVES = frozenset({"ditutup", "dibuka", "dimatikan", "dinyalakan", "diisolasi", "dihidupkan", "dijalankan"})
+_STATUS_MARKERS = frozenset(
+    {"sudah", "udah", "telah", "sedang", "already", "was", "were", "has", "have", "had", "been"}
+)
+
+
+def has_order_verb(text: str) -> bool:
+    """An action word in a form that can give an order. 'I closed …', 'pump … stopped', 'valve … sudah ditutup'
+    are status talk: they never open a pairing window."""
+    toks = al.tokenize(text)
+    for i, t in enumerate(toks):
+        if t.norm in al.IMPERATIVE_ACTIONS or t.norm in _ORDER_PASSIVES:
+            if not any(p.norm in _STATUS_MARKERS for p in toks[max(0, i - 2) : i]):
+                return True
+    return False
 
 
 def canonical_tuples(text: str, registry: Registry) -> list[tuple[str, str, str]]:
@@ -127,10 +158,16 @@ def is_imperative(text: str) -> bool:
     toks = _strip_openers(al.tokenize(text))
     if not toks or toks[0].norm in al.READBACK_CUES:
         return False
+    return _imperative_core(toks)
+
+
+def _imperative_core(toks: list[al.Token]) -> bool:
+    if not toks:
+        return False
     if toks[0].norm in al.IMPERATIVE_ACTIONS:
         return True
     if toks[0].norm in al.TAG_NOUNS or toks[0].norm == "motor":
-        return any(t.norm in al.IMPERATIVE_ACTIONS for t in toks[1:])
+        return any(t.norm in al.IMPERATIVE_ACTIONS or t.norm in _ORDER_PASSIVES for t in toks[1:])
     return False
 
 
@@ -149,6 +186,7 @@ def analyze(turn: Turn, registry: Registry) -> TurnAnalysis:
     correction_cue = opens_with_correction(text)
     a.imperative = is_imperative(text)
     a.readback_shaped = readback_shaped(text)
+    a.stand_by = is_stand_by(text)
     if turn.alt_transcript is not None:
         a.disagrees = canonical_tuples(text, registry) != canonical_tuples(turn.alt_transcript, registry)
     if turn.not_audited:
@@ -160,7 +198,7 @@ def analyze(turn: Turn, registry: Registry) -> TurnAnalysis:
 
     def fail(reason: str, detail: str) -> TurnAnalysis:
         a.status, a.reason, a.detail = "abstain", reason, detail
-        a.opens_window = not a.readback_shaped and _scan_opens_window(text, registry)
+        a.opens_window = not a.readback_shaped and has_order_verb(text) and _scan_opens_window(text, registry)
         # a correction must be cue-only ("Negative.") or carry the repeated command
         a.operator_correction = correction_cue and (cue_only(text) or a.opens_window)
         return a
@@ -212,8 +250,10 @@ def analyze(turn: Turn, registry: Registry) -> TurnAnalysis:
     # a turn opens a pairing window only with >= 1 grounded command that has an action and a tag that resolves to a
     # full tag (spoken prefix, or a bare number the registry knows); chatter and status talk ("pump one-forty is
     # running") never open one
-    a.opens_window = not a.readback_shaped and any(
-        c.action is not None and _full_tag(c.tag, c.tag_status) for c in cmds
+    a.opens_window = (
+        not a.readback_shaped
+        and has_order_verb(text)
+        and any(c.action is not None and _full_tag(c.tag, c.tag_status) for c in cmds)
     )
     a.operator_correction = correction_cue and (cue_only(text) or a.opens_window)
     return a
@@ -258,8 +298,9 @@ def span_confidence(analyses: list[TurnAnalysis]) -> float | None:
                 sp = cmd.get(f)
                 if sp is None:
                     continue
-                hit = [math.exp(lp) for s, e, lp in a.turn.tokens if s < sp[1] and sp[0] < e]
-                if not hit:
-                    return None
+                lps = [lp for s, e, lp in a.turn.tokens if s < sp[1] and sp[0] < e]
+                if not lps or any(not math.isfinite(lp) or lp > 0 for lp in lps):
+                    return None  # missing, NaN or impossible (p > 1): never a pass
+                hit = [math.exp(lp) for lp in lps]
                 probs.extend(hit)
     return min(probs) if probs else None

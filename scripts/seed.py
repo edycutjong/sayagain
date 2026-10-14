@@ -450,10 +450,15 @@ def build_cards(seed: int, rows: list[Row]) -> list[dict]:
         ("Ada orang di area klarifikasi?", "Ada dua orang, lagi bersih-bersih."),
         ("Temperature at the sterilizer is one-forty degrees.", "Copy."),
         ("Can you bring the gas detector to line Bravo?", "On my way."),
+        ("I closed valve two-oh-three earlier, all good.", "Okay, thanks."),
+        ("Pump one-forty stopped by itself, over.", "Copy, I will go and check."),
+        ("Valve dua nol delapan sudah ditutup dari tadi.", "Siap."),
     ]
     for n, (a, b) in enumerate(chatter, 1):
-        lang = "mix" if n in (9, 10) else "en"
+        lang = "mix" if n in (9, 10, 15) else "en"
         phen = ["time_in_chatter"] if n in (2, 6, 7) else (["tag_without_verb"] if n in (4, 9) else [])
+        if n >= 13:
+            phen = ["status_talk_with_verb"]
         cards.append(
             _card(
                 f"C-{n:02d}",

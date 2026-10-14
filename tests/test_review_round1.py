@@ -129,3 +129,17 @@ def test_disagreement_gate_compares_resolved_tags(registry) -> None:
 
 def test_instruction_without_action_abstains() -> None:
     assert validate_instruction([CanonCommand(None, "XV-203", "ok", "B")]) == "unmapped: no action"
+
+
+def test_configured_disagreement_gate_abstains_when_one_side_lacks_the_unprompted_pass(registry) -> None:
+    ins = analyze(make_turn(HERO_I, alt_transcript=HERO_I), registry)
+    rb = analyze(make_turn(OK_RB, t=3), registry)  # no unprompted pass on the read-back
+    assert judge(Exchange("CH-07", ins, rb), audio_gate="disagreement").reason == "audio"
+    assert judge(Exchange("CH-07", ins, rb)).verdict == "VERIFIED"  # auto: one-sided -> no gate, stated in trace
+
+
+@pytest.mark.parametrize("bad", [float("nan"), 0.5, float("-inf")])
+def test_impossible_log_probs_never_pass_the_floor(registry, bad: float) -> None:
+    ins = analyze(make_turn(HERO_I, tokens=[(0, 99, -0.01)]), registry)
+    rb = analyze(make_turn(OK_RB, t=3, tokens=[(0, 99, bad)]), registry)
+    assert judge(Exchange("CH-07", ins, rb), floor=0.5).reason == "audio"
