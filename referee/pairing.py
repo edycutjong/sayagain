@@ -18,8 +18,8 @@ written down and tested:
   * an unreadable (NOT_AUDITED) instruction's window closes when a new instruction-shaped turn arrives;
   * while a read-back is awaited, a cue-less order for OTHER tags starts a new exchange; the same order with a query
     ("…, do you copy?") is the operator repeating; a second read-back after the first is kept and judged, also
-    when the referee cannot read it (it abstains) if code hears an action, a tag or a plant line in it (a bare "Roger."
-    or "Roger, Mike." is an acknowledgement);
+    when the referee cannot read it (it abstains) if code hears an action, a tag, a line word with its letter, or a bare
+    NATO word that is a plant line or ends a tag (a bare "Roger." or "Roger, Mike." is an acknowledgement);
   * no read-back inside the window -> NO_READBACK. Radio is half-duplex: no overlap model.
 """
 

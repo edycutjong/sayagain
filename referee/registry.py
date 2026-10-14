@@ -66,6 +66,11 @@ class Registry:
         """The plant's line letters ("A" … "D")."""
         return frozenset(r.line for r in self.rows.values())
 
+    @property
+    def tag_letters(self) -> frozenset[str]:
+        """Letters that end a tag ("MOV-22H" → "H"): a bare NATO word may complete one."""
+        return frozenset(t[-1] for t in self.rows if t[-1].isalpha())
+
     def line_of(self, tag: str) -> str | None:
         r = self.rows.get(tag)
         return r.line if r else None

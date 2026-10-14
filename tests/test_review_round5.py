@@ -435,6 +435,7 @@ def test_unreadable_chatter_that_names_no_work_is_not_an_orphan() -> None:
         "Okay, starting my round now.",
         "Copy, I will stop by the lab.",
         "Roger, the gate is open.",
+        "Copy, pump one-fifty psi.",  # a noun and a number, but no pump P-150 in the registry
     ):
         empty = {"kind": "other", "commands": [], "retracted_spans": []}
         rep = audit([Turn("c", "CH-01", 0.0, 2.5, said, empty)], REG, spot_checks=0)
@@ -448,11 +449,20 @@ def test_unreadable_chatter_that_names_no_work_is_not_an_orphan() -> None:
 def test_an_unreadable_ack_with_a_nato_name_raises_no_card() -> None:
     from referee.regex_extractor import extract as regex_extract
 
-    for said in ("Roger, Mike.", "Affirmative, Victor.", "Siap, Hotel.", "Roger, see you in November."):
+    empty = {"kind": "other", "commands": [], "retracted_spans": []}
+    for said in ("Roger, Mike.", "Affirmative, Victor.", "Roger, see you in November."):
         texts = ("Close valve two-oh-three, line Bravo.", "Copy, closing valve two-oh-three, line Bravo.", said)
         turns = [Turn(f"t{k}", "CH-01", 3.5 * k, 3.5 * k + 2.5, x, regex_extract(x)) for k, x in enumerate(texts)]
-        turns[2].extraction = {"kind": "other", "commands": [], "retracted_spans": []}
-        assert audit(turns, REG, spot_checks=0).judged[0].verdict.verdict == "VERIFIED", said
+        turns[2].extraction = empty
+        rep = audit(turns, REG, spot_checks=0)
+        assert [j.verdict.verdict for j in rep.judged] == ["VERIFIED"] and not rep.orphans, said
+        alone = audit([Turn("c", "CH-01", 0.0, 2.5, said, empty)], REG, spot_checks=0)  # idle channel: chatter
+        assert not alone.judged and not alone.orphans, said
+    for said in ("Siap, Hotel.", "Roger, 31, Hotel."):  # H ends registry tags (MOV-22H): it may complete one
+        texts = ("Close valve two-oh-three, line Bravo.", "Copy, closing valve two-oh-three, line Bravo.", said)
+        turns = [Turn(f"t{k}", "CH-01", 3.5 * k, 3.5 * k + 2.5, x, regex_extract(x)) for k, x in enumerate(texts)]
+        turns[2].extraction = empty
+        assert audit(turns, REG, spot_checks=0).judged[0].verdict.verdict == "ABSTAIN", said
 
 
 def test_an_unreadable_readback_naming_a_pump_with_an_unknown_verb_is_an_orphan() -> None:

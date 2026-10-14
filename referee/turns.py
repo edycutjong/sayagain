@@ -58,8 +58,10 @@ class TurnAnalysis:
     opens_window: bool = False
     disagrees: bool = False  # prompted vs unprompted ASR read differently (only with an unprompted pass)
     # what code hears in the turn (alias tables), whatever the model returned:
-    safety_words: bool = False  # an action, a tag or a line ("line Bravo", or a bare letter that is a plant line)
-    names_work: bool = False  # work someone could be doing: an action + a tag naming equipment, or a noun + its number
+    # an action, a tag, a line word with its letter, or a bare NATO word that is a plant line or ends a registry tag
+    safety_words: bool = False
+    # work someone could be doing: an action + a tag naming equipment, or a registry tag spoken with its equipment noun
+    names_work: bool = False
 
     @property
     def id(self) -> str:
@@ -235,15 +237,19 @@ def _code_kinds(turn: Turn, registry: Registry) -> tuple[TurnAnalysis, bool]:
     a.stand_by = is_stand_by(text)
     toks = al.tokenize(text)
     tags = al.tag_mentions(toks)
-    # a bare NATO word counts only if it is one of the plant's lines: "Roger, Mike." is not a read-back
+    # a bare NATO word counts only if it can be a plant line or complete a tag ("…two-two, Hotel"); "Roger, Mike." not
+    letters = registry.lines | registry.tag_letters
     a.safety_words = bool(
         al.action_mentions(toks)
         or tags
         or al.line_mentions(toks)
-        or any(m.value in registry.lines for m in al.bare_letter_mentions(toks))
+        or any(m.value in letters for m in al.bare_letter_mentions(toks))
     )
-    # "turning off pump one-forty": the verb is not in the tables, the pump is; a bare number ("level two-fifty") is not
-    a.names_work = _scan_opens_window(text, registry) or any(m.prefix is not None for m in tags)
+    # "turning off pump one-forty": the verb is not in the tables, the pump is in the registry; "pump one-fifty psi" or
+    # a bare number ("level two-fifty") is not work
+    a.names_work = _scan_opens_window(text, registry) or any(
+        m.prefix is not None and registry.resolve(m.prefix, m.suffix or "").status == "ok" for m in tags
+    )
     if turn.alt_transcript is not None:
         a.disagrees = canonical_tuples(text, registry) != canonical_tuples(turn.alt_transcript, registry)
     return a, opens_with_correction(text)
