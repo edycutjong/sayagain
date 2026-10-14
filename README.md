@@ -97,6 +97,7 @@ flowchart LR
 | Local kill test (Whisper-large-v3 on a laptop, off-AMD) | `scripts/kill_test_local.py` | harness ready, waiting for recordings |
 | Supervisor queue: read-back strip card, confirm, or dismiss with a required reason, "Try the refused one", end-of-shift list (spot-checks, caught on channel, not audited), receipts per model call | `sayagain/server.py`, `sayagain/shift.py`, `web/` | done, over the stored text runs |
 | Static replay of stored runs (same page, GitHub Pages-ready, not published) | `scripts/export_run.py` → `docs/replay/` | done |
+| Landing page and pitch deck with its PDF, built from the stored results and the sources listed in `evidence/sources.json` (GitHub Pages-ready, not published) | `docs/index.html`, `docs/pitch/` | done |
 | Human recordings, audio eval rows | — | not built yet |
 
 ## 🏆 AMD Token Factory Integration
@@ -236,7 +237,8 @@ referee/        pure-Python referee: aliases, grounding, coverage, pairing, regi
 sayagain/       AMD Token Factory client, extraction, speech path, queue server, shift list
 scripts/        seed, radio simulation, eval ladder, export, access probe, readiness gate
 web/            the queue page (one static page, no framework)
-docs/           static replay (docs/replay), screenshots, developer-experience report
+docs/           landing page, pitch deck + PDF (docs/pitch), static replay (docs/replay), screenshots, DX report
+evidence/       recorded terminal sessions, live-call receipts, the external sources the pages quote
 bench/          pre-registered protocol and every stored result and receipt
 data/           fictional plant registry and the 145 recording cards
 tests/          505 tests, with regression tests from five review rounds (`test_review_round*.py`)
@@ -251,7 +253,8 @@ tests/          505 tests, with regression tests from five review rounds (`test_
 - [ ] Human recordings, one WAV per card
 - [ ] Audio rows: local kill test, speech-to-text, headline row and failure case
 - [ ] Blind auditor set
-- [ ] Demo video and pitch deck
+- [x] Landing page and pitch deck with its PDF (`docs/`)
+- [ ] Demo video
 
 ## 📄 License
 
