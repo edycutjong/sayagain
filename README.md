@@ -28,7 +28,7 @@
 ## 📸 See it in Action
 
 The supervisor queue, replaying a stored run over the 145 recording cards. Red marks only the read-back word that differs from
-the instruction; the card leaves the queue only through **Confirm** or **Dismiss** (a reason is required).
+the instruction; the card leaves the queue only through **Confirm**, or **Dismiss** (a reason is required).
 
 | The hero exchange | The refused one | End of shift |
 |---|---|---|
@@ -95,7 +95,7 @@ flowchart LR
 | Model ladder, grounding ablation, LLM-judge baseline, offline re-scoring of every stored model output | `scripts/eval.py` | run on the card scripts (`text·scripted`), see below |
 | Speech path: one WAV per card → VAD turns → speech-to-text (local Whisper, labelled off-AMD; AMD notebook backend switched off until a notebook GPU is confirmed) → disagreement gate | `sayagain/ingest.py`, `sayagain/asr.py` | unit tests done; Whisper has not yet run on a human recording (only on one `tts·fixture` clip, in an opt-in test) |
 | Local kill test (Whisper-large-v3 on a laptop, off-AMD) | `scripts/kill_test_local.py` | harness ready, waiting for recordings |
-| Supervisor queue: read-back strip card, confirm / dismiss (reason required), "Try the refused one", end-of-shift list (spot-checks, caught on channel, not audited), receipts per model call | `sayagain/server.py`, `sayagain/shift.py`, `web/` | done, over the stored text runs |
+| Supervisor queue: read-back strip card, confirm, or dismiss with a required reason, "Try the refused one", end-of-shift list (spot-checks, caught on channel, not audited), receipts per model call | `sayagain/server.py`, `sayagain/shift.py`, `web/` | done, over the stored text runs |
 | Static replay of stored runs (same page, GitHub Pages-ready, not published) | `scripts/export_run.py` → `docs/replay/` | done |
 | Human recordings, audio eval rows | — | not built yet |
 
@@ -114,7 +114,7 @@ rate could plausibly have, given so few cards.
 ### First measurements: the card scripts, no audio yet (2026-10-14)
 
 These rows feed the **written words of the 145 recording cards** to each extractor (`text·scripted`): no microphone,
-no speech-to-text. They are each rung's ceiling on clean words, not the audio result the protocol pre-registers
+no speech-to-text. They are each rung's result on clean written words (no speech-to-text error), not the audio result the protocol pre-registers
 (bench/PROTOCOL.md). Scored on the 89 held-out cards: the hero and its secondary, plus the 87 A2 cards left after the
 dev slice (the first 20 A2 cards and the 20 kill-test cards). Full tables with Wilson intervals: bench/results/text/RESULTS.md.
 
@@ -141,14 +141,14 @@ dev slice (the first 20 A2 cards and the 20 kill-test cards). Full tables with W
   still not audited after the re-audit.
 
 Every call above has a receipt in bench/results/receipts/, and `uv run python scripts/eval.py --rescore` re-judges
-every stored model output offline and re-derives the per-rung rows, call metrics and rule outcome of every ladder, ablation, LLM-judge and dev-slice result file (it reports OK for each). A second live run of
+every stored model output offline and re-derives the per-rung rows, call metrics and rule outcome of every ladder, ablation, LLM-judge and dev-slice run file (it reports OK for each; the repeat-run comparison files are not re-derived). A second live run of
 DeepSeek-V4-Flash on the dev slice gave the same verdict on 40/40 cards (bench/results/text/repro-dev-DeepSeek-V4-Flash.json),
 with every extraction identical but one turn's `kind` (same file) and one re-audit of 3 transcripts (bench/results/text/dev-r2-repro-reaudit.json);
 temperature 0 gives no determinism guarantee at this gateway, so this is measured, not guaranteed.
 
 The access probe (bench/results/access-gate.json) listed 11 instruct models on the AMD Token Factory; 8 of them returned a span
 extraction of the hero read-back that the referee reads as `CLOSE · XV-208 · line B` (the probe answer of Gemma-4-31B-IT was not
-valid JSON, and it passed in the ladder run). The model list has no speech-to-text model, so
+valid JSON, and it meets the rule in the ladder re-audit). The model list has no speech-to-text model, so
 transcription will run elsewhere, and every stage will be labelled with where it ran. Friction log:
 [docs/DX-REPORT.md](docs/DX-REPORT.md).
 
@@ -176,7 +176,7 @@ placeholder, a hardware or serving-stack name no receipt backs, or a number its 
 
 ### Honest limits (9)
 
-1. No recorded speech has been measured. Every result is `text·scripted`, each rung's ceiling on clean words.
+1. No recorded speech has been measured. Every result is `text·scripted`, each rung's result on clean written words.
 2. The held-out set is 89 cards, so the intervals are wide: the best model's 2/48 false alarms is a 4.17 % rate with a Wilson interval of 1.15 % to 13.98 % (bench/results/text/RESULTS.md).
 3. On scripted words the plain regex rung meets the rule with no model, so what a language model adds is unproven until the audio rows exist.
 4. The plant, its 120 tags and every exchange are fictional; the error mix is seeded, not sampled from a real site.
