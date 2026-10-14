@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SayAgain · pitch deck</title>
+<meta name="description" content="SayAgain pitch deck: checks every radio read-back of a safety instruction and sends the wrong ones to a human.">
+<meta name="theme-color" content="#272A2B">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="../assets/fonts/SairaStencilOne-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="deck.css">
+<!-- Keys: arrows / space / PageDown navigate · Esc overview · P presenter notes · C contrast check · F fullscreen · Cmd+P prints one slide per page.
+     Images: ../assets/shots/*.webp are captures of docs/replay/. Every figure is read from bench/results/ or evidence/. -->
+</head>
+<body>
+<div class="viewport" id="viewport">
+<main class="stage" id="stage">
+
+<section class="slide s-cover on" data-title="Cover" aria-label="Slide 1, cover">
+<div class="cv-l">
+<p class="lab">AMD Developer Hackathon ACT III · Intelligent Industry</p>
+<p class="wm"><img src="../assets/icon.svg" alt="" width="64" height="64"><span>SAYAGAIN</span></p>
+<h1><span class="g">Nobody on the channel noticed.</span> <span class="k">The radio log did.</span></h1>
+<p class="sub">Checks every radio read-back of a safety instruction, and sends the wrong ones to a human.</p>
+</div>
+<div class="cv-r render">
+<article class="xcard v-MISMATCH" id="x-open" data-x="H-01" data-ins="H-01-0" data-rb="H-01-1">
+<header class="xc-h">
+<p class="xc-v"><i class="ring" aria-hidden="true"></i><span>MISMATCH</span></p>
+<p class="xc-meta"><b>H-01</b> · CH-01 · English</p>
+</header>
+<p class="xc-diff"><b>tag: XV-203 ≠ XV-208</b> <span>XV-208 is on line A (registry)</span></p>
+<div class="xc-strip">
+<div class="xc-turn ins" data-t="H-01-0" data-role="operator">
+<p class="who"><b>OPERATOR</b><span>H-01-0</span><span>no recording</span></p>
+<p class="said"><span class="sp" data-f="action" data-c="0">Close</span> <span class="sp" data-f="tag" data-c="0">valve two-oh-three</span>, <span class="sp" data-f="line" data-c="0">line Bravo</span>.</p>
+</div>
+<div class="xc-turn rb" data-t="H-01-1" data-role="field">
+<p class="who"><b>FIELD TECH</b><span>H-01-1</span><span>no recording</span></p>
+<p class="said">Copy, <span class="sp" data-f="action" data-c="0">closing</span> <span class="sp" data-f="tag" data-c="0"><mark class="red">two-oh-eight</mark></span>, <span class="sp" data-f="line" data-c="0">line Bravo</span>.</p>
+</div>
+<svg class="connectors" aria-hidden="true"></svg>
+</div>
+<div class="xc-act">
+<button type="button" class="btn ink" data-act="confirm">Confirm error</button>
+<button type="button" class="btn" data-act="dismiss">Dismiss…</button>
+<form class="why" hidden><label>Reason <input name="why" maxlength="120" required placeholder="e.g. the tech corrected it on the channel"></label><button class="btn" type="submit">Dismiss</button></form>
+<p class="stamp" role="status" aria-live="polite"></p>
+</div>
+<ul class="xc-badges">
+<li>speaker <b>text·scripted</b></li>
+<li>radio <b>none (no audio)</b></li>
+<li class="amd">extraction <b>Gemma-4-31B-IT · AMD-hosted API</b></li>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">referee <b>local · 0.77 ms</b></li>
+</ul>
+</article>
+<div class="tcard"><p class="tb">zsh · build/</p><p class="tl cmd">uv run python scripts/eval.py --rescore</p><p class="tl"><b>OK</b>   ladder-r1-reaudit.json :: Gemma-4-31B-IT (rows, calls, meets_rule)</p><p class="tl"><b>OK</b>   llm-judge-r1-reaudit.json :: llm_judge (rows, calls, meets_rule)</p></div>
+</div>
+<aside class="speaker-notes">An operator radios close valve two-oh-three, line Bravo. The technician answers two-oh-eight. That is a different valve, on a different line, and on a busy channel nobody may catch it. SayAgain is the radio log that checks itself.</aside>
+</section>
+
+<section class="slide s-before" data-title="Before" aria-label="Slide 2, the channel today">
+<p class="lab">CH-01 · how the channel hears it today</p>
+<h2>Two lines. Nobody flags them.</h2>
+<div class="plain render">
+<p class="pl"><span class="who">OPERATOR</span><span class="said">Close valve two-oh-three, line Bravo.</span></p>
+<p class="pl"><span class="who">FIELD TECH</span><span class="said">Copy, closing two-oh-eight, line Bravo.</span></p>
+<p class="none">no flag · no card · the crew walks to XV-208</p>
+</div>
+<svg class="mini render" viewBox="0 0 1680 230" role="img" aria-label="Line A with XV-208 and line B with XV-203, all grey: nothing on the channel marks the wrong valve">
+<text x="0" y="40" class="lt">LINE A · CLARIFICATION</text><path class="pipe" d="M0 80 H1680"/>
+<text x="0" y="160" class="lt">LINE B · PRESS STATION</text><path class="pipe" d="M0 200 H1680"/>
+<g transform="translate(1000 80)"><path class="vb" d="M-24 -16 L24 16 L24 -16 L-24 16 Z"/><text x="40" y="-24" class="tg">XV-208</text></g>
+<g transform="translate(1000 200)"><path class="vb" d="M-24 -16 L24 16 L24 -16 L-24 16 Z"/><text x="40" y="-24" class="tg">XV-203</text></g>
+</svg>
+<p class="foot-note">In the registry the demo runs on, XV-203 is on line B at the press station; XV-208 is on line A, in clarification.</p>
+<aside class="speaker-notes">This is the read-back as the channel hears it. Both lines sound routine. The read-back exists so the operator catches the wrong digit, and when the operator misses it too, nothing else on the channel checks it.</aside>
+</section>
+
+<section class="slide s-gap" data-title="The gap" aria-label="Slide 3, the gap">
+<p class="lab">Three-way communication</p>
+<h2>Read-back is the check. Nothing checks it.</h2>
+<div class="facts">
+<div class="fact" data-src="evidence/sources.json"><p class="big">63 % · 50 %</p><p>of read-back errors caught by controllers</p><p class="src">Helmke 2021 · aviation</p></div>
+<div class="fact"><p class="big">1 killed, 6 injured</p><p>isolation valve left closed</p><p class="src">Goodyear 2008 · CSB</p></div>
+<div class="fact"><p class="big">No rate</p><p>published for plant radio</p></div>
+</div>
+<aside class="speaker-notes">Aviation has studied this: controllers catch only part of the wrong read-backs. On plant radio there is no published rate at all, and isolation miscommunication has killed people. The safety literature calls this check three-way communication.</aside>
+</section>
+
+<section class="slide s-product" data-title="The product" aria-label="Slide 4, the product">
+<p class="lab">The supervisor queue · stored shift replayed</p>
+<h2>The supervisor gets the one wrong word.</h2>
+<figure class="shot render">
+<img src="../assets/shots/queue-h01-crop.webp" width="1440" height="665" alt="SayAgain supervisor queue: the list of exchanges, and card H-01 with two-oh-eight blocked red under the order two-oh-three, buttons Confirm error and Dismiss">
+<span class="callout c1">1</span><span class="callout c2">2</span><span class="callout c3">3</span>
+</figure>
+<ol class="legend">
+<li><b>1</b><span>the read-back word that differs</span></li>
+<li><b>2</b><span>the diff, checked against the registry</span></li>
+<li><b>3</b><span>a human confirms or dismisses</span></li>
+</ol>
+<aside class="speaker-notes">This is the real queue, replaying a stored shift. Red appears only on the read-back word the order did not have. Nothing is sent to the plant: the card leaves the queue only through a supervisor's decision, and every card lists the receipts of the model calls behind it.</aside>
+</section>
+
+<section class="slide s-how" data-title="How it decides" aria-label="Slide 5, how it decides">
+<p class="lab">One model job · everything else is code</p>
+<h2>The model points. Code decides.</h2>
+<svg class="arch render" viewBox="0 0 1680 500" role="img" aria-labelledby="arch-t">
+<title id="arch-t">Pipeline: radio turn, speech-to-text (not run yet), span extraction on the AMD Token Factory, grounding and coverage in code, the referee with aliases, registry and pairing, then the supervisor.</title>
+<text x="562" y="64" class="amdl">span extraction ran on AMD · receipts</text>
+<rect class="amdline" x="548" y="80" width="358" height="300" rx="10"/>
+<g class="box pending"><rect x="0" y="120" width="240" height="220" rx="6"/><text x="24" y="170" class="t">radio turn</text><text x="24" y="210" class="m">one WAV per card</text><text x="24" y="242" class="m">not recorded yet</text></g>
+<g class="box pending"><rect x="276" y="120" width="250" height="220" rx="6"/><text x="300" y="170" class="t">speech-to-text</text><text x="300" y="210" class="m">local Whisper</text><text x="300" y="242" class="m">planned, badged</text></g>
+<g class="box amd"><rect x="562" y="100" width="330" height="260" rx="6"/><text x="586" y="150" class="t">span extraction</text><text x="586" y="190" class="m">AMD Token Factory</text><text x="586" y="222" class="m">Gemma-4-31B-IT</text><text x="586" y="254" class="m">copies words only</text><text x="586" y="318" class="r">a receipt per call</text></g>
+<g class="box"><rect x="928" y="120" width="230" height="220" rx="6"/><text x="952" y="170" class="t">grounding</text><text x="952" y="206" class="t">+ coverage</text><text x="952" y="250" class="m">plain code</text></g>
+<g class="box ref"><rect x="1194" y="100" width="230" height="260" rx="6"/><text x="1218" y="150" class="t">referee</text><text x="1218" y="190" class="m">aliases</text><text x="1218" y="222" class="m">registry</text><text x="1218" y="254" class="m">pairing</text><text x="1218" y="318" class="v">verdict()</text></g>
+<g class="box"><rect x="1460" y="120" width="220" height="220" rx="6"/><text x="1484" y="170" class="t">supervisor</text><text x="1484" y="210" class="m">confirms, or</text><text x="1484" y="242" class="m">dismisses</text><text x="1484" y="274" class="m">with a reason</text></g>
+<path class="ar" d="M240 230 H276 M526 230 H562 M892 230 H928 M1158 230 H1194 M1424 230 H1460"/>
+<text x="1680" y="430" class="m" text-anchor="end">VERIFIED · MISMATCH · NO-READBACK · ABSTAIN:</text>
+<text x="1680" y="466" class="m" text-anchor="end">written by code, never by the model</text>
+</svg>
+<aside class="speaker-notes">The model has one job: copy out the words that carry the action, the tag and the line. Plain code checks those words are really in the transcript, that every safety word is accounted for, and that the tag exists in the plant registry. A pure function returns the verdict; the model never writes it.</aside>
+</section>
+
+<section class="slide s-refusal" data-title="The refusal" aria-label="Slide 6, the refusal">
+<p class="lab">XV-205 · a valve the plant registry does not have</p>
+<h2>Judging is not the model’s job.</h2>
+<div class="vs">
+<div class="side judge" data-src="bench/results/text/llm-judge-r1-reaudit.json"><p class="who">LLM-as-judge · DeepSeek-V4.1-Flash, no registry</p><p class="vword">VERIFIED</p><p class="d">passed the XV-205 order, and 2 wrong read-backs</p></div>
+<div class="side ours render"><article class="xcard v-ABSTAIN" id="x-refused" data-x="R-01" data-ins="R-01-0" data-rb="R-01-1">
+<header class="xc-h">
+<p class="xc-v"><i class="ring" aria-hidden="true"></i><span>ABSTAIN</span></p>
+<p class="xc-meta"><b>R-01</b> · CH-01 · English</p>
+</header>
+<p class="xc-diff amb"><b>ABSTAIN · unknown tag</b> <span>cannot clear this exchange: a human must check it</span></p>
+<div class="xc-strip">
+<div class="xc-turn ins" data-t="R-01-0" data-role="operator">
+<p class="who"><b>OPERATOR</b><span>R-01-0</span><span>no recording</span></p>
+<p class="said"><span class="sp" data-f="action" data-c="0">Close</span> <span class="sp amb" data-f="tag" data-c="0">valve two-oh-five</span>, <span class="sp" data-f="line" data-c="0">line Charlie</span>.</p>
+<p class="chip amb">XV-205 not in registry</p>
+</div>
+<div class="xc-turn rb" data-t="R-01-1" data-role="field">
+<p class="who"><b>FIELD TECH</b><span>R-01-1</span><span>no recording</span></p>
+<p class="said">Copy, <span class="sp" data-f="action" data-c="0">closing</span> <span class="sp" data-f="tag" data-c="0">two-oh-five</span>, <span class="sp" data-f="line" data-c="0">line Charlie</span>.</p>
+</div>
+<svg class="connectors" aria-hidden="true"></svg>
+</div>
+<div class="xc-act">
+<button type="button" class="btn ink" data-act="confirm">Confirm: needs follow-up</button>
+<button type="button" class="btn" data-act="dismiss">Dismiss…</button>
+<form class="why" hidden><label>Reason <input name="why" maxlength="120" required placeholder="e.g. the tech corrected it on the channel"></label><button class="btn" type="submit">Dismiss</button></form>
+<p class="stamp" role="status" aria-live="polite"></p>
+</div>
+<ul class="xc-badges">
+<li>speaker <b>text·scripted</b></li>
+<li>radio <b>none (no audio)</b></li>
+<li class="amd">extraction <b>Gemma-4-31B-IT · AMD-hosted API</b></li>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">referee <b>local · 0.607 ms</b></li>
+</ul>
+</article></div>
+</div>
+<aside class="speaker-notes">We measured the obvious alternative. Given the whole exchange and no registry, an LLM judge passed an order for a valve that does not exist, and passed two read-backs that dropped the action word. SayAgain's referee refuses to clear an unknown tag and sends it to a human.</aside>
+</section>
+
+<section class="slide s-ladder" data-title="The model ladder" aria-label="Slide 7, the model ladder">
+<p class="lab" data-src="bench/results/text/ladder-r1-reaudit.json">Model ladder · 89 held-out exchanges · text·scripted</p>
+<h2>Climb only as high as needed.</h2>
+<div class="ld render">
+<div class="lr meets"><span class="nm">regex<small>rung 0 · no model</small></span><span class="fv" data-src="bench/results/text/ladder-r1-reaudit.json">0</span><span class="cells"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="fa" data-src="bench/results/text/ladder-r1-reaudit.json">0/48</span><span class="mr">meets the rule</span></div>
+<div class="lr"><span class="nm">MiniCPM5-2B<small>smallest model</small></span><span class="fv" data-src="bench/results/text/ladder-r1-reaudit.json">0</span><span class="cells"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="fa" data-src="bench/results/text/ladder-r1-reaudit.json">48/48</span><span class="mr"></span></div>
+<div class="lr meets"><span class="nm">Gemma-4-31B-IT<small>thinking off</small></span><span class="fv" data-src="bench/results/text/ladder-r1-reaudit.json">0</span><span class="cells"><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="fa" data-src="bench/results/text/ladder-r1-reaudit.json">2/48</span><span class="mr">meets the rule</span></div>
+<div class="lr"><span class="nm">DeepSeek-V4-Flash<small>thinking off</small></span><span class="fv" data-src="bench/results/text/ladder-r1-reaudit.json">0</span><span class="cells"><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i class="on"></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="fa" data-src="bench/results/text/ladder-r1-reaudit.json">4/48</span><span class="mr"></span></div>
+<div class="lr"><span class="nm">Qwen3.8-27B<small>thinking on</small></span><span class="fv" data-src="bench/results/text/ladder-r1-reaudit.json">0</span><span class="cells"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="fa" data-src="bench/results/text/ladder-r1-reaudit.json">4/48</span><span class="mr"></span></div>
+<div class="lr judge"><span class="nm">LLM-as-judge<small>baseline · no registry</small></span><span class="fv bad" data-src="bench/results/text/llm-judge-r1-reaudit.json">2</span><span class="cells"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="na"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="fa" data-src="bench/results/text/llm-judge-r1-reaudit.json">1/48</span><span class="mr">passed XV-205</span></div>
+<p class="hd"><span>false-VERIFIED</span><span>false alarms on 48 correct read-backs · dashed: the pre-registered budget</span></p>
+</div>
+<p class="note" data-src="bench/results/text/ladder-r1-reaudit.json">On written words, rung 0 (a frozen regex) already meets the rule. The audio rows decide whether a model earns its place.</p>
+<aside class="speaker-notes">The rule was pre-registered before the first model call: the smallest rung with no wrong read-back passed and a false-alarm load the shift can absorb. No rung passed a wrong read-back. Gemma is the only model rung inside the budget, and on clean written words the plain regex meets the rule too; the recordings will show whether that survives real speech.</aside>
+</section>
+
+<section class="slide s-amd" data-title="Where each stage ran" aria-label="Slide 8, where each stage ran">
+<p class="lab">Receipts · where each stage ran</p>
+<h2>Every stage says where it ran.</h2>
+<ol class="stg render">
+<li class="pending"><b>speech-to-text</b><span>not measured yet</span><em>Oct 16</em></li>
+<li class="on"><b>span extraction</b><span>AMD Token Factory · developer.amd.com.cn</span><em>a receipt per call</em></li>
+<li><b>referee</b><span>local · plain Python</span><em data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">0.77 ms on H-01</em></li>
+<li><b>queue</b><span>local · FastAPI</span><em>reviews in SQLite</em></li>
+</ol>
+<div class="probe" data-src="bench/results/access-gate.json"><p><b>11</b> instruct models probed</p><p><b>8</b> read the read-back as CLOSE · XV-208 · line B</p><p><b>0</b> accepted JSON-schema output</p><p><b>0</b> transcription models</p></div>
+<aside class="speaker-notes">Every card prints where each stage ran, from receipts: the host, the model served, the request id and the cost. Extraction ran on the AMD Token Factory. Speech-to-text has not run on a recording yet, and the Token Factory lists no transcription model, so that stage will be badged with wherever it runs. The ladder then tells a plant the smallest model it needs on its own servers.</aside>
+</section>
+
+<section class="slide s-biz" data-title="Business" aria-label="Slide 9, business value">
+<p class="lab">Who pays</p>
+<h2>Priced per channel. Bought by HSE.</h2>
+<div class="calc" data-src="evidence/sources.json"><p><span class="n">1,318</span><span>mills, Indonesia 2022</span></p><p><span class="n">× 30 %</span><span>addressable*</span></p><p><span class="n">× 6</span><span>channels per mill*</span></p><p><span class="n">× USD 2,400</span><span>per channel-year*</span></p><p class="tot"><span class="n">≈ USD 5.7 M</span><span>a year, mills only</span></p><p class="ast">* assumption</p></div>
+<ul class="who-pays">
+<li><b>Buyer</b> HSE / K3 manager (SMK3 audit)</li>
+</ul>
+<aside class="speaker-notes">We sell an on-prem licence per monitored radio channel to the HSE or K3 manager, who needs audit evidence for the SMK3 audit. The wedge is a free thirty-day listen-only baseline at one mill; after Indonesian mills come the Malaysian mills, refineries, mines and ports, none of them sized yet. The mills line alone, with our assumptions labelled, is a floor of about 5.7 million dollars a year in Indonesia.</aside>
+</section>
+
+<section class="slide s-comp" data-title="Competition" aria-label="Slide 10, competition">
+<p class="lab">Public documentation, read Oct 2026</p>
+<h2>Loggers transcribe. None we checked compares.</h2>
+<table class="mx render">
+<thead><tr><th></th><th>transcribes radio</th><th>compares a read-back</th><th>plant tag registry</th></tr></thead>
+<tbody>
+<tr><th>NICE Inform AI</th><td class="y">yes</td><td>not found</td><td>no</td></tr>
+<tr><th>Eventide NexLog + Speech Factor AI</th><td class="y">yes</td><td>not found</td><td>not found</td></tr>
+<tr><th>Motorola Assist</th><td class="y">yes</td><td>not found</td><td>not found</td></tr>
+<tr><th>IntelliPERMIT</th><td>no</td><td>radioed codes, not speech</td><td class="y">yes</td></tr>
+<tr><th>HAAWAII (air-traffic research)</th><td class="y">yes</td><td class="y">yes, aviation</td><td>no</td></tr>
+<tr class="us"><th>SayAgain</th><td>planned</td><td class="y">yes</td><td class="y">yes</td></tr>
+</tbody>
+</table>
+<aside class="speaker-notes">Radio loggers already record, transcribe and spot keywords. Among the vendors we checked, none documents comparing an instruction with its read-back. Automatic read-back checking exists in air-traffic research; IntelliPERMIT checks radioed codes, which needs a procedure change. SayAgain checks natural speech against the plant's own registry.</aside>
+</section>
+
+<section class="slide s-honest" data-title="Honest by design" aria-label="Slide 11, honest by design">
+<p class="lab">README · honest limits</p>
+<h2>Honest by design.</h2>
+<div class="hq">
+<blockquote><p>No recorded speech has been measured.</p></blockquote>
+<blockquote><p>The plant, its 120 tags and every exchange are fictional</p></blockquote>
+<blockquote><p>…what a language model adds is unproven until the audio rows exist.</p></blockquote>
+</div>
+<p class="slots-h">measured Oct 16</p>
+<ul class="slots render">
+<li><b>audio row</b></li>
+<li><b>failure case</b></li>
+<li><b>kill test</b></li>
+<li><b>auditor</b></li>
+</ul>
+<aside class="speaker-notes">Everything you saw ran on the written scripts of a fictional plant. No recording has been measured, and on clean words a regex already meets our rule. The recordings decide the rest: the audio row, the minus-six-decibel failure case, the language test and a blind auditor.</aside>
+</section>
+
+<section class="slide s-ask" data-title="The ask" aria-label="Slide 12, the ask">
+<p class="lab">The ask · goals</p>
+<h2>Put it on one mill’s radio.</h2>
+<ol class="road">
+<li><b>Q1 2027</b><span>paid pilot, one palm-oil mill</span></li>
+<li><b>Q3 2027</b><span>DCS check: did the valve close?</span></li>
+<li><b>Q4 2027</b><span>Malaysian palm belt</span></li>
+</ol>
+<div class="qr"><div class="code"><svg role="img" aria-label="QR code: https://github.com/edycutjong/sayagain" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 29 29" class="segno"><path class="qrline" stroke="#272a2b" d="M0 0.5h7m1 0h2m2 0h1m1 0h3m1 0h1m3 0h7m-29 1h1m5 0h1m6 0h2m1 0h4m2 0h1m5 0h1m-29 1h1m1 0h3m1 0h1m2 0h1m2 0h1m1 0h5m3 0h1m1 0h3m1 0h1m-29 1h1m1 0h3m1 0h1m1 0h2m3 0h4m1 0h3m1 0h1m1 0h3m1 0h1m-29 1h1m1 0h3m1 0h1m1 0h1m3 0h1m1 0h3m5 0h1m1 0h3m1 0h1m-29 1h1m5 0h1m1 0h4m4 0h1m2 0h2m1 0h1m5 0h1m-29 1h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7m-21 1h2m2 0h1m4 0h2m1 0h1m-21 1h1m3 0h1m1 0h3m3 0h3m2 0h1m1 0h7m2 0h1m-29 1h2m2 0h1m3 0h2m2 0h5m4 0h8m-25 1h5m3 0h1m2 0h1m1 0h2m1 0h1m1 0h2m4 0h1m-28 1h2m1 0h1m3 0h2m1 0h1m3 0h3m2 0h1m1 0h4m1 0h2m-29 1h3m1 0h1m1 0h3m1 0h2m1 0h2m2 0h1m1 0h3m5 0h1m-28 1h1m2 0h3m4 0h1m1 0h1m1 0h5m3 0h7m-29 1h2m2 0h3m3 0h2m1 0h3m4 0h4m1 0h2m1 0h1m-29 1h3m1 0h1m2 0h2m2 0h1m1 0h1m1 0h3m1 0h3m5 0h2m-28 1h3m1 0h2m3 0h1m1 0h2m1 0h3m2 0h1m2 0h1m3 0h1m-28 1h2m3 0h1m1 0h2m3 0h7m1 0h1m1 0h4m1 0h2m-26 1h1m2 0h1m3 0h2m3 0h1m2 0h1m1 0h1m5 0h1m1 0h1m-27 1h1m2 0h1m2 0h2m2 0h1m1 0h5m1 0h2m1 0h2m2 0h2m-29 1h5m1 0h2m1 0h2m2 0h2m2 0h1m2 0h6m2 0h1m-21 1h3m4 0h6m3 0h1m3 0h1m-29 1h7m1 0h3m1 0h4m2 0h3m1 0h1m1 0h3m1 0h1m-29 1h1m5 0h1m2 0h2m2 0h1m2 0h2m1 0h2m3 0h1m2 0h1m-28 1h1m1 0h3m1 0h1m1 0h2m1 0h1m1 0h1m2 0h2m1 0h7m1 0h1m-28 1h1m1 0h3m1 0h1m2 0h4m1 0h3m1 0h1m2 0h1m6 0h1m-29 1h1m1 0h3m1 0h1m2 0h1m2 0h2m1 0h1m2 0h4m3 0h4m-29 1h1m5 0h1m5 0h3m2 0h2m1 0h3m1 0h2m1 0h2m-29 1h7m1 0h1m2 0h5m1 0h2m1 0h6m1 0h1"/></svg></div><p>github.com/edycutjong/sayagain</p><p class="small">public at submission</p></div>
+<p class="sig">Edy Cu · Jakarta</p>
+<aside class="speaker-notes">We are looking for one mill that will put SayAgain on its radio for thirty days, listen-only. The first deliverable is the number nobody has published: how often read-backs go wrong on plant radio. The code, the receipts and the replay are in the repository.</aside>
+</section>
+
+</main>
+</div>
+<div class="ui" role="group" aria-label="Deck controls">
+<button type="button" id="prev" aria-label="Previous slide"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+<button type="button" id="grid" aria-label="Slide overview (Esc)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></button>
+<button type="button" id="notes" aria-label="Presenter notes (P)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v10H4z"/><path d="M8 19h8"/></svg></button>
+<button type="button" id="next" aria-label="Next slide"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+</div>
+<p class="hint">← → navigate · Esc overview · P notes · C contrast · Cmd+P PDF</p>
+<div class="notes-panel" id="notesPanel" aria-live="polite"><div class="nt" id="noteText"></div><div class="meta" id="noteMeta"></div></div>
+<div class="overview" id="overview" role="dialog" aria-label="Slide overview"></div>
+<script>window.DECK_VERSION = "dev build c57de6a";</script>
+<script src="deck.js" defer></script>
+</body>
+</html>
