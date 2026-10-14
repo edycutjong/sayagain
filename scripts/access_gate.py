@@ -18,18 +18,22 @@ import sys
 import time
 from datetime import UTC, datetime
 from pathlib import Path
+from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from referee import coverage, grounding  # noqa: E402
+from referee.registry import Registry  # noqa: E402
+from referee.turns import Turn, analyze  # noqa: E402
 from sayagain.amd_client import RESPONSE_MODES, MissingCredentials, NotAuditing, TokenFactory, load_config  # noqa: E402
 
 OUT = ROOT / "bench" / "results" / "access-gate.json"
 RECEIPTS = ROOT / "bench" / "results" / "receipts" / "access-gate.jsonl"
 HERO_RB = "Copy, closing two-oh-eight, line Bravo."
+HERO_RB_CANON = ("CLOSE", "XV-208", "B")
 AUDIO_HINTS = ("whisper", "asr", "audio", "transcri", "speech")
-INSTRUCT_HINTS = ("qwen", "llama", "instruct", "deepseek", "glm", "mistral", "gemma", "phi", "minicpm")
+INSTRUCT_HINTS = ("qwen", "llama", "instruct", "deepseek", "glm", "mistral", "gemma", "phi", "minicpm", "mimo")
 
 
 def classify_models(models: list[dict]) -> dict[str, list[str]]:
@@ -94,6 +98,11 @@ def probe_extraction(tf: TokenFactory, model: str) -> dict:
                     out["grounded"] = True
                 except (grounding.GroundingError, coverage.CoverageError) as e:
                     out["grounded"], out["grounding_error"] = False, str(e)
+                # does the referee read the expected tuple from it? (CLOSE, XV-208, line B)
+                a = analyze(Turn("gate", "gate", 0, 1, HERO_RB, obj), Registry.load())
+                got = [(c.action, c.tag, c.line) for c in a.commands] if a.status == "ok" else [a.reason]
+                out["canonical"] = got
+                out["canonical_ok"] = got == [HERO_RB_CANON]
             return out
     return {"ok": False, "rejected": rejected}
 
@@ -138,6 +147,25 @@ def probe_asr(tf: TokenFactory, model: str, clip: Path) -> dict:
     return out
 
 
+def probe_audio_route(tf: TokenFactory) -> dict:
+    """Is there an audio route at all? One POST of 0.5 s of silence (a probe, not speech) to /audio/transcriptions."""
+    import tempfile
+    import wave
+
+    with tempfile.TemporaryDirectory() as d:
+        wav = Path(d) / "silence.wav"
+        with wave.open(str(wav), "wb") as w:
+            w.setnchannels(1)
+            w.setsampwidth(2)
+            w.setframerate(16000)
+            w.writeframes(b"\x00\x00" * 8000)
+        try:
+            res, rec = tf.transcribe(wav, "whisper-1", language="en")
+            return {"status": rec.http_status, "answered": True, "text": res.get("text")}
+        except NotAuditing as e:
+            return {"status": e.status, "answered": False, "reason": e.reason, "body": e.body[:200]}
+
+
 def recommend_branch(gate: dict) -> str:
     asr = gate.get("asr") or {}
     if asr.get("ok"):
@@ -156,6 +184,7 @@ def run_gate(tf: TokenFactory, *, model: str | None, clip: Path | None, retry_af
     gate: dict = {
         "run_at": datetime.now(UTC).isoformat(timespec="seconds"),
         "host": tf.config.host,
+        "base_path": urlparse(tf.config.base_url).path,
         "on_amd": tf.config.on_amd,
     }
     try:
@@ -192,7 +221,7 @@ def run_gate(tf: TokenFactory, *, model: str | None, clip: Path | None, retry_af
     if limits:
         gate["rate_limit_note"] = sorted(limits)[0][:200]
     gate["ladder_candidates"] = sorted(
-        m for m, e in gate["extraction"].items() if e.get("ok") and e.get("schema_valid") and e.get("grounded")
+        m for m, e in gate["extraction"].items() if e.get("ok") and e.get("canonical_ok")
     )
     audio = gate["models"]["audio"]
     if audio and clip is not None and clip.exists():
@@ -200,7 +229,7 @@ def run_gate(tf: TokenFactory, *, model: str | None, clip: Path | None, retry_af
     elif audio:
         gate["asr"] = {"ok": None, "reason": "audio model listed, no clip given to probe it"}
     else:
-        gate["asr"] = {"ok": False, "reason": "no audio model in /models"}
+        gate["asr"] = {"ok": False, "reason": "no audio model in /models", "route": probe_audio_route(tf)}
     gate["key_expiry"] = "not exposed by the API — check the Token Factory console"
     gate["branch"] = recommend_branch(gate)
     return gate
@@ -211,7 +240,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--model", help="instruct model id to probe (default: first instruct model listed)")
     ap.add_argument("--clip", type=Path, default=ROOT / "data" / "human" / "hero" / "H-01.wav")
     ap.add_argument("--out", type=Path, default=OUT)
-    ap.add_argument("--interval", type=float, default=3.2, help="seconds between calls (limit: 20 / minute)")
+    ap.add_argument("--interval", type=float, default=3.2, help="seconds between calls (unpaced bursts drew HTTP 429)")
     ap.add_argument("--retry-after", type=float, default=65.0, help="cool-down before re-probing rate-limited models")
     args = ap.parse_args(argv)
     try:

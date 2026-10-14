@@ -23,6 +23,8 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
+import mix  # noqa: E402
+
 from referee.audit import audit  # noqa: E402
 from referee.regex_extractor import extract  # noqa: E402
 from referee.registry import Registry  # noqa: E402
@@ -95,22 +97,41 @@ def summarise(scored: list[dict]) -> dict:
     }
 
 
-def verdict_of(rows: dict) -> dict:
-    """Pass/fail per pre-registered threshold for one language mode: rows = {"clean": summary, "0dB": summary}."""
-    clean, zero = rows.get("clean") or {}, rows.get("0dB") or {}
-    checks = {
-        "tag_clean": clean.get("tag_exact"),
-        "tag_0db": zero.get("tag_exact"),
-        "paired_clean": clean.get("paired"),
-    }
+def _checks(clean: dict, zero: dict) -> dict:
+    vals = {"tag_clean": clean.get("tag_exact"), "tag_0db": zero.get("tag_exact"), "paired_clean": clean.get("paired")}
     return {
-        k: {
-            "value": v,
-            "threshold": THRESHOLDS[k],
-            "pass": (v is not None and v >= THRESHOLDS[k]) if v is not None else None,
-        }
-        for k, v in checks.items()
+        k: {"value": v, "threshold": THRESHOLDS[k], "pass": None if v is None else v >= THRESHOLDS[k]}
+        for k, v in vals.items()
     }
+
+
+def verdict_of(rows: dict) -> dict:
+    """Pass/fail per pre-registered threshold for one language mode, pooled AND per language.
+
+    rows = {"clean": summary, "0dB": summary} (labels from mix.snr_label). A check that could not be evaluated is
+    `pass: None` and the mode is not a pass. Pivot rule: English passes, code-switched fails -> "pivot".
+    """
+    clean, zero = rows.get("clean") or {}, rows.get(mix.snr_label("0")) or {}
+    pooled = _checks(clean, zero)
+    by_lang = {}
+    for lang in sorted(set(clean.get("by_lang", {})) | set(zero.get("by_lang", {}))):
+        c = (clean.get("by_lang") or {}).get(lang, {})
+        z = (zero.get("by_lang") or {}).get(lang, {})
+        by_lang[lang] = _checks(
+            {"tag_exact": c.get("tag_exact"), "paired": c.get("paired")}, {"tag_exact": z.get("tag_exact")}
+        )
+
+    def ok(checks: dict) -> bool:
+        return all(c["pass"] is True for c in checks.values())
+
+    en, mixed = by_lang.get("en"), by_lang.get("mix")
+    if ok(pooled) and all(ok(v) for v in by_lang.values()):
+        decision = "go"
+    elif en is not None and mixed is not None and ok(en) and not ok(mixed):
+        decision = "pivot: English radio phraseology with Bahasa action words only, then re-test"
+    else:
+        decision = "stop: a human decides"
+    return {"pooled": pooled, "by_lang": by_lang, "decision": decision}
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -132,7 +153,6 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 3
 
-    import mix
     import numpy as np
     import torch
     from transformers import pipeline
@@ -150,7 +170,7 @@ def main(argv: list[str] | None = None) -> int:
         torch_dtype=torch.float16 if device == "mps" else torch.float32,
     )
     noise_pool = sorted(args.noise.rglob("*.wav"))
-    if "0" in args.snr and not noise_pool:
+    if any(x != "clean" for x in args.snr) and not noise_pool:
         print("no noise WAVs: run scripts/fetch_mimii.sh first", file=sys.stderr)
         return 2
 
@@ -174,11 +194,7 @@ def main(argv: list[str] | None = None) -> int:
             for clip in clips:
                 card = cards[clip.stem]
                 clean = load(clip)
-                if snr == "clean":
-                    x = clean
-                else:
-                    rng = np.random.default_rng([1018, sum(map(ord, clip.stem)), int(snr) + 100])
-                    x = mix.mix_at_snr(clean, mix.noise_segment(len(clean), noise_pool, rng), float(snr))
+                x = mix.noisy_copy(clean, clip.stem, snr, noise_pool)
                 texts = []
                 for s, e in segments(clean):
                     t0 = time.perf_counter()
@@ -196,7 +212,7 @@ def main(argv: list[str] | None = None) -> int:
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(results, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     for mode, r in results["modes"].items():
-        print(mode, {k: (v["value"], v["pass"]) for k, v in r["verdict"].items()})
+        print(mode, r["verdict"]["decision"], {k: (v["value"], v["pass"]) for k, v in r["verdict"]["pooled"].items()})
     print(f"-> {args.out}")
     return 0
 

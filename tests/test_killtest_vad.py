@@ -50,8 +50,33 @@ def test_summary_and_thresholds(registry) -> None:
     summ = kt.summarise(scored)
     assert summ["n_exchanges"] == 20 and summ["tag_exact"] == 1.0 and summ["paired"] == 1.0
     assert set(summ["by_lang"]) == {"en", "mix"}
-    v = kt.verdict_of({"clean": summ, "0dB": {**summ, "tag_exact": 0.5}})
-    assert v["tag_clean"]["pass"] and not v["tag_0db"]["pass"] and v["paired_clean"]["pass"]
+    zero = kt.mix.snr_label("0")
+    assert zero == "0dB"
+    v = kt.verdict_of({"clean": summ, zero: {**summ, "tag_exact": 0.5}})
+    p = v["pooled"]
+    assert p["tag_clean"]["pass"] and p["tag_0db"]["pass"] is False and p["paired_clean"]["pass"]
+    assert v["decision"].startswith("stop")
+    assert kt.verdict_of({"clean": summ, zero: summ})["decision"] == "go"
+
+
+def test_missing_0db_row_is_not_a_pass(registry) -> None:
+    kts = [c for c in CARDS.values() if c["set"] == "KT"]
+    summ = kt.summarise([kt.score_card(c, [t["text"] for t in c["turns"]], registry) for c in kts])
+    v = kt.verdict_of({"clean": summ})
+    assert v["pooled"]["tag_0db"]["pass"] is None and v["decision"] != "go"
+
+
+def test_code_switched_failure_is_not_hidden_by_the_pooled_average() -> None:
+    def summ(en: float, mixed: float) -> dict:
+        return {
+            "tag_exact": (en + mixed) / 2,
+            "paired": (en + mixed) / 2,
+            "by_lang": {"en": {"tag_exact": en, "paired": en}, "mix": {"tag_exact": mixed, "paired": mixed}},
+        }
+
+    v = kt.verdict_of({"clean": summ(1.0, 0.6), "0dB": summ(1.0, 0.6)})
+    assert v["pooled"]["tag_clean"]["pass"]  # 0.80 pooled passes …
+    assert v["decision"].startswith("pivot")  # … but the code-switched half fails: pivot
 
 
 def test_no_clips_writes_nothing(tmp_path: Path) -> None:

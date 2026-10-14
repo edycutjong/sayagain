@@ -63,8 +63,8 @@ class NotAuditing(Exception):
 
 @dataclass
 class Config:
-    api_key: str
-    base_url: str
+    api_key: str = field(repr=False)  # never in a repr, a log line or an assertion diff
+    base_url: str = ""
 
     @property
     def host(self) -> str:
@@ -115,6 +115,7 @@ class Receipt:
     rate_limit: dict = field(default_factory=dict)
     asr_language: str | None = None
     asr_prompt: str | None = None
+    error_body: str | None = None  # first 300 chars of a failed response's body
     client_id: str = field(default_factory=lambda: uuid.uuid4().hex[:12])
 
     def to_dict(self) -> dict:
@@ -130,7 +131,7 @@ class TokenFactory:
         transport: httpx.BaseTransport | None = None,
         receipts_path: Path | None = None,
         thinking_off: str = "chat_template_kwargs",  # or "no_think" (Qwen3 soft switch), chosen by the access gate
-        min_interval_s: float = 0.0,  # client-side pacing: the Token Factory allows 20 requests / minute per model
+        min_interval_s: float = 0.0,  # client-side pacing: unpaced bursts drew HTTP 429 from the Token Factory
     ):
         self.config = config
         self.receipts_path = receipts_path
@@ -158,6 +159,12 @@ class TokenFactory:
                 f.write(json.dumps(r.to_dict(), sort_keys=True) + "\n")
         return r
 
+    def _fail(self, reason: str, rec: Receipt, status: int | None = None, body: str = "") -> NotAuditing:
+        rec.ok, rec.error = False, rec.error or reason
+        rec.error_body = body[:300] or None
+        self._record(rec)
+        return NotAuditing(reason, rec, status, body)
+
     def _call(
         self,
         stage: str,
@@ -169,7 +176,9 @@ class TokenFactory:
         asr_language: str | None = None,
         asr_prompt: str | None = None,
         **kw,
-    ) -> tuple[httpx.Response, Receipt]:
+    ) -> tuple[object, Receipt]:
+        """One HTTP call -> (parsed JSON, receipt NOT yet recorded: the caller records it once it is complete).
+        Every failure is recorded here and raised as NotAuditing."""
         wait = self._last_call + self.min_interval_s - time.monotonic()
         if wait > 0:
             time.sleep(wait)
@@ -177,62 +186,53 @@ class TokenFactory:
         started = datetime.now(UTC).isoformat(timespec="milliseconds")
         t0 = time.perf_counter()
 
-        def receipt(status: int | None, ok: bool, error: str | None, resp: httpx.Response | None = None) -> Receipt:
-            body: dict = {}
-            if resp is not None and ok:
-                try:
-                    body = resp.json() if isinstance(resp.json(), dict) else {}
-                except ValueError:
-                    body = {}
+        def receipt(status: int | None, resp: httpx.Response | None = None, data: object = None) -> Receipt:
+            body = data if isinstance(data, dict) else {}
             headers = resp.headers if resp is not None else {}
-            return self._record(
-                Receipt(
-                    stage=stage,
-                    endpoint=path,
-                    host=self.config.host,
-                    on_amd=self.config.on_amd,
-                    model=model,
-                    request_id=(headers.get("x-request-id") or body.get("id")) if resp is not None else None,
-                    http_status=status,
-                    started_at=started,
-                    latency_s=round(time.perf_counter() - t0, 4),
-                    ok=ok,
-                    error=error,
-                    usage=body.get("usage"),
-                    params=params or {},
-                    rate_limit={h: headers[h] for h in _RATE_HEADERS if h in headers},
-                    asr_language=asr_language,
-                    asr_prompt=asr_prompt,
-                )
+            return Receipt(
+                stage=stage,
+                endpoint=path,
+                host=self.config.host,
+                on_amd=self.config.on_amd,
+                model=model,
+                request_id=(headers.get("x-request-id") or body.get("id")) if resp is not None else None,
+                http_status=status,
+                started_at=started,
+                latency_s=round(time.perf_counter() - t0, 4),
+                ok=True,
+                usage=body.get("usage"),
+                params=params or {},
+                rate_limit={h: headers[h] for h in _RATE_HEADERS if h in headers},
+                asr_language=asr_language,
+                asr_prompt=asr_prompt,
             )
 
         try:
             resp = self._http.request(method, path, **kw)
         except httpx.TimeoutException as e:
-            raise NotAuditing("timeout", receipt(None, False, "timeout")) from e
+            raise self._fail("timeout", receipt(None)) from e
         except httpx.HTTPError as e:
-            raise NotAuditing("network error", receipt(None, False, f"network: {type(e).__name__}")) from e
-        if resp.status_code == 429:
-            raise NotAuditing("rate limited", receipt(429, False, "rate limited", resp), 429, resp.text)
-        if resp.status_code >= 500:
-            raise NotAuditing(
-                "server error", receipt(resp.status_code, False, "server error", resp), resp.status_code, resp.text
-            )
-        if resp.status_code >= 400:
-            raise NotAuditing(
-                f"rejected ({resp.status_code})",
-                receipt(resp.status_code, False, "rejected", resp),
-                resp.status_code,
-                resp.text,
-            )
-        return resp, receipt(resp.status_code, True, None, resp)
+            raise self._fail("network error", receipt(None), body=type(e).__name__) from e
+        code = resp.status_code
+        if code == 429:
+            raise self._fail("rate limited", receipt(code, resp), code, resp.text)
+        if code >= 500:
+            raise self._fail("server error", receipt(code, resp), code, resp.text)
+        if code >= 300:  # redirects are not followed: a gateway / login page is not an answer
+            raise self._fail(f"rejected ({code})", receipt(code, resp), code, resp.text)
+        try:
+            data = resp.json()
+        except ValueError as e:
+            raise self._fail("malformed response", receipt(code, resp), code, resp.text) from e
+        return data, receipt(code, resp, data)
 
     # ------------------------------------------------------------------------------------------- calls
 
     def models(self) -> tuple[list[dict], Receipt]:
-        resp, rec = self._call("models", "GET", "/models")
-        data = resp.json()
-        return (data.get("data", []) if isinstance(data, dict) else []), rec
+        data, rec = self._call("models", "GET", "/models")
+        self._record(rec)
+        items = data.get("data", []) if isinstance(data, dict) else []
+        return [m for m in items if isinstance(m, dict)], rec
 
     def chat(
         self,
@@ -246,8 +246,10 @@ class TokenFactory:
         logprobs: bool = False,
         max_tokens: int = 512,
         stage: str = "chat",
+        record: bool = True,
     ) -> tuple[str, dict, Receipt]:
-        """One chat completion with thinking off. Returns (content without any think block, raw JSON, receipt)."""
+        """One chat completion with thinking off. Returns (content without any think block, raw JSON, receipt).
+        `record=False` leaves recording to the caller (it adds fields first)."""
         body: dict = {
             "model": model,
             "messages": [dict(m) for m in messages],
@@ -274,16 +276,18 @@ class TokenFactory:
             "logprobs": logprobs,
             "max_tokens": max_tokens,
         }
-        resp, rec = self._call(stage, "POST", "/chat/completions", model=model, params=params, json=body)
-        raw = resp.json()
+        raw, rec = self._call(stage, "POST", "/chat/completions", model=model, params=params, json=body)
         try:
-            content = raw["choices"][0]["message"]["content"] or ""
+            content = raw["choices"][0]["message"]["content"] or ""  # type: ignore[index]
+            if not isinstance(content, str):
+                raise TypeError("content is not a string")
         except (KeyError, IndexError, TypeError) as e:
-            rec.ok, rec.error = False, "malformed response"
-            raise NotAuditing("malformed response", rec) from e
+            raise self._fail("malformed response", rec, rec.http_status, json.dumps(raw)[:300]) from e
         stripped = _THINK.sub("", content)
         rec.params["think_block_stripped"] = stripped != content
-        return stripped, raw, rec
+        if record:
+            self._record(rec)
+        return stripped, raw, rec  # type: ignore[return-value]
 
     def extract_spans(
         self, transcript: str, model: str, *, temperature: float = 0.0, response_mode: str = "json_schema"
@@ -297,7 +301,13 @@ class TokenFactory:
         system = SYSTEM_PROMPT if response_mode == "json_schema" else SYSTEM_PROMPT + SCHEMA_IN_PROMPT
         msgs = [{"role": "system", "content": system}, {"role": "user", "content": f"Transcript: {transcript}"}]
         content, _, rec = self.chat(
-            model, msgs, schema=SPAN_SCHEMA, temperature=temperature, stage="extract", response_mode=response_mode
+            model,
+            msgs,
+            schema=SPAN_SCHEMA,
+            temperature=temperature,
+            stage="extract",
+            response_mode=response_mode,
+            record=False,
         )
         content = _FENCE.sub("", content).strip()
         try:
@@ -308,6 +318,7 @@ class TokenFactory:
         rec.params["schema_valid"] = problem is None
         if problem:
             rec.error = f"schema: {problem}"
+        self._record(rec)  # complete now: schema validity and think-block stripping are on disk
         return obj, rec
 
     def transcribe(
@@ -319,7 +330,7 @@ class TokenFactory:
         if prompt:
             data["prompt"] = prompt
         with open(wav_path, "rb") as f:
-            resp, rec = self._call(
+            out, rec = self._call(
                 "asr",
                 "POST",
                 "/audio/transcriptions",
@@ -330,7 +341,7 @@ class TokenFactory:
                 files={"file": (wav_path.name, f, "audio/wav")},
                 data=data,
             )
-        out = resp.json()
+        self._record(rec)
         return (out if isinstance(out, dict) else {"text": str(out)}), rec
 
 

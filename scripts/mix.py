@@ -51,7 +51,7 @@ def mix_at_snr(speech: np.ndarray, noise: np.ndarray, snr_db: float, normalize: 
     s = active_rms(speech)
     nr = rms(noise)
     if s == 0 or nr == 0:
-        return speech.copy()
+        raise ValueError("silent speech or noise: an SNR mix would be mislabelled")
     gain = s / (nr * 10 ** (snr_db / 20))
     y = speech + gain * noise
     peak = float(np.max(np.abs(y)))
@@ -61,7 +61,19 @@ def mix_at_snr(speech: np.ndarray, noise: np.ndarray, snr_db: float, normalize: 
 
 
 def snr_label(snr: str) -> str:
-    return "clean" if snr == "clean" else f"{int(snr):+d}dB"
+    """'clean', '+6dB', '0dB', '-6dB'."""
+    if snr == "clean":
+        return "clean"
+    v = int(snr)
+    return "0dB" if v == 0 else f"{v:+d}dB"
+
+
+def noisy_copy(speech: np.ndarray, stem: str, snr: str, pool: list[Path] | None, seed: int = 1018) -> np.ndarray:
+    """The one way every tool builds an SNR copy: same exchange + same SNR -> same noise slice."""
+    if snr == "clean":
+        return speech
+    rng = np.random.default_rng([seed, zlib.crc32(stem.encode()), int(snr) + 100])
+    return mix_at_snr(speech, noise_segment(len(speech), pool, rng), float(snr))
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -79,14 +91,7 @@ def main(argv: list[str] | None = None) -> int:
     for f in files:
         speech = load(f)
         for snr in args.snr:
-            label = snr_label(snr)
-            if snr == "clean":
-                y = speech
-            else:
-                # same exchange + same SNR -> same noise slice, whatever order files are processed in
-                rng = np.random.default_rng([args.seed, zlib.crc32(f.stem.encode()), int(snr) + 100])
-                y = mix_at_snr(speech, noise_segment(len(speech), pool, rng), float(snr))
-            save(args.out / label / f.name, y)
+            save(args.out / snr_label(snr) / f.name, noisy_copy(speech, f.stem, snr, pool, args.seed))
     print(f"mixed {len(files)} files × {len(args.snr)} SNR -> {args.out}")
     return 0
 

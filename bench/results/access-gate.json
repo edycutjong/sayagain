@@ -1,13 +1,28 @@
 {
   "asr": {
     "ok": false,
-    "reason": "no audio model in /models"
+    "reason": "no audio model in /models",
+    "route": {
+      "answered": false,
+      "body": "{\"error\":{\"message\":\"Transcription model not found: whisper-1\",\"type\":\"invalid_request_error\",\"param\":\"model\",\"code\":\"model_not_found\"}}",
+      "reason": "rejected (400)",
+      "status": 400
+    }
   },
+  "base_path": "/radeon/api/v1",
   "branch": "B or C \u2014 no audio route on the Token Factory; depends on the notebook GPU check (human)",
   "extraction": {
     "DeepSeek-V4-Flash": {
+      "canonical": [
+        [
+          "CLOSE",
+          "XV-208",
+          "B"
+        ]
+      ],
+      "canonical_ok": true,
       "grounded": true,
-      "latency_s": 3.174,
+      "latency_s": 4.3624,
       "ok": true,
       "output": {
         "commands": [
@@ -32,19 +47,19 @@
           "thinking_off": "chat_template_kwargs"
         }
       ],
-      "request_id": "0fecd191d01f428696428ddc1d33b2e5",
+      "request_id": "ff988dfb43b74ca29a2557bfd78bade5",
       "response_mode": "json_object",
       "schema_valid": true,
       "think_block_stripped": false,
       "thinking_off": "chat_template_kwargs",
       "usage": {
-        "completion_tokens": 57,
+        "completion_tokens": 70,
         "completion_tokens_details": {
           "audio_tokens": 0,
           "image_tokens": 0,
           "reasoning_tokens": 0
         },
-        "cost": 4.97e-05,
+        "cost": 5.334e-05,
         "cost_details": {
           "audio_input_cost": null,
           "cache_write_input_cost": 0,
@@ -52,11 +67,11 @@
           "image_input_cost": null,
           "image_output_cost": null,
           "input_cost": 3.374e-05,
-          "output_cost": 1.596e-05,
+          "output_cost": 1.96e-05,
           "request_cost": 0,
-          "total_cost": 4.97e-05,
-          "upstream_inference_completions_cost": 1.596e-05,
-          "upstream_inference_cost": 4.97e-05,
+          "total_cost": 5.334e-05,
+          "upstream_inference_completions_cost": 1.96e-05,
+          "upstream_inference_cost": 5.334e-05,
           "upstream_inference_prompt_cost": 3.374e-05,
           "web_search_cost": 0
         },
@@ -69,12 +84,20 @@
           "video_tokens": 0
         },
         "reasoning_tokens": 0,
-        "total_tokens": 298
+        "total_tokens": 311
       }
     },
     "DeepSeek-V4-Flash-Vision-Exp": {
+      "canonical": [
+        [
+          "CLOSE",
+          "XV-208",
+          "B"
+        ]
+      ],
+      "canonical_ok": true,
       "grounded": true,
-      "latency_s": 3.18,
+      "latency_s": 3.1593,
       "ok": true,
       "output": {
         "commands": [
@@ -99,7 +122,7 @@
           "thinking_off": "chat_template_kwargs"
         }
       ],
-      "request_id": "9d481138456d4b63b29a02d71509ed20",
+      "request_id": "bdbf329a56ea4ba491f04ca1d46d6a65",
       "response_mode": "json_object",
       "schema_valid": true,
       "think_block_stripped": false,
@@ -140,8 +163,92 @@
       }
     },
     "DeepSeek-V4.1-Flash": {
+      "canonical": [
+        [
+          "CLOSE",
+          "XV-208",
+          "B"
+        ]
+      ],
+      "canonical_ok": true,
       "grounded": true,
-      "latency_s": 2.6316,
+      "latency_s": 5.0992,
+      "ok": true,
+      "output": {
+        "commands": [
+          {
+            "action_span": "closing",
+            "line_span": "line Bravo",
+            "state_span": null,
+            "tag_span": "two-oh-eight"
+          }
+        ],
+        "kind": "instruction",
+        "retracted_spans": []
+      },
+      "reasoning_tokens": 0,
+      "rejected": [
+        {
+          "body": "{\"error\":{\"message\":\"Model DeepSeek-V4.1-Flash does not support JSON schema output mode\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":null}}",
+          "mode": "json_schema",
+          "ok": false,
+          "reason": "rejected (400)",
+          "status": 400,
+          "thinking_off": "chat_template_kwargs"
+        }
+      ],
+      "request_id": "989394a58c20480499ea31136b764cb9",
+      "response_mode": "json_object",
+      "retried": true,
+      "schema_valid": true,
+      "think_block_stripped": false,
+      "thinking_off": "chat_template_kwargs",
+      "usage": {
+        "completion_tokens": 56,
+        "completion_tokens_details": {
+          "audio_tokens": 0,
+          "image_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "cost": 9.912e-05,
+        "cost_details": {
+          "audio_input_cost": null,
+          "cache_write_input_cost": 0,
+          "cached_input_cost": 0,
+          "image_input_cost": null,
+          "image_output_cost": null,
+          "input_cost": 6.776e-05,
+          "output_cost": 3.136e-05,
+          "request_cost": 0,
+          "total_cost": 9.912e-05,
+          "upstream_inference_completions_cost": 3.136e-05,
+          "upstream_inference_cost": 9.912e-05,
+          "upstream_inference_prompt_cost": 6.776e-05,
+          "web_search_cost": 0
+        },
+        "prompt_tokens": 242,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cache_write_tokens": 0,
+          "cached_tokens": 0,
+          "image_tokens": 0,
+          "video_tokens": 0
+        },
+        "reasoning_tokens": 0,
+        "total_tokens": 298
+      }
+    },
+    "GLM-5.3-Flash": {
+      "canonical": [
+        [
+          "CLOSE",
+          "XV-208",
+          "B"
+        ]
+      ],
+      "canonical_ok": true,
+      "grounded": true,
+      "latency_s": 2.4499,
       "ok": true,
       "output": {
         "commands": [
@@ -158,73 +265,6 @@
       "reasoning_tokens": 0,
       "rejected": [
         {
-          "body": "{\"error\":{\"message\":\"Model DeepSeek-V4.1-Flash does not support JSON schema output mode\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":null}}",
-          "mode": "json_schema",
-          "ok": false,
-          "reason": "rejected (400)",
-          "status": 400,
-          "thinking_off": "chat_template_kwargs"
-        }
-      ],
-      "request_id": "9f568db84f6f4b70bb4cc4cded4019d1",
-      "response_mode": "json_object",
-      "schema_valid": true,
-      "think_block_stripped": false,
-      "thinking_off": "chat_template_kwargs",
-      "usage": {
-        "completion_tokens": 57,
-        "completion_tokens_details": {
-          "audio_tokens": 0,
-          "image_tokens": 0,
-          "reasoning_tokens": 0
-        },
-        "cost": 9.968e-05,
-        "cost_details": {
-          "audio_input_cost": null,
-          "cache_write_input_cost": 0,
-          "cached_input_cost": 0,
-          "image_input_cost": null,
-          "image_output_cost": null,
-          "input_cost": 6.776e-05,
-          "output_cost": 3.192e-05,
-          "request_cost": 0,
-          "total_cost": 9.968e-05,
-          "upstream_inference_completions_cost": 3.192e-05,
-          "upstream_inference_cost": 9.968e-05,
-          "upstream_inference_prompt_cost": 6.776e-05,
-          "web_search_cost": 0
-        },
-        "prompt_tokens": 242,
-        "prompt_tokens_details": {
-          "audio_tokens": 0,
-          "cache_write_tokens": 0,
-          "cached_tokens": 0,
-          "image_tokens": 0,
-          "video_tokens": 0
-        },
-        "reasoning_tokens": 0,
-        "total_tokens": 299
-      }
-    },
-    "GLM-5.3-Flash": {
-      "grounded": true,
-      "latency_s": 9.0113,
-      "ok": true,
-      "output": {
-        "commands": [
-          {
-            "action_span": "Copy",
-            "line_span": "line Bravo",
-            "state_span": "closing",
-            "tag_span": "two-oh-eight"
-          }
-        ],
-        "kind": "instruction",
-        "retracted_spans": []
-      },
-      "reasoning_tokens": 0,
-      "rejected": [
-        {
           "body": "{\"error\":{\"message\":\"Model GLM-5.3-Flash does not support JSON schema output mode\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":null}}",
           "mode": "json_schema",
           "ok": false,
@@ -233,7 +273,7 @@
           "thinking_off": "chat_template_kwargs"
         }
       ],
-      "request_id": "chatcmpl-mkrx6sHqvbwhdcTTyi9ChjMqnD9SLpcHztXv3mAQ",
+      "request_id": "chatcmpl-YqFNSCIK6YMXYOiu2d503zZnU19SOnIHtp9LKEeH",
       "response_mode": "json_object",
       "schema_valid": true,
       "think_block_stripped": false,
@@ -275,7 +315,7 @@
       }
     },
     "Gemma-4-31B-IT": {
-      "latency_s": 11.8486,
+      "latency_s": 16.1981,
       "ok": true,
       "output": {
         "_content": "{\"//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////",
@@ -292,8 +332,9 @@
           "thinking_off": "chat_template_kwargs"
         }
       ],
-      "request_id": "d57243c0bd96468e91d442bb87b67b00",
+      "request_id": "2cf94079a0054474885d37be72edcddc",
       "response_mode": "json_object",
+      "retried": true,
       "schema_valid": false,
       "think_block_stripped": false,
       "thinking_off": "chat_template_kwargs",
@@ -332,8 +373,83 @@
         "total_tokens": 774
       }
     },
+    "MiMo-V2.6-Flash": {
+      "canonical": [
+        [
+          "CLOSE",
+          "XV-208",
+          "B"
+        ]
+      ],
+      "canonical_ok": true,
+      "grounded": true,
+      "latency_s": 2.7777,
+      "ok": true,
+      "output": {
+        "commands": [
+          {
+            "action_span": "closing",
+            "line_span": "line Bravo",
+            "state_span": null,
+            "tag_span": "two-oh-eight"
+          }
+        ],
+        "kind": "readback",
+        "retracted_spans": []
+      },
+      "reasoning_tokens": 0,
+      "rejected": [
+        {
+          "body": "{\"error\":{\"message\":\"Model MiMo-V2.6-Flash does not support JSON schema output mode\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":null}}",
+          "mode": "json_schema",
+          "ok": false,
+          "reason": "rejected (400)",
+          "status": 400,
+          "thinking_off": "chat_template_kwargs"
+        }
+      ],
+      "request_id": "442a988db6334884b299996c97cbbb16",
+      "response_mode": "json_object",
+      "schema_valid": true,
+      "think_block_stripped": false,
+      "thinking_off": "chat_template_kwargs",
+      "usage": {
+        "completion_tokens": 51,
+        "completion_tokens_details": {
+          "audio_tokens": 0,
+          "image_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "cost": 4.732e-05,
+        "cost_details": {
+          "audio_input_cost": null,
+          "cache_write_input_cost": 0,
+          "cached_input_cost": 0,
+          "image_input_cost": null,
+          "image_output_cost": null,
+          "input_cost": 3.304e-05,
+          "output_cost": 1.428e-05,
+          "request_cost": 0,
+          "total_cost": 4.732e-05,
+          "upstream_inference_completions_cost": 1.428e-05,
+          "upstream_inference_cost": 4.732e-05,
+          "upstream_inference_prompt_cost": 3.304e-05,
+          "web_search_cost": 0
+        },
+        "prompt_tokens": 236,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cache_write_tokens": 0,
+          "cached_tokens": 0,
+          "image_tokens": 0,
+          "video_tokens": 0
+        },
+        "reasoning_tokens": 0,
+        "total_tokens": 287
+      }
+    },
     "MiniCPM-V-4.7-1B": {
-      "latency_s": 1.939,
+      "latency_s": 2.3364,
       "ok": true,
       "output": {
         "kind": "readback",
@@ -353,7 +469,7 @@
           "thinking_off": "chat_template_kwargs"
         }
       ],
-      "request_id": "3a1e1de8a68c47169f05d1daeff9bd37",
+      "request_id": "770f037bd4f24288b59b1f9f83049b92",
       "response_mode": "json_object",
       "schema_valid": false,
       "think_block_stripped": false,
@@ -394,8 +510,16 @@
       }
     },
     "MiniCPM-V-4.7-35B-A3B": {
+      "canonical": [
+        [
+          "CLOSE",
+          "XV-208",
+          "B"
+        ]
+      ],
+      "canonical_ok": true,
       "grounded": true,
-      "latency_s": 5.0425,
+      "latency_s": 9.3097,
       "ok": true,
       "output": {
         "commands": [
@@ -420,7 +544,7 @@
           "thinking_off": "chat_template_kwargs"
         }
       ],
-      "request_id": "c4012babe30642d3aed89c3709939757",
+      "request_id": "684554c095b34d4ba58d8e1e1a3ba1c3",
       "response_mode": "json_object",
       "schema_valid": true,
       "think_block_stripped": false,
@@ -432,27 +556,27 @@
           "image_tokens": 0,
           "reasoning_tokens": 0
         },
-        "cost": 5.5244e-06,
+        "cost": 1.211e-05,
         "cost_details": {
           "audio_input_cost": null,
           "cache_write_input_cost": 0,
-          "cached_input_cost": 1.344e-07,
+          "cached_input_cost": 0,
           "image_input_cost": null,
           "image_output_cost": null,
-          "input_cost": 1.82e-06,
+          "input_cost": 8.54e-06,
           "output_cost": 3.57e-06,
           "request_cost": 0,
-          "total_cost": 5.5244e-06,
+          "total_cost": 1.211e-05,
           "upstream_inference_completions_cost": 3.57e-06,
-          "upstream_inference_cost": 5.5244e-06,
-          "upstream_inference_prompt_cost": 1.9544e-06,
+          "upstream_inference_cost": 1.211e-05,
+          "upstream_inference_prompt_cost": 8.54e-06,
           "web_search_cost": 0
         },
         "prompt_tokens": 244,
         "prompt_tokens_details": {
           "audio_tokens": 0,
           "cache_write_tokens": 0,
-          "cached_tokens": 192,
+          "cached_tokens": 0,
           "image_tokens": 0,
           "video_tokens": 0
         },
@@ -461,8 +585,13 @@
       }
     },
     "MiniCPM5-2B": {
-      "grounded": true,
-      "latency_s": 0.8868,
+      "canonical": [
+        "coverage"
+      ],
+      "canonical_ok": false,
+      "grounded": false,
+      "grounding_error": "line_span 'closing two-oh-eight, line Bravo' also holds the action 'closing'",
+      "latency_s": 1.087,
       "ok": true,
       "output": {
         "commands": [
@@ -487,7 +616,7 @@
           "thinking_off": "chat_template_kwargs"
         }
       ],
-      "request_id": "chatcmpl-feGDntuCJJJQmYrtzZvVenlMRdODFhDUknQi4wSH",
+      "request_id": "chatcmpl-iC56jPy0swc68DbxzS1XCVAqYrjIalX6M5WHxuGM",
       "response_mode": "json_object",
       "schema_valid": true,
       "think_block_stripped": false,
@@ -499,27 +628,27 @@
           "image_tokens": 0,
           "reasoning_tokens": 0
         },
-        "cost": 1.2985e-05,
+        "cost": 4.2042e-06,
         "cost_details": {
           "audio_input_cost": null,
           "cache_write_input_cost": 0,
-          "cached_input_cost": 0,
+          "cached_input_cost": 1.792e-07,
           "image_input_cost": null,
           "image_output_cost": null,
-          "input_cost": 8.995e-06,
+          "input_cost": 3.5e-08,
           "output_cost": 3.99e-06,
           "request_cost": 0,
-          "total_cost": 1.2985e-05,
+          "total_cost": 4.2042e-06,
           "upstream_inference_completions_cost": 3.99e-06,
-          "upstream_inference_cost": 1.2984999999999998e-05,
-          "upstream_inference_prompt_cost": 8.995e-06,
+          "upstream_inference_cost": 4.2041999999999995e-06,
+          "upstream_inference_prompt_cost": 2.142e-07,
           "web_search_cost": 0
         },
         "prompt_tokens": 257,
         "prompt_tokens_details": {
           "audio_tokens": 0,
           "cache_write_tokens": 0,
-          "cached_tokens": 0,
+          "cached_tokens": 256,
           "image_tokens": 0,
           "multimodal_tokens": null,
           "video_tokens": 0
@@ -528,8 +657,16 @@
       }
     },
     "Qwen3.8-27B": {
+      "canonical": [
+        [
+          "CLOSE",
+          "XV-208",
+          "B"
+        ]
+      ],
+      "canonical_ok": true,
       "grounded": true,
-      "latency_s": 3.0515,
+      "latency_s": 2.7108,
       "ok": true,
       "output": {
         "commands": [
@@ -554,7 +691,7 @@
           "thinking_off": "chat_template_kwargs"
         }
       ],
-      "request_id": "2364baa708104f348d954d94d26596fa",
+      "request_id": "fdd9c5111dcb4a2d8ba03294cffd27b5",
       "response_mode": "json_object",
       "schema_valid": true,
       "think_block_stripped": false,
@@ -566,27 +703,27 @@
           "image_tokens": 0,
           "reasoning_tokens": 0
         },
-        "cost": 5.5244e-06,
+        "cost": 1.211e-05,
         "cost_details": {
           "audio_input_cost": null,
           "cache_write_input_cost": 0,
-          "cached_input_cost": 1.344e-07,
+          "cached_input_cost": 0,
           "image_input_cost": null,
           "image_output_cost": null,
-          "input_cost": 1.82e-06,
+          "input_cost": 8.54e-06,
           "output_cost": 3.57e-06,
           "request_cost": 0,
-          "total_cost": 5.5244e-06,
+          "total_cost": 1.211e-05,
           "upstream_inference_completions_cost": 3.57e-06,
-          "upstream_inference_cost": 5.5244e-06,
-          "upstream_inference_prompt_cost": 1.9544e-06,
+          "upstream_inference_cost": 1.211e-05,
+          "upstream_inference_prompt_cost": 8.54e-06,
           "web_search_cost": 0
         },
         "prompt_tokens": 244,
         "prompt_tokens_details": {
           "audio_tokens": 0,
           "cache_write_tokens": 0,
-          "cached_tokens": 192,
+          "cached_tokens": 0,
           "image_tokens": 0,
           "video_tokens": 0
         },
@@ -595,8 +732,16 @@
       }
     },
     "Qwen3.8-Flash-Next": {
+      "canonical": [
+        [
+          "CLOSE",
+          "XV-208",
+          "B"
+        ]
+      ],
+      "canonical_ok": true,
       "grounded": true,
-      "latency_s": 2.9414,
+      "latency_s": 3.4196,
       "ok": true,
       "output": {
         "commands": [
@@ -621,7 +766,7 @@
           "thinking_off": "chat_template_kwargs"
         }
       ],
-      "request_id": "cf2266aa9f664234895197c89f84b0bc",
+      "request_id": "527fc9431e0741abb5b508a6a750e4eb",
       "response_mode": "json_object",
       "schema_valid": true,
       "think_block_stripped": false,
@@ -633,27 +778,27 @@
           "image_tokens": 0,
           "reasoning_tokens": 0
         },
-        "cost": 2.90976e-05,
+        "cost": 5.544e-05,
         "cost_details": {
           "audio_input_cost": null,
           "cache_write_input_cost": 0,
-          "cached_input_cost": 5.376e-07,
+          "cached_input_cost": 0,
           "image_input_cost": null,
           "image_output_cost": null,
-          "input_cost": 7.28e-06,
+          "input_cost": 3.416e-05,
           "output_cost": 2.128e-05,
           "request_cost": 0,
-          "total_cost": 2.90976e-05,
+          "total_cost": 5.544e-05,
           "upstream_inference_completions_cost": 2.128e-05,
-          "upstream_inference_cost": 2.9097599999999997e-05,
-          "upstream_inference_prompt_cost": 7.8176e-06,
+          "upstream_inference_cost": 5.544e-05,
+          "upstream_inference_prompt_cost": 3.416e-05,
           "web_search_cost": 0
         },
         "prompt_tokens": 244,
         "prompt_tokens_details": {
           "audio_tokens": 0,
           "cache_write_tokens": 0,
-          "cached_tokens": 192,
+          "cached_tokens": 0,
           "image_tokens": 0,
           "video_tokens": 0
         },
@@ -669,8 +814,8 @@
     "DeepSeek-V4-Flash-Vision-Exp",
     "DeepSeek-V4.1-Flash",
     "GLM-5.3-Flash",
+    "MiMo-V2.6-Flash",
     "MiniCPM-V-4.7-35B-A3B",
-    "MiniCPM5-2B",
     "Qwen3.8-27B",
     "Qwen3.8-Flash-Next"
   ],
@@ -678,7 +823,6 @@
     "DeepSeek-V4-Flash": {
       "ok": true,
       "rate_limit_headers": {},
-      "retried": true,
       "returned": false,
       "usage_present": true
     },
@@ -691,6 +835,7 @@
     "DeepSeek-V4.1-Flash": {
       "ok": true,
       "rate_limit_headers": {},
+      "retried": true,
       "returned": false,
       "usage_present": true
     },
@@ -701,6 +846,12 @@
       "usage_present": true
     },
     "Gemma-4-31B-IT": {
+      "ok": true,
+      "rate_limit_headers": {},
+      "returned": false,
+      "usage_present": true
+    },
+    "MiMo-V2.6-Flash": {
       "ok": true,
       "rate_limit_headers": {},
       "returned": false,
@@ -759,6 +910,7 @@
       "DeepSeek-V4.1-Flash",
       "GLM-5.3-Flash",
       "Gemma-4-31B-IT",
+      "MiMo-V2.6-Flash",
       "MiniCPM-V-4.7-1B",
       "MiniCPM-V-4.7-35B-A3B",
       "MiniCPM5-2B",
@@ -767,9 +919,9 @@
     ]
   },
   "models_request": {
-    "latency_s": 0.7312,
+    "latency_s": 1.0761,
     "rate_limit_headers": {}
   },
   "on_amd": true,
-  "run_at": "2026-10-14T00:00:27+00:00"
+  "run_at": "2026-10-14T00:34:15+00:00"
 }

@@ -32,7 +32,8 @@ Labels come from the card (what the speaker was asked to say). If a speaker depa
 listening**, before any model output on that clip is looked at, and the correction is logged in `data/label-fixes.csv`.
 
 Radio path: `scripts/radioize.py` (300–3400 Hz band-pass, μ-law 8 kHz round-trip, squelch tail) → badge `radio·simulated`.
-Noise: `scripts/mix.py --seed 1018` at clean / +6 / 0 / −6 dB SNR with MIMII pump / valve / fan recordings (CC BY-SA 4.0, eval
+SNR = 20·log10(speech level ÷ noise RMS), speech level = RMS over the frames within 35 dB of the loudest frame (silences
+excluded). Noise: `scripts/mix.py --seed 1018` at clean / +6 / 0 / −6 dB SNR with MIMII pump / valve / fan recordings (CC BY-SA 4.0, eval
 only, never committed). The four SNR copies of one exchange are the same speech: each SNR is its own row, never pooled.
 
 ### Dev slice
@@ -44,8 +45,9 @@ scored on the rest of A2 with the frozen code; the dev slice is reported as its 
 ## 3. Pipeline under test
 
 audio → VAD turns → ASR → extractor (rung) → referee (grounding → coverage → aliases → registry precedence → pairing → audio
-gate → verdict). The referee is the same code for every rung. Receipts record, per stage: endpoint, model id, request id, timings,
-whether the stage ran on AMD (`asr_on_amd`, `llm_on_amd`), and for ASR the language token and the prompt.
+gate → verdict). The referee is the same code for every rung. Receipts record, per call: stage, endpoint host, model id,
+request id, timings, `on_amd` (the endpoint is AMD-operated — it does not name a GPU), and for ASR the language token and
+the prompt.
 
 ### Audio gate
 
@@ -141,4 +143,6 @@ exchange, errors caught / missed, seconds from card shown to decision. n = 1 aud
 | Date | Change | Why |
 |---|---|---|
 | 2026-10-14 | Editorial only: internal planning labels removed from two headings and the rung-0 rule reworded; no threshold, formula or rule changed | the labels referred to private planning notes |
+| 2026-10-14 | Model ladder output mode: JSON mode (`json_object`) with the schema in the system prompt instead of server-enforced JSON schema; the schema is still checked locally | the access gate found no Token Factory model that accepts `json_schema` |
+| 2026-10-14 | Referee hardening, round 2 of code review, before any recording existed: wider negation lexicon; a span may hold words of its own field only; an order needs a bare imperative (or a Bahasa passive) to open a window; explicit audio-gate mode, missing input abstains; "stand by" extends the window; kill-test thresholds are also checked per language (pivot rule) | each change closes a path to a false VERIFIED, a phantom card or a silently skipped check |
 | 2026-10-14 | Referee hardening from code review, before any recording existed: the coverage scan also counts negators ("not", "jangan", "unable", "can't" …) and NATO letters without "line"; command spans must keep the order of their tags; with a floor set, missing token probabilities abstain; a bare unknown number in suffix format opens a window; read-back-shaped orphan turns and unreadable turns no longer create phantom live cards. The regex extractor's output is unchanged | each change closes a path that could mark a real error VERIFIED or create a false card; they apply to every rung alike |

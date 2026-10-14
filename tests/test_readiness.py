@@ -76,7 +76,7 @@ def test_negated_amd_sentence_is_not_a_claim(tmp_path: Path) -> None:
 
 
 def test_amd_without_any_receipt_fails(tmp_path: Path) -> None:
-    root = site(tmp_path, "Built for the AMD hackathon.\n", [])
+    root = site(tmp_path, "Built for the AMD hackathon. Everything runs on AMD.\n", [])
     assert checks(root) == ["amd-stage"]
 
 
@@ -106,11 +106,12 @@ def test_old_hero_string_fails(tmp_path: Path) -> None:
 def test_unbacked_number_fails_and_cited_passes(tmp_path: Path) -> None:
     root = site(
         tmp_path,
-        "We flag 94% of errors.\nWe flag 94% of errors (bench/results/eval.json).\nTarget: ≥ 90 % flagged.\n",
-        files={"bench/results/eval.json": "{}"},
+        "We flag 94% of errors.\nWe flag 94% of errors (bench/results/eval.json).\nTarget: ≥ 90 % flagged.\n"
+        "We flag 97% (bench/results/eval.json).\n",
+        files={"bench/results/eval.json": '{"flagged": 0.94}'},
     )
     found = cr.check_files(root, "build")
-    assert [(f.check, f.line) for f in found] == [("number", 1)]
+    assert [(f.check, f.line) for f in found] == [("number", 1), ("number", 4)]
 
 
 def test_docs_folder_is_checked(tmp_path: Path) -> None:
@@ -120,3 +121,33 @@ def test_docs_folder_is_checked(tmp_path: Path) -> None:
 
 def test_repo_itself_passes_build_stage() -> None:
     assert cr.main(["--stage", "build", "--no-collect"]) == 0
+
+
+def test_wider_claims_are_caught(tmp_path: Path) -> None:
+    root = site(
+        tmp_path,
+        "Everything runs on AMD hardware, no cloud needed.\nSpeech recognition runs on AMD.\n"
+        "Served on an AMD Radeon GPU.\nIt is 3x faster than by ear.\nLatency 1.8 s end to end.\n",
+        [EXTRACT_RECEIPT],
+    )
+    assert sorted(checks(root)) == ["amd-stage", "amd-stage", "amd-stage", "hardware", "number", "number"]
+
+
+def test_url_path_does_not_back_a_hardware_claim(tmp_path: Path) -> None:
+    rec = {**EXTRACT_RECEIPT, "base_path": "/radeon/api/v1"}
+    root = site(tmp_path, "Served on a Radeon card.\n", [rec])
+    assert "hardware" in checks(root)
+
+
+def test_every_public_page_is_scanned(tmp_path: Path) -> None:
+    root = site(
+        tmp_path,
+        "# ok\n",
+        files={"SECURITY.md": "TBD\n", "web/index.html": "<p>TODO</p>\n", "tests/notes.md": "TODO\n"},
+    )
+    assert checks(root) == ["placeholder", "placeholder"]
+
+
+def test_stated_test_counts_anywhere_must_match(tmp_path: Path) -> None:
+    root = site(tmp_path, "341 passing tests.\n", files={"docs/x.md": "We have 12 unit tests.\n"})
+    assert checks(root, n=341) == ["tests"]

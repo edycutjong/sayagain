@@ -65,3 +65,12 @@ def test_mix_cli_is_deterministic(tmp_path: Path) -> None:
     a, b = load(tmp_path / "a" / "-6dB" / "X-01.wav"), load(tmp_path / "b" / "-6dB" / "X-01.wav")
     assert np.array_equal(a, b)
     assert (tmp_path / "a" / "clean" / "X-01.wav").exists()
+
+
+def test_snr_labels() -> None:
+    assert [mix.snr_label(x) for x in ("clean", "6", "0", "-6")] == ["clean", "+6dB", "0dB", "-6dB"]
+
+
+def test_silent_noise_is_refused() -> None:
+    with pytest.raises(ValueError):
+        mix.mix_at_snr(tone_bursts(), np.zeros(SR * 2, dtype=np.float32), 0.0)

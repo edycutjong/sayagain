@@ -163,6 +163,8 @@ def test_gate_falls_back_when_json_schema_is_refused() -> None:
     def h(req: httpx.Request) -> httpx.Response:
         if req.url.path.endswith("/models"):
             return httpx.Response(200, json={"data": [{"id": "DeepSeek-X"}]})
+        if req.url.path.endswith("/audio/transcriptions"):
+            return httpx.Response(404, json={"error": {"message": "Not Found"}})
         body = json.loads(req.content)
         seen.append(body)
         if body.get("response_format", {}).get("type") == "json_schema":
@@ -177,8 +179,51 @@ def test_gate_falls_back_when_json_schema_is_refused() -> None:
     assert ext["ok"] and ext["response_mode"] == "json_object" and ext["thinking_off"] == "chat_template_kwargs"
     assert ext["rejected"][0]["status"] == 400
     assert "Return only one JSON object" in seen[1]["messages"][0]["content"]
-    assert gate["ladder_candidates"] == ["DeepSeek-X"]
+    assert gate["ladder_candidates"] == ["DeepSeek-X"] and ext["canonical_ok"]
+    assert gate["asr"]["route"] == {
+        "status": 404,
+        "answered": False,
+        "reason": "rejected (404)",
+        "body": '{"error":{"message":"Not Found"}}',
+    }
 
 
 def test_china_token_factory_host_counts_as_amd_operated() -> None:
     assert Config("k", "https://developer.amd.com.cn/radeon/api/v1").on_amd
+
+
+@pytest.mark.parametrize(
+    "response",
+    [
+        httpx.Response(200, text="<html>login</html>"),
+        httpx.Response(302, headers={"location": "https://login.example"}),
+        httpx.Response(200, json={"choices": [{"message": {"content": ["not", "a", "string"]}}]}),
+        httpx.Response(200, json={"choices": []}),
+    ],
+)
+def test_non_answers_are_not_auditing_and_recorded(response: httpx.Response, tmp_path: Path) -> None:
+    tf = client(lambda req: response, tmp_path)
+    ext, why, rec = extract_or_not_audited(tf, "Copy.", "m")
+    assert ext is None and why and rec.ok is False
+    line = json.loads((tmp_path / "receipts.jsonl").read_text().splitlines()[-1])
+    assert line["ok"] is False and line["error"]
+
+
+def test_receipt_on_disk_is_complete(tmp_path: Path) -> None:
+    bad = {"choices": [{"message": {"content": '{"kind": "readback"}'}}]}
+    client(lambda r: httpx.Response(200, json=bad), tmp_path).extract_spans("Copy.", "m")
+    rec = json.loads((tmp_path / "receipts.jsonl").read_text())
+    assert rec["params"]["schema_valid"] is False and rec["error"].startswith("schema")
+    assert "think_block_stripped" in rec["params"]
+
+
+def test_error_body_is_kept(tmp_path: Path) -> None:
+    msg = {"error": {"message": "Rate limit exceeded: maximum 20 requests per minute"}}
+    tf = client(lambda r: httpx.Response(429, json=msg), tmp_path)
+    extract_or_not_audited(tf, "Copy.", "m")
+    rec = json.loads((tmp_path / "receipts.jsonl").read_text())
+    assert "maximum 20 requests per minute" in rec["error_body"]
+
+
+def test_key_is_not_in_config_repr() -> None:
+    assert "sk-test" not in repr(CFG)
