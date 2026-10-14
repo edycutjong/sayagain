@@ -897,7 +897,7 @@
         var ex = S.meta.stages.extract;
         var exTxt = S.rung === 'regex' ? 'extraction: regex rung 0, no model call'
           : (live ? 'extraction called live on the ' : 'extraction replayed from its receipts, ') + esc(ex.where) + ': <b>' + esc(ext.join(' + ')) + '</b>' +
-            (ex.latency_s_p50 != null ? ' (p50 ' + esc(ex.latency_s_p50.toFixed(2)) + ' s over the ' + esc(ex.calls) + ' calls behind this run' + (ex.calls_reused ? ', ' + esc(ex.calls_reused) + ' of them reused from the first pass' : '') + ')' : '');
+            (ex.latency_s_p50 != null ? ' (p50 ' + esc(ex.latency_s_p50.toFixed(2)) + ' s over the ' + esc(ex.calls) + ' successful calls behind this run' + (ex.calls_reused ? ', ' + esc(ex.calls_reused) + ' of them reused from the first pass' : '') + ')' : '');
         var refTxt = 'referee <b>' + c.referee_ms.toFixed(2) + ' ms</b> ' + (j.replay ? 'when this replay was exported' : 'just now in the server') + ' (' + esc(j.measured_on || '') + ')' +
           (live ? ' · each live receipt below carries the time of its call (a turn already called this session is reused)' : '');
         var why = c.verdict && c.verdict.reason === 'unknown tag'

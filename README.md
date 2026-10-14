@@ -157,7 +157,7 @@ transcription will run elsewhere, and every stage will be labelled with where it
 
 ## 📊 Engineering Rigor
 
-520 tests (`uv run pytest`; one runs only with local Whisper weights), ruff lint and format, `pip-audit` and gitleaks over the
+521 tests (`uv run pytest`; one runs only with local Whisper weights), ruff lint and format, `pip-audit` and gitleaks over the
 full history (`make ci`, `make secrets`), CI workflows for the same checks plus CodeQL (none has executed yet, see Testing & CI), and a readiness gate (`scripts/check_submission_readiness.py`) that fails the build on an unfilled
 placeholder, a hardware or serving-stack name no receipt backs, or a number its cited file does not contain.
 
@@ -179,7 +179,7 @@ placeholder, a hardware or serving-stack name no receipt backs, or a number its 
 | A `NOT_AUDITED` turn is never VERIFIED | A failed model call must not become a pass | `tests/test_verdict.py:196` |
 | A referee exception fails closed, while reading, pairing or judging a turn | A bug must reach a human, not a log, and never end the shift; the benchmark stops on one instead of counting it | `tests/test_verdict.py:203`, `tests/test_review_round5.py:168` |
 | The verdict module imports no model code | The verdict cannot be moved into the model | `tests/test_verdict.py:215` |
-| A page on another site cannot dismiss a card or start paid calls | The local queue has no login: a foreign Host header (DNS rebinding) gets 400, a cross-site write or live stream gets 403 | `tests/test_review_round5.py:256` |
+| A page on another site cannot dismiss a card or start paid calls | The local queue has no login: a foreign Host header (DNS rebinding) gets 400, a write or live stream from another site or another local port gets 403 | `tests/test_review_round5.py:256` |
 
 ### Honest limits (9)
 
@@ -221,7 +221,8 @@ The queue replays a shift from a stored run: the referee judges each exchange fr
 recorded, and every card shows the receipt of each model call (request id, model served, host, latency, cost).
 `SAYAGAIN_LIVE_EXTRACT=1` lets the server call the AMD Token Factory for each turn instead of replaying the stored output
 (paced, capped per process; a failed call is `NOT_AUDITED`). The server is a local tool: it answers only to a localhost
-Host header, and the one write and the paid live calls refuse a request the browser marks as cross-site.
+Host header, and the one write and the paid live calls refuse a request a browser marks as coming from another site, or
+from another port on this host.
 
 ## 🧪 Testing & CI
 
@@ -247,7 +248,7 @@ docs/           landing page, pitch deck + PDF (docs/pitch), static replay (docs
 evidence/       recorded terminal sessions, live-call receipts, the external sources the pages quote
 bench/          pre-registered protocol and every stored result and receipt
 data/           fictional plant registry and the 145 recording cards
-tests/          520 tests, with regression tests from five review rounds (`test_review_round*.py`)
+tests/          521 tests, with regression tests from five review rounds (`test_review_round*.py`)
 ```
 
 ## 🗺️ Roadmap

@@ -266,7 +266,7 @@ def test_a_cross_site_page_cannot_dismiss_a_card(tmp_path) -> None:
 
 def test_a_cross_site_page_cannot_start_paid_live_calls(tmp_path) -> None:
     r = _client(tmp_path).get("/api/stream", params={"extract": "live"}, headers={"sec-fetch-site": "cross-site"})
-    assert r.status_code == 403 and "cross-site" in r.text
+    assert r.status_code == 403 and "another origin" in r.text
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -315,3 +315,15 @@ def test_the_benchmark_stops_on_a_referee_error_after_writing_its_extractions(mo
     with pytest.raises(SystemExit, match="referee error"):
         ev.run_extraction_rung("t", REGEX, [card], REG, Pacer(0.0), ev.Budget(0.0))
     assert (tmp_path / "t" / "regex.extractions.jsonl").exists() and (tmp_path / "t" / "regex.cards.jsonl").exists()
+
+
+def test_a_page_on_another_local_port_cannot_drive_the_queue(tmp_path) -> None:
+    from sayagain import shift
+
+    c = _client(tmp_path)
+    same_site = {"sec-fetch-site": "same-site"}  # e.g. a dev server on localhost:3000
+    r = c.get("/api/stream", params={"extract": "live"}, headers=same_site)
+    assert r.status_code == 403 and "another origin" in r.text
+    body = {"run": shift.DEFAULT_RUN, "rung": shift.DEFAULT_RUNG, "exchange_id": "H-01", "decision": "confirmed"}
+    assert c.post("/api/review", json=body, headers=same_site).status_code == 403
+    assert c.post("/api/review", json=body, headers={"sec-fetch-site": "same-origin"}).status_code == 201

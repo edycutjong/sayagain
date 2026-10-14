@@ -17,7 +17,8 @@ call is replayed with its receipt. `extract=live` calls the AMD Token Factory fo
 20 requests per minute, capped at LIVE_BUDGET_USD per server process); any failed call is NOT_AUDITED, never a verdict.
 
 The queue is a local tool: it answers only to a localhost Host header (a DNS-rebinding page gets 400), and the one
-write and the paid live calls refuse a request a browser marks as cross-site.
+write and the paid live calls refuse a request a browser marks as coming from another origin (another site, or another
+port on this host).
 """
 
 from __future__ import annotations
@@ -192,8 +193,12 @@ class Try(BaseModel):
 
 def _not_cross_site(request: Request) -> None:
     """The one write and the paid live calls: a page on another site cannot drive them from a browser."""
-    if request.headers.get("sec-fetch-site") == "cross-site":
-        raise HTTPException(403, "cross-site request refused")
+    if request.headers.get("sec-fetch-site") not in (
+        None,
+        "same-origin",
+        "none",
+    ):  # cross-site, or same-site = another port
+        raise HTTPException(403, "request from another origin refused")
     origin = request.headers.get("origin")
     if origin is not None and urlparse(origin).netloc != request.headers.get("host"):
         raise HTTPException(403, "cross-origin request refused")

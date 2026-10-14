@@ -1,4 +1,6 @@
+import atexit
 import os
+import shutil
 import tempfile
 
 import pytest
@@ -8,8 +10,11 @@ from referee.regex_extractor import extract
 from referee.registry import Registry
 from referee.turns import Turn, analyze
 
-# sayagain.server builds its app, and a reviews database under SAYAGAIN_VAR, at import: keep that out of the repo
-os.environ.setdefault("SAYAGAIN_VAR", tempfile.mkdtemp(prefix="sayagain-test-var-"))
+# sayagain.server builds its app, and a reviews database under SAYAGAIN_VAR, at import: always a fresh temp dir (never a
+# SAYAGAIN_VAR exported in the developer's shell, never the repo), removed when the test run ends
+_VAR = tempfile.mkdtemp(prefix="sayagain-test-var-")
+os.environ["SAYAGAIN_VAR"] = _VAR
+atexit.register(shutil.rmtree, _VAR, ignore_errors=True)
 
 
 @pytest.fixture(scope="session")
