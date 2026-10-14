@@ -383,7 +383,10 @@ def test_a_crash_judging_a_caught_readback_stops_the_benchmark(monkeypatch) -> N
         return real(ins, rb, **kw)
 
     monkeypatch.setattr(audit_mod, "_judge", crash_on_the_wrong_readback)
-    assert ev.judge_card(card, ev.regex_extraction, REG)["referee_errors"]  # before: only the final verdict was read
+    rec = ev.judge_card(card, ev.regex_extraction, REG)
+    assert rec["referee_errors"]  # before: only the final verdict was read, so this crash was counted silently
+    with pytest.raises(SystemExit, match="referee error"):
+        ev.stop_on_referee_errors([rec], "A2-021", "fix it")
 
 
 def test_a_pairing_crash_makes_every_turn_its_own_not_audited_exchange(monkeypatch) -> None:
@@ -409,3 +412,29 @@ def test_a_run_with_no_receipt_is_not_labelled_a_non_amd_host(monkeypatch) -> No
     monkeypatch.setattr(shift, "run_receipts", lambda run, rung: [])
     stage = shift.rung_stage("ladder-r1-reaudit", "Gemma-4-31B-IT")["extract"]
     assert stage["where"] == "no receipt found for this run" and stage["on_amd"] is None
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Loop-QA round 2: an unreadable turn naming a line still reaches the supervisor; chatter naming no work stays out.
+
+
+def test_an_unreadable_line_or_letter_after_the_readback_is_judged() -> None:
+    from referee.regex_extractor import extract as regex_extract
+
+    for said in ("Roger, line Charlie.", "Roger, Bravo.", "Siap, Charlie."):
+        texts = ("Close valve two-oh-three, line Bravo.", "Copy, closing valve two-oh-three, line Bravo.", said)
+        turns = [Turn(f"t{k}", "CH-01", 3.5 * k, 3.5 * k + 2.5, x, regex_extract(x)) for k, x in enumerate(texts)]
+        turns[2].extraction = {"kind": "other", "commands": [], "retracted_spans": []}  # the model saw nothing
+        assert audit(turns, REG, spot_checks=0).judged[0].verdict.verdict == "ABSTAIN", said  # was VERIFIED
+
+
+def test_unreadable_chatter_that_names_no_work_is_not_an_orphan() -> None:
+    for said in (
+        "Roger, tank level two-fifty.",
+        "Okay, starting my round now.",
+        "Copy, I will stop by the lab.",
+        "Roger, the gate is open.",
+    ):
+        empty = {"kind": "other", "commands": [], "retracted_spans": []}
+        rep = audit([Turn("c", "CH-01", 0.0, 2.5, said, empty)], REG, spot_checks=0)
+        assert not rep.orphans and not rep.judged, said

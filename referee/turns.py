@@ -57,7 +57,9 @@ class TurnAnalysis:
     verb_first: bool = False  # opens (after copy / roger / siap) with an action verb that is not a past participle
     opens_window: bool = False
     disagrees: bool = False  # prompted vs unprompted ASR read differently (only with an unprompted pass)
-    safety_words: bool = False  # code hears an action or a tag in the turn (alias tables), whatever the model returned
+    # what code hears in the turn (alias tables), whatever the model returned:
+    safety_words: bool = False  # any action, tag or line (letters too): the words coverage counts
+    names_work: bool = False  # an action and a tag that names equipment: work someone could be doing
 
     @property
     def id(self) -> str:
@@ -231,8 +233,8 @@ def _code_kinds(turn: Turn, registry: Registry) -> tuple[TurnAnalysis, bool]:
     a.ack_only = is_ack_only(text)
     a.verb_first = verb_first(text)
     a.stand_by = is_stand_by(text)
-    toks = al.tokenize(text)
-    a.safety_words = bool(al.action_mentions(toks) or al.tag_mentions(toks))
+    a.safety_words = bool(al.all_mentions(text))
+    a.names_work = _scan_opens_window(text, registry)
     if turn.alt_transcript is not None:
         a.disagrees = canonical_tuples(text, registry) != canonical_tuples(turn.alt_transcript, registry)
     return a, opens_with_correction(text)

@@ -18,7 +18,8 @@ written down and tested:
   * an unreadable (NOT_AUDITED) instruction's window closes when a new instruction-shaped turn arrives;
   * while a read-back is awaited, a cue-less order for OTHER tags starts a new exchange; the same order with a query
     ("…, do you copy?") is the operator repeating; a second read-back after the first is kept and judged, also
-    when the referee cannot read it (it abstains);
+    when the referee cannot read it (it abstains) if code hears an action, a tag or a line in it (a bare "Roger." is an
+    acknowledgement);
   * no read-back inside the window -> NO_READBACK. Radio is half-duplex: no overlap model.
 """
 
@@ -92,7 +93,7 @@ def _pair_channel(turns: list[TurnAnalysis], window_s: float, out: Paired) -> No
             # the exchange is then NOT_AUDITED (end-of-shift list)
             ex = Exchange(t.turn.channel, instruction=t, turn_ids=[t.id])
             state, deadline = _AWAIT_RB, t.turn.t_end + window_s
-        elif t.readback_shaped and ((t.status == "ok" and t.commands) or (t.status == "abstain" and t.safety_words)):
+        elif t.readback_shaped and ((t.status == "ok" and t.commands) or (t.status == "abstain" and t.names_work)):
             out.orphans.append(t)  # a read-back with no instruction heard (readable or not): end-of-shift list
         else:
             out.other.append(t)

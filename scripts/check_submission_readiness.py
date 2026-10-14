@@ -271,7 +271,7 @@ def check_files(root: Path, stage: str, collected_tests: int | None = None) -> l
         # the README a judge opens first links the live replay: the published site, not the repository folder
         readme = root / "README.md"
         body = readme.read_text(encoding="utf-8") if readme.exists() else ""
-        if not re.search(r"https://(?![^/\s]*github(?:usercontent)?\.com/)[^/\s]+/\S*replay/", body):
+        if not re.search(r"https://(?![^/\s]*github(?:usercontent)?\.com(?::\d+)?/)[^/\s]+/\S*replay/", body):
             findings.append(Finding("submit", "README.md", 0, "no https link to the live replay (…/replay/)"))
         # no public page still calls itself unfinished or unpublished, or carries a dated promise judges read too late
         for f in judged_files(root):

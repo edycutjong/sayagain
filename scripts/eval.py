@@ -165,15 +165,12 @@ def judge_card(card: dict, extract: Callable[[str], Extraction], registry: Regis
     }
 
 
-def stop_on_referee_errors(records: list[dict], where: str) -> None:
+def stop_on_referee_errors(records: list[dict], where: str, advice: str) -> None:
     """Fail closed is for the queue. In the benchmark a referee crash is a bug: stop loud, never a measured NOT_AUDITED
     (a re-audit would not even retry it: it requests failed model calls only)."""
     crashed = [r["exchange_id"] for r in records if r.get("referee_errors")]
     if crashed:
-        raise SystemExit(
-            f"{where}: referee error on {len(crashed)} card(s) {crashed[:5]}. Fix the referee and run again under a new"
-            " --run name: no result file was written, so --rescore cannot see this run (a full ladder costs cents)"
-        )
+        raise SystemExit(f"{where}: referee error on {len(crashed)} card(s) {crashed[:5]}. {advice}")
 
 
 # ----------------------------------------------------------------------------------------------------- metrics
@@ -487,7 +484,12 @@ def run_extraction_rung(
     write_jsonl(OUT / run / f"{tag}.extractions.jsonl", exts)
     write_jsonl(OUT / run / f"{tag}.cards.jsonl", records)
     # the paid extractions and the per-card records are on disk first; a referee crash then stops before any summary row
-    stop_on_referee_errors(records, f"{run}/{tag} (extractions and cards written, no summary)")
+    stop_on_referee_errors(
+        records,
+        f"{run}/{tag} (extractions and cards written, no summary)",
+        "Fix the referee and run again under a new --run name: no result file was written, so --rescore cannot see"
+        " this run (a full ladder costs cents)",
+    )
     # call metrics from every attempt on disk (429s included), so --rescore can recompute them
     summary = summarise(records, read_jsonl(rpath), model_rung=rung.model is not None)
     summary.update(
@@ -798,7 +800,11 @@ def rescore_summary(summary: dict, cards: list[dict], registry: Registry) -> dic
     subset = [c for c in cards if c["exchange_id"] in stored]
     fn = regex_extraction if summary["rung"]["model"] is None else stored_extractor(rows)
     records = [judge_card(c, fn, registry, analyzer) for c in subset]
-    stop_on_referee_errors(records, f"--rescore {summary.get('extractions') or summary['rung']['name']}")
+    stop_on_referee_errors(
+        records,
+        f"--rescore {summary.get('extractions') or summary['rung']['name']}",
+        "Fix the referee, then run --rescore again (the stored extractions are untouched)",
+    )
     receipts = read_jsonl(ROOT / summary["receipts"]) if summary.get("receipts") else []
     new = summarise(records, receipts, model_rung=summary["rung"]["model"] is not None)
     new["meets_rule"] = meets_rule(new)

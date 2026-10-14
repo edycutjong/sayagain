@@ -154,7 +154,7 @@ def audit(
                     Verdict(NOT_AUDITED, "referee error", trace=list(trace)),
                     [],
                     False,
-                    trace,
+                    list(trace),
                 )
                 for a in analyses
             ],
