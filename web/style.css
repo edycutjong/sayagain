@@ -123,7 +123,7 @@ img,svg{display:block}
 
 /* ---------- channel strip ---------- */
 .channel{display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"id line clock" "ctl ctl ctl" "prog prog prog" "sub sub sub";
-  gap:10px 18px;align-items:center;padding:14px clamp(14px,2vw,28px) 10px;border-bottom:1px solid var(--rule)}
+  gap:8px 18px;align-items:center;padding:10px clamp(14px,2vw,28px) 8px;border-bottom:1px solid var(--rule)}
 .ch-id{grid-area:id;display:flex;flex-direction:column;gap:4px}
 .ch-name{font:400 30px/1 var(--font-display);letter-spacing:.04em}
 .ch-line{grid-area:line;display:flex;align-items:baseline;gap:12px;min-width:0;min-height:44px;padding:8px 14px;border-radius:4px;background:var(--sunk);border:1px solid var(--rule);
@@ -141,7 +141,7 @@ img,svg{display:block}
 #play[aria-pressed="true"] .i-pause{display:none}
 .prog{grid-area:prog;height:3px;background:var(--rule);border-radius:2px;overflow:hidden}
 .prog i{display:block;height:100%;width:0;background:var(--before);transition:width .3s linear}
-.ch-sub{grid-area:sub;margin:0;font:500 13px/1.35 var(--font-data);color:var(--mid)}
+.ch-sub{grid-area:sub;margin:0;font:500 12.5px/1.3 var(--font-data);color:var(--mid)}
 
 /* ---------- desk: queue log + card ---------- */
 .desk{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:0;align-items:start}
@@ -233,7 +233,7 @@ img,svg{display:block}
 .links circle{fill:var(--before)}
 .links circle.x{fill:var(--after)}
 .sline{display:grid;grid-template-columns:5.6em minmax(0,1fr);gap:0 14px;align-items:baseline;padding:10px 0 6px;border-bottom:1px solid var(--rule)}
-.sline + .gap{height:34px}
+.sline + .gap{height:26px}
 .sline .who{font:600 12px/1.2 var(--font-data);letter-spacing:.12em;text-transform:uppercase;color:var(--mid)}
 .sline .who small{display:block;font-weight:500;letter-spacing:.04em;text-transform:none;margin-top:3px}
 .sline .who small.norec{color:var(--muted);font-style:italic}
@@ -253,7 +253,17 @@ mark.blk{background:var(--after-block);color:var(--ink);border-radius:3px;paddin
 .listen{margin:0 0 10px;padding-left:12px;border-left:4px solid transparent;border-image:var(--hatch-amber) 1;font:600 17px/1.35 var(--font-body);color:var(--abstain-text)}
 .strip.ab{padding-left:14px}
 .strip.ab::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:5px;background:var(--hatch-amber);border-radius:2px}
-.sp.xi{border-bottom:2px solid var(--ink)}
+.sp.xi{border-bottom:3px solid var(--ink)}
+.strip.ab{background:linear-gradient(90deg,rgba(230,160,25,.07),transparent 70%);border-radius:4px}
+.strip.ab svg.links{display:none}
+.sp.amb{border-bottom:2px dashed var(--abstain)}
+.nreg{display:inline-block;margin-left:.45em;padding:2px 6px;border:1px solid var(--abstain);border-radius:2px;font:600 12px/1.2 var(--font-data);letter-spacing:.06em;
+  color:var(--abstain-text);vertical-align:3px;white-space:nowrap}
+.listen.na{color:var(--before);border-image:var(--hatch-grey) 1}
+.timing p{margin:0}
+.timing details{margin-top:6px}
+.timing summary{cursor:pointer;color:var(--mid);font-weight:600;min-height:28px;display:inline-flex;align-items:center;transition:color .15s}
+.timing summary:hover{color:var(--ink)}
 
 .chan{list-style:none;margin:0 0 14px;padding:0;border-top:1px solid var(--line)}
 .chan li{display:grid;grid-template-columns:4.4em 5.6em minmax(0,1fr);gap:0 12px;padding:6px 0;border-bottom:1px solid var(--line);font:500 15px/1.4 var(--font-data);color:var(--mid)}
@@ -327,12 +337,16 @@ details.sec[open] > summary{margin-bottom:8px}
 
 /* ---------- desktop: both panes scroll inside the viewport ---------- */
 @media (min-width:1024px){
+  .stages summary{flex-wrap:nowrap}
+  .stages summary .sum{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   body{height:100dvh;display:flex;flex-direction:column;overflow:hidden}
   .desk{flex:1;min-height:0;align-items:stretch}
   .log,.cardpane{overflow-y:auto;min-height:0;scrollbar-width:thin}
   .foot{display:none}
 }
 @media (max-width:1279px){
+  .ch-ctl .btn{padding:8px 11px;font-size:14px}
+  #chime .t{display:none}
   .cols,.row{grid-template-columns:3.8rem 7.6rem minmax(3rem,.6fr) minmax(5rem,1.6fr)}
   .cols span:nth-child(2),.row .c{display:none}
   .stage-list{grid-template-columns:1fr}
@@ -363,8 +377,15 @@ details.sec[open] > summary{margin-bottom:8px}
   .ch-line{flex-direction:column;align-items:flex-start;gap:4px}
   .ch-line .txt{white-space:normal;font-size:16px}
   .ch-clock .num{font-size:20px}
-  .ch-ctl .btn{flex:1 1 auto}
-  .btn-ref{flex-basis:100%!important}
+  .ch-ctl{display:grid;grid-template-columns:auto 1fr auto;gap:8px}
+  .ch-ctl .btn{padding:8px 10px}
+  #play .t{display:none}
+  .ch-ctl .seg{justify-self:stretch;display:flex}
+  .ch-ctl .seg button{flex:1}
+  #skip{grid-column:1 / span 2}
+  #follow{display:none}
+  .btn-ref{grid-column:1 / -1}
+  .ch-sub{display:none}
   .cols{display:none}
   .row{grid-template-columns:4.2em minmax(0,1fr);grid-template-areas:"t v" "t f" "t ft";gap:2px 10px;padding:10px 14px;align-items:start}
   .row .t{grid-area:t}

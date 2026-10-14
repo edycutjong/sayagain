@@ -129,7 +129,7 @@ class LiveExtract:
             client = TokenFactory(load_config(), timeout=90.0, receipts_path=receipts, thinking_off=None)
             client.context = {"run": "live", "rung": rung.name}
             ext = TokenFactoryExtractor(client, rung, pacer=self.pacer)
-            self._by_rung[rung.name] = cache = Cache(self._guarded(ext))
+            self._by_rung[rung.name] = cache = _AuditedCache(self._guarded(ext))
             return cache
 
     def _guarded(self, ext):
@@ -147,6 +147,19 @@ class LiveExtract:
             return out
 
         return call
+
+
+class _AuditedCache(Cache):
+    """Keeps only answered calls: a failed call (NOT_AUDITED) is asked again next time, never replayed as a failure."""
+
+    def __call__(self, text: str) -> Extraction:
+        if text in self.store:
+            self.hits += 1
+            return self.store[text]
+        out = self.fn(text)  # type: ignore[operator]
+        if out.not_audited is None:
+            self.store[text] = out
+        return out
 
 
 # ------------------------------------------------------------------------------------------------- app

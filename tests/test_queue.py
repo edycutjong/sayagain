@@ -207,3 +207,30 @@ def test_meta_numbers_come_from_the_run():
 
 def test_judge_baseline_names_its_model():
     assert {b["model"] for b in shift.judge_baseline().values()} == {"DeepSeek-V4.1-Flash"}
+
+
+def test_live_cache_keeps_only_answered_calls():
+    calls = []
+
+    def fn(text):
+        calls.append(text)
+        from sayagain.extract import Extraction
+
+        return (
+            Extraction(text, None, "server error", None, 1) if len(calls) == 1 else Extraction(text, {}, None, None, 1)
+        )
+
+    cache = server._AuditedCache(fn)
+    assert cache("x").not_audited == "server error"
+    assert cache("x").not_audited is None and cache("x").not_audited is None
+    assert calls == ["x", "x"]  # the failure was asked again once, the answer then cached
+
+
+def test_stage_percentile_matches_the_result_file_for_a_first_pass():
+    ex = shift.run_meta("ladder-r1", RUNG)["stages"]["extract"]
+    calls = json.loads((shift.RESULTS / "ladder-r1.json").read_text())["rungs"][RUNG]["calls"]
+    assert ex["calls_reused"] == 0 and ex["latency_s_p95"] == calls["latency_s_p95"]
+    re = shift.run_meta(RUN, RUNG)["stages"]["extract"]
+    assert (
+        re["calls_own"] + re["calls_reused"] == re["calls"] and re["reused_from"] == "bench/results/text/ladder-r1.json"
+    )

@@ -35,7 +35,7 @@
   }
   function usdFixed(x) {
     if (typeof x !== 'number') return null;
-    return '$' + x.toFixed(7).replace(/0+$/, '').replace(/\.$/, '');
+    return '$' + (x === 0 ? '0' : x.toPrecision(3));
   }
   function secs(x) { return typeof x === 'number' ? x.toFixed(2) + ' s' : null; }
   function getJSON(url) {
@@ -141,11 +141,18 @@
 
   // ------------------------------------------------------------------------------------------- runs + sources
   function storedReviews() {
-    try { var v = JSON.parse(localStorage.getItem(reviewKey()) || '[]'); return Array.isArray(v) ? v : []; }
+    try {
+      var v = JSON.parse(localStorage.getItem(reviewKey()) || '[]');
+      return Array.isArray(v) ? v.filter(function (r) { return r && typeof r === 'object' && typeof r.exchange_id === 'string'; }) : [];
+    }
     catch (e) { return []; }
   }
   function loadRun() {
     stopSource();
+    var isRegex = $('rung').value.split('|')[1] === 'regex';
+    var liveOpt = $('extract').querySelector('option[value="live"]');
+    if (liveOpt) liveOpt.disabled = isRegex;  // rung 0 makes no model call: nothing to call live
+    if (isRegex && S.extract === 'live') { S.extract = 'stored'; $('extract').value = 'stored'; }
     S.gen = (S.gen || 0) + 1;
     var gen = S.gen;
     (S.timers || []).forEach(clearTimeout); S.timers = [];
@@ -156,6 +163,7 @@
     S.done = false; S.paused = false; S.cardsDone = 0; S.clockBase = 0; S.lastAt = 0; S.data = null; S.tried = null;
     syncPlay();
     $('count').textContent = '0';
+    $('count-lab').innerHTML = S.mode === 'live' && S.extract === 'live' ? 'Cards<br>this run' : 'Cards in<br>this replay';
     $('clock').textContent = '00:00';
     $('progbar').style.width = '0';
     $('ch-who').textContent = '·';
@@ -235,6 +243,7 @@
     var b = $('play');
     b.setAttribute('aria-pressed', String(S.paused || S.done));
     b.querySelector('.t').textContent = S.done ? 'Replay the shift' : S.paused ? 'Play' : 'Pause';
+    b.setAttribute('aria-label', b.querySelector('.t').textContent);
     $('skip').textContent = S.done ? 'Open the end-of-shift list' : 'Skip to end of shift';
   }
   function syncSpeed() {
@@ -286,7 +295,7 @@
       S.done = true; S.src = null; syncPlay();
       $('ch-line').classList.remove('tx');
       $('ch-who').textContent = 'Shift over';
-      $('ch-txt').textContent = S.cardsDone + ' exchanges judged · ' + S.liveIds.length + ' sent to the supervisor';
+      $('ch-txt').textContent = S.cardsDone + ' exchanges judged · ' + S.liveIds.length + ' sent to the supervisor (error-dense test corpus)';
       if (S.eos) $('clock').textContent = clock(S.clockBase + S.eos.at);
       renderSub();
     }
@@ -342,11 +351,15 @@
     var lead = S.mode === 'live'
       ? 'Live queue over run <b>' + esc(m.run) + '</b>'
       : 'Replay of run <b>' + esc(m.run) + '</b>';
+    if (m.reaudit_of) lead += ' (a re-audit of <span class="data">' + esc(m.reaudit_of) + '</span>: only the transcripts whose call failed there were requested again)';
+    if (!ho.n) lead += ' · the development slice of ' + esc(m.n_cards_run) + ' cards, used for tuning only: it has no held-out figures';
+    if (S.mode === 'live' && S.extract === 'live') lead += ' · <b>model calls are live now</b>; the held-out figures and the stage p50 below are the stored run\u2019s, not these calls';
     var cps = m.cards_per_shift_assumption, cpsTxt = '';
     if (cps) {
       var lo = cps['2_errors_per_180'], hi = cps['5_errors_per_180'];
+      var range = Math.round(lo) === Math.round(hi) ? esc(Math.round(lo)) : esc(Math.round(lo)) + '\u2013' + esc(Math.round(hi));
       if (lo != null && hi != null) cpsTxt = ' The test corpus is dense with seeded errors; at the protocol\u2019s shift assumption (' + esc(m.shift_assumption || '') +
-        ') this rung would send about ' + esc(Math.round(lo)) + '\u2013' + esc(Math.round(hi)) + ' cards a shift.';
+        ') this rung would send about ' + range + ' cards a shift' + (ho.not_audited && ho.not_audited.k ? ' (an exchange not audited counts as no card here)' : '') + '.';
     }
     $('banner').innerHTML = lead + ' · fictional plant radio traffic · ' + esc(m.provenance) + ': each turn is the written script of a recording card, there is no recording yet' +
       (parts.length ? ' · this rung on the ' + esc(ho.n || '') + ' held-out cards: ' + parts.join(' · ') : '') +
@@ -364,7 +377,8 @@
     var ex = st.extract;
     var exVal = esc(ex.name) + (ex.model_served && ex.model_served.length ? ' <span class="data">(' + esc(ex.model_served.join(', ')) + ')</span>' : '') +
       (ex.hosts && ex.hosts.length ? ' · ' + esc(ex.where) + ' · ' + esc(ex.hosts.join(', ')) : ' · ' + esc(ex.where)) +
-      (ex.latency_s_p50 != null ? ' · p50 ' + esc(ex.latency_s_p50.toFixed(2)) + ' s over ' + esc(ex.calls) + ' calls' : '') +
+      (ex.latency_s_p50 != null ? ' · p50 ' + esc(ex.latency_s_p50.toFixed(2)) + ' s over the ' + esc(ex.calls) + ' successful calls behind this run' +
+        (ex.calls_reused ? ' (' + esc(ex.calls_reused) + ' reused from <span class="data">' + esc(ex.reused_from) + '</span>, so this differs from the result file\u2019s own-call figure)' : '') : '') +
       (ex.on_amd ? '<span class="where">AMD-hosted API</span>' : '<span class="where off">local</span>');
     var refVal = esc(st.referee.name) + ' · ' + (S.mode === 'live' ? 'judging in this server' : 'run at export (' + esc(m.referee_measured_on) + '), trace kept') + '<span class="where off">local</span>';
     $('stage-list').innerHTML =
@@ -490,15 +504,15 @@
     }
     var e = S.eos;
     box.innerHTML =
-      section('Spot-checks', e.spot_checks, 'Random VERIFIED exchanges a human re-checks at the end of the shift: how the plant learns whether the referee lets errors through.') +
-      section('Caught on channel', e.caught_on_channel, 'The operator heard a wrong read-back and corrected it on air. The first, wrong read-back is listed here; the exchange itself is judged on what followed.') +
-      section('Not audited', e.not_audited, 'A model call failed, so the referee never judged these. Nobody checked them: they are listed, never passed.');
+      section('Spot-checks', e.spot_checks, 'Random VERIFIED exchanges a human re-checks at the end of the shift: how the plant learns whether the referee lets errors through.', 'No VERIFIED exchange to sample this shift.') +
+      section('Caught on channel', e.caught_on_channel, 'The operator heard a wrong read-back and corrected it on air. The first, wrong read-back is listed here; the exchange itself is judged on what followed.', 'No read-back was corrected on air this shift.') +
+      section('Not audited', e.not_audited, 'Each of these has at least one turn whose model call failed, so part of it was never judged. They are listed, never passed.', 'Every exchange was judged.');
     bindRows(box);
   }
-  function section(title, ids, why) {
+  function section(title, ids, why, none) {
+    if (!ids.length) return '<h3>' + esc(title) + '<span class="n">0</span></h3><p class="why">' + esc(none) + '</p>';
     return '<h3>' + esc(title) + '<span class="n">' + ids.length + '</span></h3><p class="why">' + esc(why) + '</p>' +
-      (ids.length ? '<ol class="rows">' + ids.map(function (id) { return S.cards[id] ? rowHTML(S.cards[id], false) : ''; }).join('') + '</ol>'
-        : '<p class="why">None this shift.</p>');
+      '<ol class="rows">' + ids.map(function (id) { return S.cards[id] ? rowHTML(S.cards[id], false) : ''; }).join('') + '</ol>';
   }
 
   // ------------------------------------------------------------------------------------------- the card
@@ -538,6 +552,24 @@
     return null;
   }
 
+  function blockHTML(c, t, s, attrs) {
+    // red covers only the words of the read-back span that the instruction's span of the same field does not have
+    var text = t.text.slice(s.start, s.end);
+    var ins = c.strip && turnById(c, c.strip.instruction), have = {};
+    if (ins) ins.spans.forEach(function (o) {
+      if (o.field === s.field) ins.text.slice(o.start, o.end).toLowerCase().split(/[^\w-]+/).forEach(function (w) { if (w) have[w] = 1; });
+    });
+    var parts = text.split(/(\s+)/), shared = parts.filter(function (p) { return p.trim() && have[p.toLowerCase().replace(/[^\w-]/g, '')]; }).length;
+    var words = parts.filter(function (p) { return p.trim(); }).length;
+    if (!shared || shared === words) return '<mark class="blk sp"' + attrs + ' data-x="1">' + esc(text) + '</mark>';
+    var out = '<span class="sp"' + attrs + ' data-x="1">';
+    parts.forEach(function (p) {
+      if (!p.trim()) out += esc(p);
+      else if (have[p.toLowerCase().replace(/[^\w-]/g, '')]) out += esc(p);
+      else out += '<mark class="blk">' + esc(p) + '</mark>';
+    });
+    return out + '</span>';
+  }
   function insDiffers(c, field) {
     return !!(c.verdict && c.verdict.diffs && c.verdict.diffs.some(function (d) { return d.field === field; }));
   }
@@ -560,9 +592,11 @@
       else {
         var d = diffFor(c, t, s);
         var xi = role === 'ins' && insDiffers(c, s.field);
+        var amb = role === 'ins' && s.field === 'tag' && c.verdict && c.verdict.reason === 'unknown tag';
         var attrs = ' data-f="' + esc(s.field) + '" data-c="' + esc(s.cmd) + '" data-side="' + role + '"';
-        out += d ? '<mark class="blk sp"' + attrs + ' data-x="1">' + w + '</mark>'
-          : '<span class="sp' + (s.field === 'state' ? ' st' : '') + (xi ? ' xi' : '') + '"' + attrs + ' title="' + esc(s.field) + ' span">' + w + '</span>';
+        if (d) out += blockHTML(c, t, s, attrs);
+        else out += '<span class="sp' + (s.field === 'state' ? ' st' : '') + (xi ? ' xi' : '') + (amb ? ' amb' : '') + '"' + attrs + ' title="' + esc(s.field) + ' span">' + w + '</span>' +
+          (amb ? '<span class="nreg">not in registry</span>' : '');
       }
       pos = s.end;
     });
@@ -599,7 +633,7 @@
     if (t.not_audited) bits = '<b>not audited</b> · ' + esc(t.not_audited);
     else if (!r) bits = S.rung === 'regex' ? 'regex rung 0 · no model, no call' : 'no receipt';
     else {
-      bits = (r.live ? '<b>live call</b> · ' : '') + '<b>' + esc(r.model_served || S.rung) + '</b> · ' + esc(r.host || '') +
+      bits = (r.live ? '<b>live call</b>' + (r.started_at ? ' at ' + esc(String(r.started_at).slice(11, 19)) + ' UTC' : '') + ' · ' : '') + '<b>' + esc(r.model_served || S.rung) + '</b> · ' + esc(r.host || '') +
         (r.on_amd ? ' (AMD-hosted API)' : '') + ' · <b>' + esc(secs(r.latency_s) || '') + '</b>' +
         (r.cost_usd != null ? ' · ' + esc(usdFixed(r.cost_usd)) : '') + ' · request <span title="' + esc(r.request_id) + '">' + esc(String(r.request_id || '').slice(0, 12)) + '…</span>' +
         (r.run ? ' · run ' + esc(r.run) : '');
@@ -630,6 +664,7 @@
       h += '<div class="diffline quiet"><span class="note">No instruction on the channel: no exchange was opened, so there is nothing to judge.</span></div>';
     }
     if (vk === 'ABSTAIN') h += '<p class="listen">' + (v.reason === 'audio' ? 'Cannot hear: listen yourself.' : 'Cannot clear this exchange: a human must check it.') + '</p>';
+    if (vk === 'NOT_AUDITED') h += '<p class="listen na">Not audited: a model call failed, so the referee did not judge this exchange. It is listed, never passed.</p>';
     // the read-back strip
     var ins = c.strip && turnById(c, c.strip.instruction), rb = c.strip && c.strip.readback && turnById(c, c.strip.readback);
     if (ins) {
@@ -655,22 +690,24 @@
     h += '<div class="badges">' +
       '<span class="bdg">speaker <b>' + esc(c.provenance.speaker) + '</b></span>' +
       '<span class="bdg">radio <b>' + esc(c.provenance.radio) + '</b></span>' +
-      (S.meta.stages.extract.on_amd ? '<span class="bdg amd">extraction <b>' + esc(S.rung) + '</b> · AMD-hosted API</span>' : '<span class="bdg">extraction <b>' + esc(S.rung === 'regex' ? 'regex, no model' : S.rung) + '</b></span>') +
+      (c.turns.some(function (t) { return t.receipt && t.receipt.on_amd; }) ? '<span class="bdg amd">extraction <b>' + esc(S.rung) + '</b> · AMD-hosted API</span>'
+        : '<span class="bdg">extraction <b>' + esc(S.rung === 'regex' ? 'regex, no model' : S.rung + ', no successful call') + '</b></span>') +
       '<span class="bdg">referee <b>local</b> · ' + esc(c.referee_ms != null ? c.referee_ms.toFixed(2) + ' ms ' + refWhere : '') + '</span>' +
       '</div>';
     // receipts
     var nCalls = {};
     c.turns.forEach(function (t) { if (t.receipt && t.receipt.request_id) nCalls[t.receipt.request_id] = 1; });
-    h += '<details class="sec"><summary><span class="lab">Receipts · ' + Object.keys(nCalls).length + ' model call' + (Object.keys(nCalls).length === 1 ? '' : 's') +
-      ' behind these turns</span></summary><ul class="rcpt">' + c.turns.map(receiptLine).join('') +
-      '</ul><p class="evalrow">Identical wording shares one stored call: the run extracted each distinct transcript once.</p></details>';
+    var nc = Object.keys(nCalls).length, anyLive = c.turns.some(function (t) { return t.receipt && t.receipt.live; });
+    h += '<details class="sec"><summary><span class="lab">Receipts · ' + (S.rung === 'regex' ? 'no model call (regex rung 0)' : nc + ' model call' + (nc === 1 ? '' : 's') +
+      ' behind these turns') + '</span></summary><ul class="rcpt">' + c.turns.map(receiptLine).join('') + '</ul>' +
+      (nc && !anyLive ? '<p class="evalrow">Identical wording shares one stored call: the run extracted each distinct transcript once.</p>' : '') + '</details>';
     // the baseline
-    if (c.baseline) {
+    if (c.baseline && c.baseline.verdict) {
       var b = c.baseline, exp = c.expected || '';
       var passedWrong = b.verdict === 'VERIFIED' && /^(MISMATCH|NO-READBACK)/.test(exp);
       var passedUnknown = b.verdict === 'VERIFIED' && /unknown tag/.test(exp);
       h += '<div class="sec"><span class="lab">Same exchange, LLM-as-judge baseline</span><div class="base"><span class="bv' + (passedWrong || passedUnknown ? ' bad' : '') + '">' +
-        esc(b.label || b.verdict || 'not audited') + '</span><span>' + esc(b.model || 'the judge model') + ', given the whole exchange and no plant registry' +
+        esc(VERDICT_WORD[b.verdict] || b.label || b.verdict) + '</span><span>' + esc(b.model || 'the judge model') + ', given the whole exchange and no plant registry' +
         (passedWrong ? ': <strong>it passed a read-back the card script seeded as wrong.</strong>'
           : passedUnknown ? ': <strong>it passed an order for equipment the plant registry does not have.</strong>' : '.') + '</span></div></div>';
     }
@@ -709,8 +746,8 @@
     }
     var opts = DISMISS_REASONS.map(function (t, i) {
       return '<label><input type="radio" name="why" value="' + esc(t) + '" id="why' + i + '">' + esc(t) + '</label>';
-    }).join('') + '<label><input type="radio" name="why" value="other" id="why-o">Other</label><input type="text" id="why-txt" placeholder="What did you hear?" hidden aria-label="Dismissal reason">';
-    return '<div class="review"><button type="button" class="btn btn-confirm" id="rv-confirm">Confirm error</button>' +
+    }).join('') + '<label><input type="radio" name="why" value="other" id="why-o">Other</label><input type="text" id="why-txt" placeholder="Why is the referee wrong here?" hidden aria-label="Dismissal reason">';
+    return '<div class="review"><button type="button" class="btn btn-confirm" id="rv-confirm">' + (vkey(c) === 'ABSTAIN' ? 'Confirm: needs follow-up' : 'Confirm error') + '</button>' +
       '<button type="button" class="btn" id="rv-dismiss" aria-expanded="false" aria-controls="rv-form">Dismiss…</button>' +
       '<form class="dismiss" id="rv-form" hidden><fieldset><legend class="lab">Why dismiss? A reason is required</legend>' + opts +
       '</fieldset><div class="acts"><button type="submit" class="btn" id="rv-send" disabled>Dismiss with this reason</button></div></form>' +
@@ -804,13 +841,15 @@
         var live = c.turns.some(function (t) { return t.receipt && t.receipt.live; });
         var ex = S.meta.stages.extract;
         var exTxt = S.rung === 'regex' ? 'extraction: regex rung 0, no model call'
-          : (live ? 'extraction called just now on the ' : 'extraction replayed from its receipts, ') + esc(ex.where) + ': <b>' + esc(ext.join(' + ')) + '</b>' +
+          : (live ? 'extraction called live on the ' : 'extraction replayed from its receipts, ') + esc(ex.where) + ': <b>' + esc(ext.join(' + ')) + '</b>' +
             (ex.latency_s_p50 != null ? ' (this run’s p50 is ' + esc(ex.latency_s_p50.toFixed(2)) + ' s over ' + esc(ex.calls) + ' calls)' : '');
-        var refTxt = 'referee <b>' + c.referee_ms.toFixed(2) + ' ms</b> ' + (j.replay ? 'when this replay was exported' : 'just now in the server') + ' (' + esc(j.measured_on || '') + ')';
+        var refTxt = 'referee <b>' + c.referee_ms.toFixed(2) + ' ms</b> ' + (j.replay ? 'when this replay was exported' : 'just now in the server') + ' (' + esc(j.measured_on || '') + ')' +
+          (live ? ' · each live receipt below carries the time of its call (a turn already called this session is reused)' : '');
         var why = c.verdict && c.verdict.reason === 'unknown tag'
           ? esc(rf.tag) + ' is not in the plant registry, so the referee refuses to clear the order: <b>' + esc(c.verdict.label) + '</b>.'
           : 'This rung’s output made the referee answer <b>' + esc(c.verdict ? c.verdict.label : 'no verdict') + '</b> before the registry check.';
-        var timing = '<p class="timing"><b>You pressed “Try the refused one”.</b> ' + why + ' ' + exTxt + ' · ' + refTxt + '</p>';
+        var timing = '<div class="timing"><p><b>You pressed \u201cTry the refused one\u201d.</b> ' + why + '</p>' +
+          '<details><summary>How this was judged</summary><p>' + exTxt + ' · ' + refTxt + '</p></details></div>';
         renderCard(c, { enter: true, timing: timing });
         $('card').scrollTop = 0;
         if (matchMedia('(max-width: 767px)').matches) openCard();

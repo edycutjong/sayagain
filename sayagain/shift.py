@@ -17,6 +17,7 @@ so the two surfaces show the same thing. Rules:
 from __future__ import annotations
 
 import json
+import math
 import platform
 import random
 import time
@@ -269,10 +270,13 @@ def judge_card(card: dict, extract: Callable[[str], Extraction], registry: Regis
 
 
 def _pct(values: list[float], q: float) -> float | None:
+    """Linear interpolation, the same percentile as scripts/eval.py."""
     if not values:
         return None
     v = sorted(values)
-    return round(v[min(len(v) - 1, max(0, round(q * (len(v) - 1))))], 4)
+    i = (len(v) - 1) * q
+    lo, hi = math.floor(i), math.ceil(i)
+    return round(v[lo] + (v[hi] - v[lo]) * (i - lo), 4)
 
 
 def run_receipts(run: str, rung: str) -> list[dict]:
@@ -293,6 +297,7 @@ def rung_stage(run: str, rung: str) -> dict:
         served = sorted({r.get("model_served") for r in recs if r.get("model_served")})
         on_amd = sorted({bool(r.get("on_amd")) for r in recs})
         lat = [float(r["latency_s"]) for r in recs if isinstance(r.get("latency_s"), int | float)]
+        own = sum(1 for r in recs if r.get("run") == run)
         extract = {
             "name": rung,
             "model_served": served,
@@ -301,6 +306,11 @@ def rung_stage(run: str, rung: str) -> dict:
             "on_amd": True if on_amd == [True] else None,
             "hosts": hosts,
             "calls": len(recs),
+            # behind this run's outputs: its own calls + calls reused from the pass it re-audits (bench result files
+            # count only the run's own calls)
+            "calls_own": own,
+            "calls_reused": len(recs) - own,
+            "reused_from": _summary(run).get("reaudit_of"),
             "latency_s_p50": _pct(lat, 0.5),
             "latency_s_p95": _pct(lat, 0.95),
         }
@@ -335,6 +345,8 @@ def run_meta(run: str = DEFAULT_RUN, rung: str = DEFAULT_RUNG) -> dict:
         "channel": CHANNEL,
         "stages": rung_stage(run, rung),
         "n_cards_run": len(run_cards(run, rung)),
+        "reaudit_of": s.get("reaudit_of"),
+        "subset": s.get("subset"),
         "held_out": {
             "n": held.get("n_cards"),
             "false_verified": kn("false_verified"),
