@@ -70,7 +70,7 @@ dev slice (the first 20 A2 cards and the 20 kill-test cards). Full tables with W
 Every call above has a receipt in bench/results/receipts/, and `uv run python scripts/eval.py --rescore` re-judges
 every stored model output offline and re-derives every table in the result files. A second live run of
 DeepSeek-V4-Flash on the dev slice gave the same verdict on 40/40 cards (bench/results/text/repro-dev-DeepSeek-V4-Flash.json);
-the gateway ignores a `seed`, so this is measured, not guaranteed.
+temperature 0 gives no determinism guarantee at this gateway, so this is measured, not guaranteed.
 
 The access probe (bench/results/access-gate.json) found 8 instruct models on the AMD Token Factory whose span extraction
 of the hero read-back the referee reads as `CLOSE · XV-208 · line B`. The model list has no speech-to-text model, so

@@ -24,7 +24,7 @@ Re-audit of bench/results/text/ladder-r1.json: only the transcripts that pass co
 | Qwen3.8-27B | on | 0 | 0 | 3 | 39/41 (95.12 %) [83.86 % – 98.65 %] | 35/38 (92.11 %) | 4/48 (8.33 %) [3.29 % – 19.55 %] | 80/89 (89.89 %) | 0/189 (0 %) | ABSTAIN · unknown tag | 0 | 14.1714 / 62.5185 | bench/results/text/ladder-r1.json |
 | regex | none | 0 | 0 | 0 | 41/41 (100 %) [91.43 % – 100 %] | 38/38 (100 %) | 0/48 (0 %) [0 % – 7.41 %] | 89/89 (100 %) | — | ABSTAIN · unknown tag | 0 | — | bench/results/text/ladder-r1.json |
 
-Cards in the *Not audited* column had a failed call (server error, time-out): they count in no rate and keep the row from meeting the rule; a re-audit result, where one exists, is listed above.
+Cards in the *Not audited* column had a failed call (server error, time-out). They stay in the denominators but are never counted as flagged errors or as false alarms — conservative for errors flagged, optimistic for false-alarm load — and they keep the row from meeting the rule; a re-audit result, where one exists, is listed above.
 
 ### ablate-grounding-r1-reaudit — `text·scripted`, row `held_out`, 145 cards run, this run spent $0.000209 (bench/results/text/ablate-grounding-r1-reaudit.json)
 

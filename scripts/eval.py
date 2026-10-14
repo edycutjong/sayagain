@@ -893,8 +893,10 @@ def report_lines(path: Path) -> list[str]:
     if any(g["rows"][row]["not_audited"]["k"] for g in groups.values()) and not doc.get("reaudit_of"):
         out.append("")
         out.append(
-            "Cards in the *Not audited* column had a failed call (server error, time-out): they count in no rate "
-            "and keep the row from meeting the rule; a re-audit result, where one exists, is listed above."
+            "Cards in the *Not audited* column had a failed call (server error, time-out). They stay in the "
+            "denominators but are never counted as flagged errors or as false alarms — conservative for errors "
+            "flagged, optimistic for false-alarm load — and they keep the row from meeting the rule; a re-audit "
+            "result, where one exists, is listed above."
         )
     out.append("")
     return out
@@ -943,7 +945,7 @@ def cmd_compare(args) -> int:
         "outputs_compared": len(set(ea) & set(eb)),
         "outputs_identical": len(set(ea) & set(eb)) - len(out_diff),
         "output_differences": [{"text": t, "first": ea[t], "second": eb[t]} for t in out_diff],
-        "note": "temperature 0; the gateway drops `seed`, so identical outputs are not guaranteed",
+        "note": "temperature 0 gives no determinism guarantee at this gateway: identical outputs are measured",
     }
     out = OUT / f"repro-{args.run or b['run']}.json"
     write_json(out, res)
