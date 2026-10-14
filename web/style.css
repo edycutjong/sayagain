@@ -427,7 +427,7 @@ details.sec[open] > summary{margin-bottom:8px}
   .stages summary .sum{font-size:0}
   .stages summary .sum::after{content:attr(data-short);font-size:14px}
   .acard{padding:16px 14px}
-  .bdg{white-space:normal}
+  .bdg{white-space:normal;flex-wrap:wrap;max-width:100%}
   .tabs button{padding:0 9px;font-size:14px}
   .sline .who small{display:inline;margin-left:8px}
   .sline{grid-template-columns:1fr;gap:4px}
