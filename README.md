@@ -37,7 +37,9 @@ The referee half of that design exists and is tested today; the speech half does
 | Model ladder, grounding ablation, LLM-judge baseline, offline re-scoring of every stored model output | `scripts/eval.py` | run on the card scripts (`text·scripted`), see below |
 | Speech path: one WAV per card → VAD turns → speech-to-text (local Whisper, labelled off-AMD; AMD notebook backend switched off until a notebook GPU is confirmed) → disagreement gate | `sayagain/ingest.py`, `sayagain/asr.py` | code + tests done, waiting for recordings |
 | Local kill test (Whisper-large-v3 on a laptop, off-AMD) | `scripts/kill_test_local.py` | harness ready, waiting for recordings |
-| Human recordings, audio eval rows, queue UI | — | not built yet |
+| Supervisor queue: FastAPI + server-sent events, the read-back strip card, confirm / dismiss (reason required), "Try the refused one", end-of-shift list (spot-checks, caught on channel, not audited), receipts per model call | `sayagain/server.py`, `sayagain/shift.py`, `web/` | done, over the stored text runs |
+| Static replay of stored runs (same page, GitHub Pages-ready, not published) | `scripts/export_run.py` → `docs/replay/` | done |
+| Human recordings, audio eval rows | — | not built yet |
 
 ## First measurements: the card scripts, no audio yet (2026-10-14)
 
@@ -76,7 +78,7 @@ The access probe (bench/results/access-gate.json) found 8 instruct models on the
 of the hero read-back the referee reads as `CLOSE · XV-208 · line B`. The model list has no speech-to-text model, so
 transcription will run elsewhere, and every stage will be labelled with where it ran.
 
-474 tests (`uv run pytest`; one runs only with local Whisper weights), lint with ruff, a CI workflow for every push. Friction log:
+492 tests (`uv run pytest`; one runs only with local Whisper weights), lint with ruff, a CI workflow for every push. Friction log:
 [docs/DX-REPORT.md](docs/DX-REPORT.md).
 
 ## Run it
@@ -87,6 +89,19 @@ uv run pytest -q
 uv run python scripts/seed.py --seed 1018          # registry + cards, byte-identical
 uv run python scripts/check_submission_readiness.py
 ```
+
+### The supervisor queue
+
+```bash
+uv run uvicorn sayagain.server:app --port 8018     # open http://127.0.0.1:8018/queue
+uv run python scripts/export_run.py                # static replay of the stored runs -> docs/replay/
+```
+
+The queue replays a shift from a stored run: the referee judges each exchange from the model output the run
+recorded, and every card shows the receipt of each model call (request id, model served, host, latency, cost).
+The words on these cards are the recording cards' scripts (`text·scripted`): there is no audio yet, and the card
+says so where a waveform will go. `SAYAGAIN_LIVE_EXTRACT=1` lets the server call the AMD Token Factory for each
+turn instead of replaying the stored output (paced, capped per process; a failed call is `NOT_AUDITED`).
 
 ## License
 
