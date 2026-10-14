@@ -188,7 +188,7 @@ img,svg{display:block}
 .v-SPOT .vw{color:var(--before)}
 .v-SPOT::before{background:var(--before)!important}
 .row.reviewed{opacity:.62}
-.row .stamp{font:600 11px/1 var(--font-data);letter-spacing:.12em;text-transform:uppercase;color:var(--mid);margin-left:6px}
+.row .stamp{display:block;margin-top:4px;font:600 11px/1 var(--font-data);letter-spacing:.12em;text-transform:uppercase;color:var(--mid)}
 .row.new{animation:arrive 1.1s var(--ease) both}
 .row.new::before{animation:edge 1s ease-out both}
 .empty{margin:0;padding:22px clamp(14px,1.6vw,22px);color:var(--mid);font-size:16px}
