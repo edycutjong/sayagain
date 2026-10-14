@@ -21,6 +21,7 @@
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preload" href="assets/fonts/SairaStencilOne-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/IBMPlexMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/IBMPlexSansCondensed-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <style>
 /* design direction: specs/design.md §4, verbatim */
 :root {
@@ -150,7 +151,7 @@
 </div>
 <ul class="xc-badges">
 <li>speaker <b>text·scripted</b></li>
-<li class="amd">extraction <b>Gemma-4-31B-IT · AMD-hosted API</b></li>
+<li class="amd">extraction <b>Gemma-4-31B-IT · <span class="nw">AMD-hosted API</span></b></li>
 <li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">referee <b>local · 0.77 ms</b></li>
 </ul>
 </article>
@@ -169,7 +170,7 @@
 <div class="receipts" role="group" aria-label="Receipts">
 <p class="lab">Receipts · 89 held-out exchanges · text·scripted</p>
 <ul>
-<li data-src="bench/results/text/llm-judge-r1-reaudit.json bench/results/text/ladder-r1-reaudit.json"><b class="num"><span class="was">2</span><span class="arw" aria-hidden="true">→</span><span>0</span></b><span>wrong read-backs passed: an LLM judge, then the referee</span></li>
+<li data-src="bench/results/text/llm-judge-r1-reaudit.json bench/results/text/ladder-r1-reaudit.json"><b class="num"><span class="was">2</span><span class="arw" aria-hidden="true">→</span><span>0</span></b><span>wrong read-backs passed · LLM judge 2, referee 0</span></li>
 <li data-src="bench/results/text/ladder-r1-reaudit.json"><b class="num"><span data-count="41">41</span>/41</b><span>seeded errors caught, Gemma-4-31B-IT</span></li>
 <li data-src="bench/results/text/ladder-r1-reaudit.json"><b class="num"><span data-count="2">2</span>/48</b><span>false alarms on correct read-backs, same rung</span></li>
 <li data-src="evidence/terminal-2026-10-14.log"><b class="num">24<small>× OK</small></b><span>result rows re-derived offline in 2.9 s</span></li>
@@ -188,20 +189,23 @@
 <p class="lede">In the plant registry the demo runs on, <span class="nw">XV-203</span> is an on/off valve on line B at the press station. <span class="nw">XV-208</span> is on line A, in clarification. The read-back exists so the operator hears that difference. Sometimes nobody does.</p>
 </div>
 <figure class="mimic" id="mimic">
-<svg viewBox="0 0 1200 330" role="img" aria-labelledby="mimic-t">
-<title id="mimic-t">Process graphic of the fictional plant: valve XV-208 on line A, valve XV-203 on line B. The order named XV-203; the read-back named XV-208.</title>
-<g class="ln a"><text x="24" y="44" class="lt">LINE A · CLARIFICATION</text><path class="pipe" d="M24 104 H1176"/><path class="flow" d="M24 104 H1176"/></g>
-<g class="ln b"><text x="24" y="210" class="lt">LINE B · PRESS STATION</text><path class="pipe" d="M24 270 H1176"/><path class="flow" d="M24 270 H1176"/></g>
-<g class="vl to" transform="translate(700 104)"><path class="body" d="M-30 -20 L30 20 L30 -20 L-30 20 Z"/><path class="stem" d="M0 -20 V-52 M-18 -52 H18"/><text x="52" y="-50" class="tg">XV-208</text><text x="52" y="-24" class="tn">the read-back named this valve</text></g>
-<g class="vl from" transform="translate(700 270)"><path class="body" d="M-30 -20 L30 20 L30 -20 L-30 20 Z"/><path class="stem" d="M0 -20 V-52 M-18 -52 H18"/><text x="52" y="-50" class="tg">XV-203</text><text x="52" y="-24" class="tn">the order was for this one</text></g>
-<path class="jump" d="M670 232 C 600 196, 600 160, 668 128"/>
+<svg viewBox="0 0 1200 300" role="img" aria-labelledby="mimic-t">
+<title id="mimic-t">Process graphic of the fictional plant, from the registry: line A with XV-207 (effluent), XV-208 (clarification) and XV-209 (press station); line B with XV-202 (sterilizer) and XV-203 (press station). The order named XV-203 on line B; the read-back named XV-208 on line A.</title>
+<g class="ln a"><text x="24" y="92" class="lt">LINE A</text><path class="pipe" d="M24 110 H1176"/><path class="flow" d="M24 110 H1176"/></g>
+<g class="ln b"><text x="24" y="222" class="lt">LINE B</text><path class="pipe" d="M24 240 H1176"/><path class="flow" d="M24 240 H1176"/></g>
+<g class="vl nb" transform="translate(300 110)"><path class="body" d="M-36 -24 L36 24 L36 -24 L-36 24 Z"/><path class="stem" d="M0 -24 V-60 M-22 -60 H22"/><text x="50" y="-36" class="tg">XV-207</text><text x="50" y="-14" class="ar">effluent</text></g>
+<g class="vl to" transform="translate(620 110)"><path class="body" d="M-36 -24 L36 24 L36 -24 L-36 24 Z"/><path class="stem" d="M0 -24 V-60 M-22 -60 H22"/><text x="50" y="-36" class="tg">XV-208</text><text x="50" y="-14" class="ar">clarification</text><text x="0" y="52" class="nt">read back</text></g>
+<g class="vl nb" transform="translate(930 110)"><path class="body" d="M-36 -24 L36 24 L36 -24 L-36 24 Z"/><path class="stem" d="M0 -24 V-60 M-22 -60 H22"/><text x="50" y="-36" class="tg">XV-209</text><text x="50" y="-14" class="ar">press station</text></g>
+<g class="vl nb" transform="translate(470 240)"><path class="body" d="M-36 -24 L36 24 L36 -24 L-36 24 Z"/><path class="stem" d="M0 -24 V-60 M-22 -60 H22"/><text x="50" y="-36" class="tg">XV-202</text><text x="50" y="-14" class="ar">sterilizer</text></g>
+<g class="vl from" transform="translate(930 240)"><path class="body" d="M-36 -24 L36 24 L36 -24 L-36 24 Z"/><path class="stem" d="M0 -24 V-60 M-22 -60 H22"/><text x="50" y="-36" class="tg">XV-203</text><text x="50" y="-14" class="ar">press station</text><text x="0" y="52" class="nt">ordered</text></g>
+<path class="hop" d="M898 218 C 840 196, 720 170, 652 132"/><text x="650" y="214" class="hl">the crew walks here</text>
 </svg>
-<figcaption><code>data/registry.csv</code> · fictional plant, 120 tags: <span class="nw"><span class="nw">XV-203</span> · on/off valve · line B · press station</span> · <span class="nw"><span class="nw">XV-208</span> · on/off valve · line A · clarification</span></figcaption>
+<figcaption><code>data/registry.csv</code> · fictional plant, 120 tags; the valves drawn are the registry’s own on lines A and B: <span class="nw"><span class="nw">XV-203</span> · on/off valve · line B · press station</span> · <span class="nw"><span class="nw">XV-208</span> · on/off valve · line A · clarification</span></figcaption>
 </figure>
 <div class="context band">
 <blockquote data-src="evidence/sources.json"><p class="fig"><b class="num"><span class="nw">63 % tower</span> · <span class="nw">50 % approach</span></b></p><p>of pilots’ read-back errors are caught by air-traffic controllers, in the literature. The rest go through.</p><cite>Helmke et al., ATM Seminar 2021 · aviation, not plant radio · evidence/sources.json</cite></blockquote>
 <blockquote><p class="fig"><b class="num">1 killed, 6&nbsp;injured</b></p><p>What a wrong valve state can cost: Goodyear, Houston, 2008. An isolation valve was left closed after maintenance and the remaining relief path was then blocked.</p><cite>US Chemical Safety Board case study · evidence/sources.json</cite></blockquote>
-<blockquote><p class="fig"><b class="num">No rate</b></p><p>of read-back errors on industrial plant radio has been published that we could find. Measuring it is the pilot’s first job.</p><cite>Our search, Oct 2026 · the check is called three-way communication</cite></blockquote>
+<blockquote data-src="evidence/sources.json"><p class="fig"><b class="num">No rate</b></p><p>of read-back errors on industrial plant radio has been published that we could find. Measuring it is the pilot study’s first job.</p><cite>Our literature search, 2026-10-09 · evidence/sources.json · the check is called three-way communication</cite></blockquote>
 </div>
 </section>
 
@@ -235,7 +239,7 @@
 <div class="sec-head">
 <p class="lab" data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">Pick a transmission · 10 of 145 · stored run, verdicts precomputed</p>
 <h2 id="h-try">Ten real cards from the stored shift.</h2>
-<p class="lede">Each card is the referee’s own output for the stored Gemma-4-31B-IT run: the verdict, the field diff, the trace, and the receipt of every model call. Nothing on this page judges in your browser. Three of the ten fooled the LLM-as-judge baseline (two wrong read-backs and the <span class="nw">XV-205</span> order); one is a false alarm of ours.</p>
+<p class="lede">Each card is the referee’s own output for the stored Gemma-4-31B-IT run: the verdict, the field diff, the trace, and the receipt of every model call (identical transcripts share one call, so two cards can show the same request id). Nothing on this page judges in your browser. Three of the ten fooled the LLM-as-judge baseline (two wrong read-backs and the <span class="nw">XV-205</span> order); one is a false alarm of ours.</p>
 <button type="button" class="btn amb lg refused" data-pick="R-01"><span>Try the refused one</span><b><span class="nw">XV-205</span></b></button>
 </div>
 <div class="console">
@@ -280,7 +284,7 @@
 <ul class="xc-badges">
 <li>speaker <b>text·scripted</b></li>
 <li>radio <b>none (no audio)</b></li>
-<li class="amd">extraction <b>Gemma-4-31B-IT · AMD-hosted API</b></li>
+<li class="amd">extraction <b>Gemma-4-31B-IT · <span class="nw">AMD-hosted API</span></b></li>
 <li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">referee <b>local · 0.77 ms</b></li>
 </ul>
 </article>
@@ -328,7 +332,7 @@
 <ul class="xc-badges">
 <li>speaker <b>text·scripted</b></li>
 <li>radio <b>none (no audio)</b></li>
-<li class="amd">extraction <b>Gemma-4-31B-IT · AMD-hosted API</b></li>
+<li class="amd">extraction <b>Gemma-4-31B-IT · <span class="nw">AMD-hosted API</span></b></li>
 <li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">referee <b>local · 0.607 ms</b></li>
 </ul>
 </article>
@@ -374,7 +378,7 @@
 <ul class="xc-badges">
 <li>speaker <b>text·scripted</b></li>
 <li>radio <b>none (no audio)</b></li>
-<li class="amd">extraction <b>Gemma-4-31B-IT · AMD-hosted API</b></li>
+<li class="amd">extraction <b>Gemma-4-31B-IT · <span class="nw">AMD-hosted API</span></b></li>
 <li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">referee <b>local · 0.628 ms</b></li>
 </ul>
 </article>
@@ -427,7 +431,7 @@
 <ul class="xc-badges">
 <li>speaker <b>text·scripted</b></li>
 <li>radio <b>none (no audio)</b></li>
-<li class="amd">extraction <b>Gemma-4-31B-IT · AMD-hosted API</b></li>
+<li class="amd">extraction <b>Gemma-4-31B-IT · <span class="nw">AMD-hosted API</span></b></li>
 <li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">referee <b>local · 1.401 ms</b></li>
 </ul>
 </article>
@@ -477,7 +481,7 @@
 <ul class="xc-badges">
 <li>speaker <b>text·scripted</b></li>
 <li>radio <b>none (no audio)</b></li>
-<li class="amd">extraction <b>Gemma-4-31B-IT · AMD-hosted API</b></li>
+<li class="amd">extraction <b>Gemma-4-31B-IT · <span class="nw">AMD-hosted API</span></b></li>
 <li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">referee <b>local · 0.776 ms</b></li>
 </ul>
 </article>
@@ -524,7 +528,7 @@
 <ul class="xc-badges">
 <li>speaker <b>text·scripted</b></li>
 <li>radio <b>none (no audio)</b></li>
-<li class="amd">extraction <b>Gemma-4-31B-IT · AMD-hosted API</b></li>
+<li class="amd">extraction <b>Gemma-4-31B-IT · <span class="nw">AMD-hosted API</span></b></li>
 <li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">referee <b>local · 0.61 ms</b></li>
 </ul>
 </article>
@@ -571,7 +575,7 @@
 <ul class="xc-badges">
 <li>speaker <b>text·scripted</b></li>
 <li>radio <b>none (no audio)</b></li>
-<li class="amd">extraction <b>Gemma-4-31B-IT · AMD-hosted API</b></li>
+<li class="amd">extraction <b>Gemma-4-31B-IT · <span class="nw">AMD-hosted API</span></b></li>
 <li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">referee <b>local · 0.972 ms</b></li>
 </ul>
 </article>
@@ -626,7 +630,7 @@
 <ul class="xc-badges">
 <li>speaker <b>text·scripted</b></li>
 <li>radio <b>none (no audio)</b></li>
-<li class="amd">extraction <b>Gemma-4-31B-IT · AMD-hosted API</b></li>
+<li class="amd">extraction <b>Gemma-4-31B-IT · <span class="nw">AMD-hosted API</span></b></li>
 <li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">referee <b>local · 1.0 ms</b></li>
 </ul>
 </article>
@@ -675,7 +679,7 @@
 <ul class="xc-badges">
 <li>speaker <b>text·scripted</b></li>
 <li>radio <b>none (no audio)</b></li>
-<li class="amd">extraction <b>Gemma-4-31B-IT · AMD-hosted API</b></li>
+<li class="amd">extraction <b>Gemma-4-31B-IT · <span class="nw">AMD-hosted API</span></b></li>
 <li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">referee <b>local · 0.541 ms</b></li>
 </ul>
 </article>
@@ -719,7 +723,7 @@
 <ul class="xc-badges">
 <li>speaker <b>text·scripted</b></li>
 <li>radio <b>none (no audio)</b></li>
-<li class="amd">extraction <b>Gemma-4-31B-IT · AMD-hosted API</b></li>
+<li class="amd">extraction <b>Gemma-4-31B-IT · <span class="nw">AMD-hosted API</span></b></li>
 <li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">referee <b>local · 0.282 ms</b></li>
 </ul>
 </article>
@@ -748,7 +752,7 @@
 <p class="lede">The rule was pre-registered before the first model call: the smallest rung with 0 false-VERIFIED and at most 5 % false-alarm load. Every model rung extracts spans on the AMD Token Factory; the referee makes each one fail toward a human.</p>
 </div>
 <div class="rungs" role="table" aria-label="Model ladder results, held-out exchanges">
-<div class="rg-h" role="row"><span role="columnheader">Rung</span><span role="columnheader">False-VERIFIED</span><span role="columnheader">Seeded errors flagged</span><span role="columnheader">False alarms, 48 correct read-backs</span><span role="columnheader">Latency, median / 95th pct</span><span role="columnheader">Meets the rule</span></div>
+<div class="rg-h" role="row"><span role="columnheader">Rung</span><span role="columnheader">False-VERIFIED</span><span role="columnheader">Seeded errors flagged</span><span role="columnheader">False alarms, <span class="nw">48 correct read-backs</span></span><span role="columnheader">Latency, median / 95th pct</span><span role="columnheader">Meets the rule</span></div>
 <div class="rg meets" role="row" data-rung="regex">
 <span role="cell" class="nm"><b>regex</b><small>rung 0 · no model</small></span>
 <span role="cell" class="fv" data-src="bench/results/text/ladder-r1-reaudit.json"><b class="num">0</b></span>
@@ -758,7 +762,7 @@
 <span role="cell" class="mr" data-src="bench/results/text/ladder-r1-reaudit.json"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>meets</span>
 </div>
 <div class="rg allhuman" role="row" data-rung="MiniCPM5-2B">
-<span role="cell" class="nm"><b>MiniCPM5-2B</b><small>smallest model</small></span>
+<span role="cell" class="nm"><b>MiniCPM5-2B</b><small>smallest rung</small></span>
 <span role="cell" class="fv" data-src="bench/results/text/ladder-r1-reaudit.json"><b class="num">0</b></span>
 <span role="cell" class="ef" data-src="bench/results/text/ladder-r1-reaudit.json">41/41</span>
 <span role="cell" class="fa" data-src="bench/results/text/ladder-r1-reaudit.json"><span class="cells"><i class="on" title="A2-021: false alarm"></i><i class="on" title="A2-022: false alarm"></i><i class="on" title="A2-024: false alarm"></i><i class="on" title="A2-025: false alarm"></i><i class="on" title="A2-026: false alarm"></i><i class="on" title="A2-028: false alarm"></i><i class="on" title="A2-030: false alarm"></i><i class="on" title="A2-035: false alarm"></i><i class="on" title="A2-036: false alarm"></i><i class="on" title="A2-037: false alarm"></i><i class="on" title="A2-038: false alarm"></i><i class="on" title="A2-040: false alarm"></i><i class="on" title="A2-041: false alarm"></i><i class="on" title="A2-042: false alarm"></i><i class="on" title="A2-045: false alarm"></i><i class="on" title="A2-047: false alarm"></i><i class="on" title="A2-048: false alarm"></i><i class="on" title="A2-049: false alarm"></i><i class="on" title="A2-050: false alarm"></i><i class="on" title="A2-051: false alarm"></i><i class="on" title="A2-054: false alarm"></i><i class="on" title="A2-057: false alarm"></i><i class="on" title="A2-058: false alarm"></i><i class="on" title="A2-059: false alarm"></i><i class="on" title="A2-060: false alarm"></i><i class="on" title="A2-062: false alarm"></i><i class="on" title="A2-067: false alarm"></i><i class="on" title="A2-070: false alarm"></i><i class="on" title="A2-072: false alarm"></i><i class="on" title="A2-073: false alarm"></i><i class="on" title="A2-077: false alarm"></i><i class="on" title="A2-079: false alarm"></i><i class="on" title="A2-081: false alarm"></i><i class="on" title="A2-083: false alarm"></i><i class="on" title="A2-084: false alarm"></i><i class="on" title="A2-086: false alarm"></i><i class="on" title="A2-087: false alarm"></i><i class="on" title="A2-088: false alarm"></i><i class="on" title="A2-090: false alarm"></i><i class="on" title="A2-094: false alarm"></i><i class="on" title="A2-095: false alarm"></i><i class="on" title="A2-096: false alarm"></i><i class="on" title="A2-099: false alarm"></i><i class="on" title="A2-100: false alarm"></i><i class="on" title="A2-102: false alarm"></i><i class="on" title="A2-103: false alarm"></i><i class="on" title="A2-104: false alarm"></i><i class="on" title="A2-106: false alarm"></i></span><b>48/48</b></span>
@@ -766,7 +770,7 @@
 <span role="cell" class="mr" data-src="bench/results/text/ladder-r1-reaudit.json">all 48 to a human</span>
 </div>
 <div class="rg meets" role="row" data-rung="Gemma-4-31B-IT">
-<span role="cell" class="nm"><b>Gemma-4-31B-IT</b><small>thinking off</small></span>
+<span role="cell" class="nm"><b>Gemma-4-31B-IT</b><small>thinking off · <i class="ra">re-audit</i></small></span>
 <span role="cell" class="fv" data-src="bench/results/text/ladder-r1-reaudit.json"><b class="num">0</b></span>
 <span role="cell" class="ef" data-src="bench/results/text/ladder-r1-reaudit.json">41/41</span>
 <span role="cell" class="fa" data-src="bench/results/text/ladder-r1-reaudit.json"><span class="cells"><i></i><i></i><i></i><i></i><i></i><i></i><i class="on" title="A2-030: false alarm"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on" title="A2-050: false alarm"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><b>2/48</b></span>
@@ -774,7 +778,7 @@
 <span role="cell" class="mr" data-src="bench/results/text/ladder-r1-reaudit.json"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>meets</span>
 </div>
 <div class="rg" role="row" data-rung="DeepSeek-V4-Flash">
-<span role="cell" class="nm"><b>DeepSeek-V4-Flash</b><small>thinking off</small></span>
+<span role="cell" class="nm"><b>DeepSeek-V4-Flash</b><small>thinking off · <i class="ra">re-audit</i></small></span>
 <span role="cell" class="fv" data-src="bench/results/text/ladder-r1-reaudit.json"><b class="num">0</b></span>
 <span role="cell" class="ef" data-src="bench/results/text/ladder-r1-reaudit.json">41/41</span>
 <span role="cell" class="fa" data-src="bench/results/text/ladder-r1-reaudit.json"><span class="cells"><i></i><i></i><i></i><i></i><i></i><i></i><i class="on" title="A2-030: false alarm"></i><i class="on" title="A2-035: false alarm"></i><i></i><i class="on" title="A2-037: false alarm"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on" title="A2-051: false alarm"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><b>4/48</b></span>
@@ -782,7 +786,7 @@
 <span role="cell" class="mr" data-src="bench/results/text/ladder-r1-reaudit.json">over budget</span>
 </div>
 <div class="rg" role="row" data-rung="Qwen3.8-27B">
-<span role="cell" class="nm"><b>Qwen3.8-27B</b><small>thinking on</small></span>
+<span role="cell" class="nm"><b>Qwen3.8-27B</b><small>thinking on · <i class="ra">re-audit</i></small></span>
 <span role="cell" class="fv" data-src="bench/results/text/ladder-r1-reaudit.json"><b class="num">0</b></span>
 <span role="cell" class="ef" data-src="bench/results/text/ladder-r1-reaudit.json">41/41</span>
 <span role="cell" class="fa" data-src="bench/results/text/ladder-r1-reaudit.json"><span class="cells"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on" title="A2-037: false alarm"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on" title="A2-050: false alarm"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on" title="A2-088: false alarm"></i><i></i><i class="on" title="A2-094: false alarm"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><b>4/48</b></span>
@@ -814,7 +818,7 @@
 </div>
 <ol class="steps">
 <li class="st-1"><p class="n">01</p><div class="tx"><h3>The model points at words</h3><p>For each turn, the model on the AMD Token Factory returns the words that carry the action, the tag and the line: copied spans, never values. JSON mode, schema checked in code; a failed call is NOT_AUDITED, never a pass.</p>
-<p class="ev" data-src="bench/results/text/ladder-r1-reaudit.json"><b>0/194</b><span class="lbl">spans not found in the transcript, Gemma-4-31B-IT, held-out</span><code>code: sayagain/extract.py</code></p></div>
+<p class="ev" data-src="bench/results/text/ladder-r1-reaudit.json"><b>0/194</b><span class="lbl">turns with a span not found in the transcript, Gemma-4-31B-IT, held-out</span><code>code: sayagain/extract.py</code></p></div>
 <pre class="json" aria-label="Stored extraction of the read-back in H-01">{
   <span class="k">&quot;commands&quot;</span>: [
     {
@@ -878,10 +882,10 @@
 <p class="calc total"><span class="op">≈</span><span class="n">USD 5.7 M</span><span class="u">a year from Indonesian mills alone: an estimate built from the labelled assumptions</span></p>
 </div>
 <ul class="pay-facts">
-<li data-src="evidence/sources.json"><b>Buyer.</b> The HSE / K3 manager who owns the SMK3 audit (PP 50/2012), and the mill manager. A timestamped record of order, read-back, verdict and supervisor decision is audit evidence.</li>
+<li data-src="evidence/sources.json"><b>Buyer.</b> The HSE / K3 manager and the mill manager. Under PP 50/2012 a company with at least 100 workers or a high hazard potential must run SMK3, which is audited; a timestamped record of order, read-back, verdict and supervisor decision is audit evidence.</li>
 <li><b>Wedge.</b> A free 30-day listen-only baseline at one mill: measure the plant’s own read-back error rate, the number nobody has published.</li>
-<li data-src="evidence/sources.json"><b>Privacy.</b> Voice is personal data under Indonesia’s UU PDP 27/2022, so production is designed to run inside the company network, keep audio only for queue cards, and score procedures, never people.</li>
-<li data-src="bench/results/text/ladder-r1.json bench/results/text/ladder-r1-reaudit.json"><b>Compute.</b> Gemma-4-31B-IT’s first pass over the shift: 300 calls, 178 answered, USD 0.000895 at the Token Factory’s price; the re-audit’s 118 calls cost USD 0.000512.</li>
+<li data-src="evidence/sources.json"><b>Privacy.</b> Voice that identifies a person is personal data under Indonesia’s UU PDP 27/2022. Planned for production: run inside the company network, keep audio only for queue cards, score procedures, never people. Today the exchanges carry roles, not names, and no audio has been processed.</li>
+<li data-src="bench/results/text/ladder-r1.json bench/results/text/ladder-r1-reaudit.json"><b>Compute.</b> Gemma-4-31B-IT’s first pass over the shift: 300 calls, 178 answered (the rest failed at the gateway: server errors and time-outs), USD 0.000895 at the Token Factory’s price; the re-audit’s 118 calls for the cards they left cost USD 0.000512.</li>
 </ul>
 </div>
 </section>
@@ -927,7 +931,7 @@
 <details><summary>Does SayAgain control anything in the plant?</summary>
 <p>No. It has no write path to the plant. A card leaves the queue only when a supervisor confirms it or dismisses it with a reason.</p></details>
 <details><summary>Isn’t this a way to watch workers?</summary>
-<p data-src="evidence/sources.json">It is designed to check procedures, not people: no speaker identification, no per-person scores, audio kept only for cards in the queue. No audio has been processed yet. Voice is personal data under UU PDP 27/2022, so production is designed to run inside the company network.</p></details>
+<p data-src="evidence/sources.json">It is planned to check procedures, not people: the exchanges carry roles (operator, field tech), not names, and nothing scores a person. No audio has been processed yet. Voice that identifies a person is personal data under UU PDP 27/2022, so production is planned to run inside the company network, keeping audio only for cards in the queue.</p></details>
 <details><summary>Don’t radio loggers already do this?</summary>
 <p>They record and transcribe, and some spot keywords. Among the loggers we checked, none documents comparing an instruction with its read-back. Automatic read-back checking exists in air-traffic research (HAAWAII); we have not found it on plant radio.</p></details>
 <details><summary>Why is it called SayAgain?</summary>

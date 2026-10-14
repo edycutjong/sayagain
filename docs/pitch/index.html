@@ -96,7 +96,7 @@
 </div>
 <ul class="xc-badges">
 <li>speaker <b>text·scripted</b></li>
-<li class="amd">extraction <b>Gemma-4-31B-IT · AMD-hosted API</b></li>
+<li class="amd">extraction <b>Gemma-4-31B-IT · <span class="nw">AMD-hosted API</span></b></li>
 <li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">referee <b>local · 0.77 ms</b></li>
 </ul>
 </article>
@@ -171,12 +171,12 @@
   ],
   <span class="k">&quot;kind&quot;</span>: <span class="s">&quot;readback&quot;</span>,
   <span class="k">&quot;retracted_spans&quot;</span>: []
-}</pre></div>
+}</pre><ul class="rchips" data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json bench/results/text/ladder-r1.json"><li class="amd">AMD Token Factory</li><li>developer.amd.com.cn</li><li>median 4.304 s</li><li>USD 4.8937e-06</li></ul></div>
 <div class="arr" aria-hidden="true">→</div>
 <div class="f3"><p class="h">3 · what code decided</p><ol class="tr"><li>instruction: grounded + covered (1 command(s))</li><li>read-back: grounded + covered (1 command(s))</li><li>audio: no gate (no token probabilities, no unprompted pass)</li><li>instruction: <span class="nw">XV-203</span> line B (registry ok)</li><li>compare: tag: <span class="nw">XV-203</span> ≠ <span class="nw">XV-208</span></li></ol><p class="vd">MISMATCH · <span>tag: <span class="nw">XV-203</span> ≠ <span class="nw">XV-208</span></span></p></div>
 </div>
 <p class="stl render">speech-to-text: not run yet · <b>span extraction: AMD Token Factory</b> · referee: local, plain Python · queue: local</p>
-<p class="rcpt render" data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json bench/results/text/ladder-r1.json">receipt, as stored · request_id c9647a04cfcc4eeaadbfa965a4d74c6d · model_served self-dploy/Gemma-4-31B-IT · host developer.amd.com.cn · latency_s 35.4972 (a slow call; the first pass’s median was 4.304 s) · cost_usd 4.8937e-06</p>
+<p class="rcpt render" data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json bench/results/text/ladder-r1.json">receipt, as stored · request_id c9647a04cfcc4eeaadbfa965a4d74c6d · model_served self-dploy/Gemma-4-31B-IT (sic, as served) · host developer.amd.com.cn · latency_s 35.4972 (a slow call; the first pass’s median was 4.304 s) · cost_usd 4.8937e-06</p>
 <aside class="speaker-notes">This is one real exchange end to end. The model has one job, on the AMD Token Factory: copy out the words that carry the action, the tag and the line. Each call leaves a receipt with the host, the model served, the request id and the cost; speech-to-text has not run on a recording yet. Plain code checks those words are really in the transcript, that every safety word is accounted for, and that the tag exists in the plant registry. A pure function returns the verdict; the model never writes it.</aside>
 </section>
 
@@ -212,7 +212,7 @@
 <ul class="xc-badges">
 <li>speaker <b>text·scripted</b></li>
 <li>radio <b>none (no audio)</b></li>
-<li class="amd">extraction <b>Gemma-4-31B-IT · AMD-hosted API</b></li>
+<li class="amd">extraction <b>Gemma-4-31B-IT · <span class="nw">AMD-hosted API</span></b></li>
 <li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">referee <b>local · 0.607 ms</b></li>
 </ul>
 </article></div>
@@ -221,19 +221,19 @@
 </section>
 
 <section class="slide s-ladder" data-title="The model ladder" aria-label="Slide 7, the model ladder">
-<p class="lab" data-src="bench/results/text/ladder-r1-reaudit.json">Model ladder · 89 held-out exchanges · text·scripted</p>
+<p class="lab" data-src="bench/results/text/ladder-r1-reaudit.json">Model ladder · AMD Token Factory · 89 held-out · text·scripted</p>
 <h2 class="h7" data-src="bench/results/text/llm-judge-r1-reaudit.json bench/results/text/ladder-r1-reaudit.json"><b class="bad">2</b><span class="arw" aria-hidden="true">→</span>0 wrong read-backs passed.</h2>
 <p class="sub7" data-src="bench/results/text/ladder-r1-reaudit.json">The LLM-as-judge baseline passed 2. Each of the five rungs passed 0.</p>
 <div class="ld render">
 <p class="hd" data-src="bench/results/text/ladder-r1-reaudit.json"><span>rung</span><span>false-VERIFIED</span><span>false alarms on 48 correct read-backs · dashed: 5 % budget</span><span></span><span>rule</span></p>
 <div class="lr meets"><span class="nm">regex<small>rung 0 · no model</small></span><span class="fv" data-src="bench/results/text/ladder-r1-reaudit.json">0</span><span class="cells"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="fa" data-src="bench/results/text/ladder-r1-reaudit.json">0/48</span><span class="mr">meets</span></div>
-<div class="lr allhuman"><span class="nm">MiniCPM5-2B<small>smallest model</small></span><span class="fv" data-src="bench/results/text/ladder-r1-reaudit.json">0</span><span class="cells"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="fa" data-src="bench/results/text/ladder-r1-reaudit.json">48/48</span><span class="mr">all 48 to a human</span></div>
-<div class="lr meets"><span class="nm">Gemma-4-31B-IT<small>thinking off</small></span><span class="fv" data-src="bench/results/text/ladder-r1-reaudit.json">0</span><span class="cells"><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="fa" data-src="bench/results/text/ladder-r1-reaudit.json">2/48</span><span class="mr">meets</span></div>
-<div class="lr"><span class="nm">DeepSeek-V4-Flash<small>thinking off</small></span><span class="fv" data-src="bench/results/text/ladder-r1-reaudit.json">0</span><span class="cells"><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i class="on"></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="fa" data-src="bench/results/text/ladder-r1-reaudit.json">4/48</span><span class="mr">over budget</span></div>
-<div class="lr"><span class="nm">Qwen3.8-27B<small>thinking on</small></span><span class="fv" data-src="bench/results/text/ladder-r1-reaudit.json">0</span><span class="cells"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="fa" data-src="bench/results/text/ladder-r1-reaudit.json">4/48</span><span class="mr">over budget</span></div>
-<div class="lr judge"><span class="nm">LLM-as-judge<small>baseline · no registry</small></span><span class="fv bad" data-src="bench/results/text/llm-judge-r1-reaudit.json">2</span><span class="cells"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="na"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="fa" data-src="bench/results/text/llm-judge-r1-reaudit.json">1/48</span><span class="mr">passed <span class="nw">XV-205</span></span></div>
+<div class="lr allhuman"><span class="nm">MiniCPM5-2B<small>smallest rung</small></span><span class="fv" data-src="bench/results/text/ladder-r1-reaudit.json">0</span><span class="cells"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="fa" data-src="bench/results/text/ladder-r1-reaudit.json">48/48</span><span class="mr">all 48 to a human</span></div>
+<div class="lr meets"><span class="nm">Gemma-4-31B-IT<small>thinking off · <i class="ra">re-audit</i></small></span><span class="fv" data-src="bench/results/text/ladder-r1-reaudit.json">0</span><span class="cells"><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="fa" data-src="bench/results/text/ladder-r1-reaudit.json">2/48</span><span class="mr">meets</span></div>
+<div class="lr"><span class="nm">DeepSeek-V4-Flash<small>thinking off · <i class="ra">re-audit</i></small></span><span class="fv" data-src="bench/results/text/ladder-r1-reaudit.json">0</span><span class="cells"><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i class="on"></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="fa" data-src="bench/results/text/ladder-r1-reaudit.json">4/48</span><span class="mr">over budget</span></div>
+<div class="lr"><span class="nm">Qwen3.8-27B<small>thinking on · <i class="ra">re-audit</i></small></span><span class="fv" data-src="bench/results/text/ladder-r1-reaudit.json">0</span><span class="cells"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="fa" data-src="bench/results/text/ladder-r1-reaudit.json">4/48</span><span class="mr">over budget</span></div>
+<div class="lr judge"><span class="nm">LLM-as-judge<small>baseline · DeepSeek-V4.1-Flash · no registry</small></span><span class="fv bad" data-src="bench/results/text/llm-judge-r1-reaudit.json">2</span><span class="cells"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="na"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="fa" data-src="bench/results/text/llm-judge-r1-reaudit.json">1/48</span><span class="mr">passed <span class="nw">XV-205</span></span></div>
 </div>
-<p class="note" data-src="bench/results/text/ladder-r1-reaudit.json">On written words, the regex rung meets the rule too.</p>
+<p class="note" data-src="bench/results/text/ladder-r1-reaudit.json">On written words, regex meets the rule too; audio decides.</p>
 <aside class="speaker-notes" data-src="bench/results/text/RESULTS.md">The rule was pre-registered before the first model call: the smallest rung with no wrong read-back passed and a false-alarm load the shift can absorb. No rung passed a wrong read-back; the LLM-judge baseline did, twice. Gemma is the only model rung inside the budget, in its re-audit: the first pass left 45 cards not audited after gateway errors, and Qwen's first pass left 3. With 48 correct read-backs the interval on Gemma's two false alarms is wide: the 95 percent Wilson interval runs from 1.15 to 13.98 percent. On clean written words the plain regex meets the rule too; the recordings will show whether that survives real speech.</aside>
 </section>
 
@@ -268,10 +268,13 @@
 <section class="slide s-honest" data-title="What we abstain on" aria-label="Slide 10, what we abstain on">
 <p class="lab">README</p>
 <h2>What we abstain on.</h2>
-<div class="hq">
-<blockquote class="ab"><p class="ab-h"><i class="ring" aria-hidden="true"></i>ABSTAIN</p><p class="ab-q">No recorded speech has been measured.</p></blockquote>
-<blockquote class="ab"><p class="ab-h"><i class="ring" aria-hidden="true"></i>ABSTAIN</p><p class="ab-q">The plant, its 120 tags and every exchange are fictional…</p></blockquote>
-<blockquote class="ab"><p class="ab-h"><i class="ring" aria-hidden="true"></i>ABSTAIN</p><p class="ab-q">…what a language model adds is unproven…</p></blockquote>
+<div class="hq ab">
+<p class="ab-h"><i class="ring" aria-hidden="true"></i>ABSTAIN</p>
+<div class="ab-qs">
+<blockquote><p class="ab-q">No recorded speech has been measured.</p></blockquote>
+<blockquote><p class="ab-q">The plant, its 120 tags and every exchange are fictional…</p></blockquote>
+<blockquote><p class="ab-q">…what a language model adds is unproven until the audio rows exist.</p></blockquote>
+</div>
 </div>
 <p class="slots-h">Next · audio eval scheduled Oct 16</p>
 <ul class="slots render">
@@ -309,7 +312,7 @@
 <p class="phone">This deck is 16:9. On a phone, open the <a href="sayagain-pitch-deck.pdf">PDF</a> or turn the phone sideways.</p>
 <div class="notes-panel" id="notesPanel" aria-live="polite"><div class="nt" id="noteText"></div><div class="meta" id="noteMeta"></div></div>
 <div class="overview" id="overview" role="dialog" aria-label="Slide overview"></div>
-<script>window.DECK_VERSION = "built on 33efed4 · 2026-10-14";</script>
+<script>window.DECK_VERSION = "built on 557ff47 · 2026-10-14";</script>
 <script src="deck.js" defer></script>
 </body>
 </html>

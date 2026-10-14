@@ -59,6 +59,14 @@
       "url": null,
       "read": "2026-10-09",
       "note": "named in the project spec; no URL recorded here"
+    },
+    {
+      "id": "plant-rate-gap",
+      "figure": "no rate",
+      "claim": "No published rate of read-back errors on industrial plant radio was found in the 2026-10-09 literature review; the read-back error rates it found are from aviation (see helmke above).",
+      "source": "SayAgain literature review, 2026-10-09",
+      "url": null,
+      "read": "2026-10-09"
     }
   ],
   "assumptions": [
