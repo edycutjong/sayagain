@@ -33,14 +33,17 @@ The referee half of that design exists and is tested today; the speech half does
 | Plant registry (fictional, 120 tags) and 145 recording cards | `data/`, `scripts/seed.py` | done |
 | Radio-path simulation and SNR mixer | `scripts/radioize.py`, `scripts/mix.py` | done |
 | AMD Token Factory client with a receipt per call; access probe | `sayagain/amd_client.py`, `scripts/access_gate.py` | probe run, see below |
+| Span extraction on the AMD Token Factory: JSON mode + local schema check, 429 back-off, fail closed to `NOT_AUDITED`, a receipt per call | `sayagain/extract.py` | done, run on text rows |
+| Model ladder, grounding ablation, LLM-judge baseline, offline re-scoring of every stored model output | `scripts/eval.py` | run on the card scripts (`text·scripted`), see below |
+| Speech path: one WAV per card → VAD turns → speech-to-text (local Whisper, labelled off-AMD; AMD notebook backend switched off until a notebook GPU is confirmed) → disagreement gate | `sayagain/ingest.py`, `sayagain/asr.py` | code + tests done, waiting for recordings |
 | Local kill test (Whisper-large-v3 on a laptop, off-AMD) | `scripts/kill_test_local.py` | harness ready, waiting for recordings |
-| Human recordings, speech-to-text path, eval, queue UI | — | not built yet |
+| Human recordings, audio eval rows, queue UI | — | not built yet |
 
 The access probe (bench/results/access-gate.json) found 8 instruct models on the AMD Token Factory whose span extraction
 of the hero read-back the referee reads as `CLOSE · XV-208 · line B`. The model list has no speech-to-text model, so
 transcription will run elsewhere, and every stage will be labelled with where it ran.
 
-424 tests (`uv run pytest`), lint with ruff, a CI workflow for every push. Friction log:
+473 tests (`uv run pytest`; one runs only with local Whisper weights), lint with ruff, a CI workflow for every push. Friction log:
 [docs/DX-REPORT.md](docs/DX-REPORT.md).
 
 ## Run it
