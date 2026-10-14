@@ -93,7 +93,24 @@ def test_test_count_must_match(tmp_path: Path) -> None:
 
 def test_submit_stage_requires_results_and_count(tmp_path: Path) -> None:
     root = site(tmp_path, "# x\n")
-    assert sorted(checks(root, stage="submit")) == ["results", "results", "tests"]
+    assert sorted(checks(root, stage="submit")) == ["results", "results", "submit", "tests"]
+
+
+def test_submit_stage_counts_the_text_rows_as_measured_results(tmp_path: Path) -> None:
+    # the measured rows live in bench/results/text/ (no recordings yet); before, only eval-*.json counted
+    root = site(
+        tmp_path, "# x\n", files={"bench/results/text/ladder-r1.json": "{}", "bench/results/access-gate.json": "{}"}
+    )
+    assert sorted(checks(root, stage="submit")) == ["submit", "tests"]
+
+
+def test_submit_stage_wants_the_live_replay_linked_and_nothing_unfinished(tmp_path: Path) -> None:
+    files = {"bench/results/text/ladder-r1.json": "{}", "bench/results/access-gate.json": "{}"}
+    stale = "Status: under construction. 3 tests.\nStatic replay (not published).\n"
+    assert sorted(checks(site(tmp_path / "a", stale, files=files), stage="submit")) == ["submit", "submit", "submit"]
+    done = "3 tests. Live replay: https://example.github.io/sayagain/replay/\n"
+    assert checks(site(tmp_path / "b", done, files=files), stage="submit") == []
+    assert checks(site(tmp_path / "c", stale, files=files), stage="build") == []
 
 
 def test_old_hero_string_fails(tmp_path: Path) -> None:

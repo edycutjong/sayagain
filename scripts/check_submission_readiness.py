@@ -14,6 +14,8 @@ Checks every public page (all .md / .html outside tests/, .github/ and caches):
   hero              the hero is the tag error (XV-203 read back as XV-208); the old line-swap hero strings fail
   number            a percentage, fraction, latency, p50/p95/p99 or "Nx faster" must appear in the file the line cites,
                     or the line says target / threshold / assumption (bench/PROTOCOL.md: thresholds, exempt)
+  submit            (--stage submit only) measured result files exist, and README.md links the live replay over https
+                    and no longer says "under construction" or "not published"
 Exit 1 on any failure.
 """
 
@@ -251,10 +253,20 @@ def check_files(root: Path, stage: str, collected_tests: int | None = None) -> l
                 findings.append(Finding("tests", rel, n, f"states {count} tests, pytest collects {collected_tests}"))
     if stage == "submit":
         res = root / "bench" / "results"
-        if not list(res.glob("eval-*.json")):
-            findings.append(Finding("results", "bench/results", 0, "no eval-*.json results"))
+        # measured rows: audio rows are eval-*.json; the text·scripted rows (no recordings needed) are text/*.json
+        if not list(res.glob("eval-*.json")) and not list((res / "text").glob("*.json")):
+            findings.append(Finding("results", "bench/results", 0, "no measured results (eval-*.json or text/*.json)"))
         if not (res / "access-gate.json").exists():
             findings.append(Finding("results", "bench/results", 0, "no access-gate.json"))
+        # the README a judge opens first: the live replay linked, nothing left saying it is unfinished or unpublished
+        readme = root / "README.md"
+        body = readme.read_text(encoding="utf-8") if readme.exists() else ""
+        if not re.search(r"https://\S+/replay/", body):
+            findings.append(Finding("submit", "README.md", 0, "no https link to the live replay (…/replay/)"))
+        for n, line in enumerate(body.splitlines(), 1):
+            for phrase in ("under construction", "not published"):
+                if phrase in line.lower():
+                    findings.append(Finding("submit", "README.md", n, f"still says '{phrase}'"))
     return findings
 
 
