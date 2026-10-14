@@ -1,0 +1,737 @@
+"""Text-row evaluation: the model ladder, the grounding ablation and the LLM-judge baseline on the scripted card words.
+
+    uv run python scripts/eval.py --ladder [--rungs regex,MiniCPM5-2B,...] [--subset dev|all] [--budget 0.50]
+    uv run python scripts/eval.py --ablate grounding --model DeepSeek-V4-Flash
+    uv run python scripts/eval.py --baseline llm-judge --model DeepSeek-V4.1-Flash
+    uv run python scripts/eval.py --rescore            # re-judge the stored extractions offline, compare every number
+
+Provenance `text·scripted`: the transcript of every turn IS the card's script — no audio, no ASR. This is the ASR-free
+ceiling of each rung, reported as its own row; it is never mixed with, or presented as, an audio row. The
+pre-registered headline (bench/PROTOCOL.md §5) is the 0 dB audio row; it needs the human recordings.
+
+Rows (cards from data/cards.jsonl, seed 1018):
+  held_out  A2 + H minus the dev slice — the set every headline-style number is scored on
+  dev       the dev slice (KT + A2-001 … A2-020): prompt tuning only, reported separately
+  refusal   R-01 (XV-205 is not in the registry)
+  chatter   C (no instruction: every card opened is a false card)
+
+Writes bench/results/text/<run>.json (metrics + metadata), bench/results/text/<run>/<rung>.extractions.jsonl
+(model output per distinct transcript) and <rung>.cards.jsonl (verdict per card); call receipts go to
+bench/results/receipts/text-<run>-<rung>.jsonl. Spend comes from `usage.cost` and is capped per run (`--budget`).
+"""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import math
+import subprocess
+import sys
+import threading
+import time
+from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor
+from datetime import UTC, datetime
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+
+from referee.audit import _SEVERITY, LIVE, audit  # noqa: E402
+from referee.registry import Registry  # noqa: E402
+from referee.schema import CANON_PROMPT, SYSTEM_PROMPT  # noqa: E402
+from referee.turns import Turn, analyze, analyze_canonical  # noqa: E402
+from referee.verdict import ABSTAIN, MISMATCH, NO_READBACK, NOT_AUDITED, R_GROUNDING, VERIFIED  # noqa: E402
+from sayagain.amd_client import (  # noqa: E402
+    SCHEMA_IN_PROMPT,
+    MissingCredentials,
+    NotAuditing,
+    TokenFactory,
+    load_config,
+)
+from sayagain.extract import (  # noqa: E402
+    REGEX,
+    Cache,
+    Extraction,
+    Pacer,
+    Rung,
+    TokenFactoryExtractor,
+    regex_extraction,
+)
+
+PROVENANCE = "text·scripted"
+CARDS_PATH = ROOT / "data" / "cards.jsonl"
+OUT = ROOT / "bench" / "results" / "text"
+RECEIPTS = ROOT / "bench" / "results" / "receipts"
+DAILY_CAP_GUARD = 0.80  # never let the account's daily spend pass this (the cap is $1/day)
+PACE_S = 3.2  # 20 requests per minute per account -> one call start every 3.2 s across all threads
+SHIFT_EXCHANGES = 180  # site assumption (bench/PROTOCOL.md §4): 6 channels x 30 instructions per shift
+SHIFT_ERRORS = (2, 5)  # assumption: ~2-5 real errors per 180 exchanges
+
+# The ladder (bench/PROTOCOL.md §5: at most 4 model rungs, smallest first). Parameter counts are not exposed by the
+# API; they come from the model names, and a model whose name states none is placed last.
+CANDIDATES: dict[str, Rung] = {
+    "regex": REGEX,
+    "MiniCPM5-2B": Rung("MiniCPM5-2B", "MiniCPM5-2B", None, "none", 2.0),
+    "Qwen3.8-27B": Rung("Qwen3.8-27B", "Qwen3.8-27B", "low", "on", 27.0, max_tokens=6144),
+    "Gemma-4-31B-IT": Rung("Gemma-4-31B-IT", "Gemma-4-31B-IT", None, "off", 31.0),
+    "DeepSeek-V4-Flash": Rung("DeepSeek-V4-Flash", "DeepSeek-V4-Flash", "none", "off", None),
+    "MiMo-V2.6-Flash": Rung("MiMo-V2.6-Flash", "MiMo-V2.6-Flash", "none", "off", None),
+    "DeepSeek-V4.1-Flash": Rung("DeepSeek-V4.1-Flash", "DeepSeek-V4.1-Flash", "none", "off", None),
+}
+DEFAULT_LADDER = ("regex", "MiniCPM5-2B", "Qwen3.8-27B", "Gemma-4-31B-IT", "DeepSeek-V4-Flash")
+
+JUDGE_PROMPT = (
+    "You check radio read-backs on a process-plant channel. You get one exchange as numbered turns with the speaker "
+    "(operator = control room, field = field technician). Decide whether the field technician's LAST read-back "
+    "repeats the operator's instruction in force correctly, field by field.\n"
+    "action_match / tag_match / line_match: 'yes' if the read-back states the same value as the instruction, 'no' "
+    "if it states a different value or leaves out one the instruction gave, 'n/a' if the instruction gives none. "
+    "Compare every command when there are several.\n"
+    "instruction_present: is there an operator order to act on equipment? readback_present: did the field "
+    "technician read it back?\n"
+    'Return only one JSON object, no prose: {"instruction_present": true|false, "readback_present": true|false, '
+    '"action_match": "yes"|"no"|"n/a", "tag_match": "yes"|"no"|"n/a", "line_match": "yes"|"no"|"n/a"}'
+)
+SPEAKER = {"operator": "operator", "tech": "field"}
+JUDGE_KEYS = ("instruction_present", "readback_present", "action_match", "tag_match", "line_match")
+
+
+# ------------------------------------------------------------------------------------------------------- cards
+
+
+def load_cards(path: Path = CARDS_PATH) -> list[dict]:
+    return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+
+def row_of(card: dict) -> str:
+    if card["set"] == "C":
+        return "chatter"
+    if card["set"] == "R":
+        return "refusal"
+    if card["dev_slice"]:
+        return "dev"
+    return "held_out"
+
+
+def script_turns(card: dict) -> list[tuple[str, float, float, str, str]]:
+    """(turn id, start s, end s, role, text) — the card's script as turns, pauses kept (same timing as the tests)."""
+    t, out = 0.0, []
+    for k, turn in enumerate(card["turns"]):
+        if turn["role"] == "pause":
+            t += turn["seconds"]
+            continue
+        out.append((f"{card['exchange_id']}-{k}", t, t + 2.5, turn["role"], turn["text"]))
+        t += 3.5
+    return out
+
+
+def judge_card(card: dict, extract: Callable[[str], Extraction], registry: Registry, analyzer=analyze) -> dict:
+    """One card through extraction + the full referee. Returns the per-card record the metrics are computed from."""
+    turns, exts = [], []
+    for tid, t0, t1, _role, text in script_turns(card):
+        e = extract(text)
+        exts.append(e)
+        turns.append(Turn(tid, card["exchange_id"], t0, t1, text, e.obj, not_audited=e.not_audited))
+    rep = audit(turns, registry, analyzer=analyzer, spot_checks=0)
+    judged = sorted(rep.judged, key=lambda j: -_SEVERITY[j.verdict.verdict])
+    analyses = [analyzer(t, registry) for t in turns]
+    return {
+        "exchange_id": card["exchange_id"],
+        "set": card["set"],
+        "row": row_of(card),
+        "lang": card["lang"],
+        "error_type": card["error_type"],
+        "expected": (card["expected"] or {}).get("label"),
+        "expected_verdict": (card["expected"] or {}).get("verdict"),
+        "labels": [j.verdict.label for j in rep.judged],
+        "verdict": judged[0].verdict.verdict if judged else None,
+        "label": judged[0].verdict.label if judged else None,
+        "live_cards": sum(j.live for j in rep.judged),
+        "caught": any(j.caught for j in rep.judged),
+        "trace": judged[0].verdict.trace if judged else [],
+        "turns": [
+            {
+                "id": a.turn.id,
+                "status": a.status,
+                "reason": a.reason,
+                "commands": len(a.commands),
+                "had_commands": bool(e.obj and isinstance(e.obj.get("commands"), list) and e.obj["commands"]),
+            }
+            for a, e in zip(analyses, exts, strict=True)
+        ],
+        "not_audited_turns": sum(e.not_audited is not None for e in exts),
+        "orphans": len(rep.orphans),
+    }
+
+
+# ----------------------------------------------------------------------------------------------------- metrics
+
+
+def wilson(k: int, n: int, z: float = 1.959964) -> dict:
+    if n == 0:
+        return {"k": 0, "n": 0, "rate": None, "ci95": None}
+    p = k / n
+    d = 1 + z * z / n
+    c = (p + z * z / (2 * n)) / d
+    h = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / d
+    return {"k": k, "n": n, "rate": round(p, 4), "ci95": [round(max(0.0, c - h), 4), round(min(1.0, c + h), 4)]}
+
+
+def pct(values: list[float], q: float) -> float | None:
+    if not values:
+        return None
+    s = sorted(values)
+    i = (len(s) - 1) * q
+    lo, hi = math.floor(i), math.ceil(i)
+    return round(s[lo] + (s[hi] - s[lo]) * (i - lo), 4)
+
+
+def row_metrics(cards: list[dict], *, model_rung: bool) -> dict:
+    errors = [c for c in cards if c["expected_verdict"] in (MISMATCH, NO_READBACK)]
+    correct = [c for c in cards if c["expected_verdict"] == VERIFIED]
+    flagged = [c for c in errors if c["verdict"] in LIVE]
+    mismatch_errors = [c for c in errors if c["expected_verdict"] == MISMATCH]
+    false_verified = [c["exchange_id"] for c in errors if c["verdict"] == VERIFIED]
+    missed_no_card = [c["exchange_id"] for c in errors if c["verdict"] is None]
+    false_alarms = [c for c in correct if c["verdict"] in LIVE]
+    labelled = [c for c in cards if c["expected"] is not None]
+    r = len(flagged) / len(errors) if errors else None
+    f = len(false_alarms) / len(correct) if correct else None
+    out = {
+        "n_cards": len(cards),
+        "n_seeded_errors": len(errors),
+        "n_correct": len(correct),
+        "errors_flagged": wilson(len(flagged), len(errors)),
+        "mismatch_only_recall": wilson(sum(c["verdict"] == MISMATCH for c in mismatch_errors), len(mismatch_errors)),
+        "false_verified": {"count": len(false_verified), "exchanges": false_verified},
+        "missed_no_card": {"count": len(missed_no_card), "exchanges": missed_no_card},
+        "false_alarm_load": wilson(len(false_alarms), len(correct)),
+        "false_alarm_exchanges": [f"{c['exchange_id']}: {c['label']}" for c in false_alarms],
+        "abstain_rate": wilson(sum(c["verdict"] == ABSTAIN for c in labelled), len(labelled)),
+        "not_audited": wilson(sum(c["verdict"] == NOT_AUDITED for c in labelled), len(labelled)),
+        "label_exact": wilson(sum(c["label"] == c["expected"] for c in labelled), len(labelled)),
+        "label_misses": [
+            f"{c['exchange_id']}: expected {c['expected']!r}, got {c['label']!r}"
+            for c in labelled
+            if c["label"] != c["expected"]
+        ],
+        "caught_on_channel_detected": wilson(
+            sum(c["caught"] for c in cards if c["error_type"] == "caught_on_channel"),
+            sum(c["error_type"] == "caught_on_channel" for c in cards),
+        ),
+    }
+    if model_rung:
+        turns = [t for c in cards for t in c["turns"]]
+        with_cmds = [t for t in turns if t["had_commands"] or t["reason"] == R_GROUNDING]
+        out["ungrounded_rate"] = wilson(sum(t["reason"] == R_GROUNDING for t in with_cmds), len(with_cmds))
+    if r is not None and f is not None:
+        prec = (r * 0.01) / (r * 0.01 + f * 0.99) if (r + f) > 0 else None
+        out["precision_at_1pct_prevalence"] = round(prec, 4) if prec is not None else None
+        tp, fp = len(flagged), len(false_alarms)
+        out["precision_at_corpus_prevalence"] = round(tp / (tp + fp), 4) if tp + fp else None
+        out["cards_per_shift_assumption"] = {
+            f"{e}_errors_per_{SHIFT_EXCHANGES}": round(f * (SHIFT_EXCHANGES - e) + r * e, 2) for e in SHIFT_ERRORS
+        }
+    return out
+
+
+def chatter_metrics(cards: list[dict]) -> dict:
+    return {
+        "n_cards": len(cards),
+        "n_turns": sum(len(c["turns"]) for c in cards),
+        "false_cards": sum(c["live_cards"] for c in cards),
+        "false_card_exchanges": [f"{c['exchange_id']}: {c['labels']}" for c in cards if c["live_cards"]],
+        "per_channel_hour": "not measurable on text rows (no audio duration); measured on the audio rows",
+    }
+
+
+def receipt_metrics(receipts: list[dict]) -> dict:
+    final = [r for r in receipts if r.get("ok")]
+    lat = [r["latency_s"] for r in final]
+    cost = sum(r.get("cost_usd") or 0.0 for r in receipts)
+    toks = [r.get("usage") or {} for r in final]
+    rt = [r.get("reasoning_tokens") for r in final if r.get("reasoning_tokens") is not None]
+    return {
+        "calls": len(receipts),
+        "calls_ok": len(final),
+        "calls_failed": len(receipts) - len(final),
+        "schema_invalid": sum(1 for r in final if (r.get("params") or {}).get("schema_valid") is False),
+        "rate_limited_attempts": sum(1 for r in receipts if r.get("http_status") == 429),
+        "latency_s_p50": pct(lat, 0.5),
+        "latency_s_p95": pct(lat, 0.95),
+        "cost_usd": round(cost, 6),
+        "prompt_tokens": sum(t.get("prompt_tokens") or 0 for t in toks),
+        "completion_tokens": sum(t.get("completion_tokens") or 0 for t in toks),
+        "reasoning_tokens_reported": sum(rt) if rt else None,
+        "model_served": sorted({r["model_served"] for r in final if r.get("model_served")}),
+        "on_amd": sorted({bool(r.get("on_amd")) for r in receipts}),
+        "hosts": sorted({r.get("host") for r in receipts if r.get("host")}),
+    }
+
+
+def summarise(records: list[dict], receipts: list[dict], *, model_rung: bool) -> dict:
+    by_row: dict[str, list[dict]] = {}
+    for c in records:
+        by_row.setdefault(c["row"], []).append(c)
+    rows = {k: row_metrics(by_row.get(k, []), model_rung=model_rung) for k in ("held_out", "dev")}
+    rows["refusal"] = [
+        {"exchange_id": c["exchange_id"], "expected": c["expected"], "got": c["label"]}
+        for c in by_row.get("refusal", [])
+    ]
+    rows["chatter"] = chatter_metrics(by_row.get("chatter", []))
+    return {"rows": rows, "calls": receipt_metrics(receipts) if model_rung else None}
+
+
+def meets_rule(summary: dict) -> dict:
+    """The pre-registered ladder rule (PROTOCOL §5), applied here to the text·scripted held-out row: 0 false-VERIFIED
+    AND false-alarm load <= 5 %. `strict` also requires no seeded error that formed no card at all."""
+    h = summary["rows"]["held_out"]
+    fa = h["false_alarm_load"]["rate"]
+    literal = h["false_verified"]["count"] == 0 and fa is not None and fa <= 0.05
+    return {"literal": literal, "strict": literal and h["missed_no_card"]["count"] == 0}
+
+
+# --------------------------------------------------------------------------------------------------- plumbing
+
+
+class Budget:
+    def __init__(self, limit_usd: float):
+        self.limit, self.spent, self._lock = limit_usd, 0.0, threading.Lock()
+
+    def add(self, usd: float | None) -> None:
+        with self._lock:
+            self.spent += usd or 0.0
+
+    @property
+    def exceeded(self) -> bool:
+        return self.spent >= self.limit
+
+
+def guarded(fn: Callable[[str], Extraction], budget: Budget) -> Callable[[str], Extraction]:
+    def call(text: str) -> Extraction:
+        if budget.exceeded:
+            return Extraction(text, None, "budget guard")
+        e = fn(text)
+        budget.add((e.receipt or {}).get("cost_usd"))
+        return e
+
+    return call
+
+
+def sha256(s: str | bytes) -> str:
+    return hashlib.sha256(s.encode() if isinstance(s, str) else s).hexdigest()
+
+
+def git_head() -> str | None:
+    try:
+        return subprocess.run(
+            ["git", "-C", str(ROOT), "rev-parse", "--short", "HEAD"], capture_output=True, text=True, check=True
+        ).stdout.strip()
+    except (OSError, subprocess.CalledProcessError):
+        return None
+
+
+def read_jsonl(p: Path) -> list[dict]:
+    return (
+        [json.loads(line) for line in p.read_text(encoding="utf-8").splitlines() if line.strip()] if p.exists() else []
+    )
+
+
+def write_jsonl(p: Path, rows: list[dict]) -> None:
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text("".join(json.dumps(r, ensure_ascii=False, sort_keys=True) + "\n" for r in rows), encoding="utf-8")
+
+
+def write_json(p: Path, obj: dict) -> None:
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(json.dumps(obj, ensure_ascii=False, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def open_client(receipts_path: Path) -> TokenFactory:
+    return TokenFactory(load_config(), timeout=90.0, receipts_path=receipts_path, thinking_off=None)
+
+
+def check_daily(budget_usd: float) -> tuple[float, dict]:
+    """The account's spend today -> the budget this run may use (never past DAILY_CAP_GUARD)."""
+    c = open_client(RECEIPTS / "usage-checks.jsonl")
+    try:
+        u, _ = c.usage()
+    finally:
+        c.close()
+    used = float(u.get("daily_cost_used_usd") or 0.0)
+    allowed = min(budget_usd, DAILY_CAP_GUARD - used)
+    snap = {k: u.get(k) for k in ("daily_cost_used_usd", "daily_cost_limit_usd", "rpm_limit", "daily_reset_at")}
+    return allowed, snap
+
+
+# ------------------------------------------------------------------------------------------------------ runs
+
+
+def stored_extractor(rows: list[dict]) -> Callable[[str], Extraction]:
+    by_text = {r["text"]: r for r in rows}
+
+    def call(text: str) -> Extraction:
+        r = by_text[text]
+        return Extraction(text, r["obj"], r["not_audited"], None, r.get("attempts", 0))
+
+    return call
+
+
+def run_extraction_rung(
+    run: str, rung: Rung, cards: list[dict], registry: Registry, pacer: Pacer, budget: Budget, mode: str = "spans"
+) -> dict:
+    tag = rung.name if mode == "spans" else f"{rung.name}.canonical"
+    analyzer = analyze if mode == "spans" else analyze_canonical
+    rpath = RECEIPTS / f"text-{run}-{tag}.jsonl"
+    client = None
+    if rung.model is None:
+        fn: Callable[[str], Extraction] = regex_extraction
+    else:
+        client = open_client(rpath)
+        fn = guarded(TokenFactoryExtractor(client, rung, pacer=pacer, mode=mode), budget)
+    cache = Cache(fn)
+    t0 = time.time()
+    try:
+        if rung.model is not None:
+            # extract every distinct transcript first (a thinking rung uses several workers: ~25 s per call), then
+            # judge the cards from the cache; call starts stay paced across all rungs by the shared pacer
+            texts = list(dict.fromkeys(t[4] for c in cards for t in script_turns(c)))
+            workers = 4 if rung.thinking == "on" else 1
+            with ThreadPoolExecutor(max_workers=workers) as pool:
+                for text, e in zip(texts, pool.map(fn, texts), strict=True):
+                    cache.store[text] = e
+        records = [judge_card(c, cache, registry, analyzer) for c in cards]
+    finally:
+        if client is not None:
+            client.close()
+    exts = [
+        {
+            "text": e.text,
+            "obj": e.obj,
+            "not_audited": e.not_audited,
+            "attempts": e.attempts,
+            "request_id": (e.receipt or {}).get("request_id"),
+            "client_id": (e.receipt or {}).get("client_id"),
+            "latency_s": (e.receipt or {}).get("latency_s"),
+            "cost_usd": (e.receipt or {}).get("cost_usd"),
+        }
+        for e in cache.store.values()
+    ]
+    write_jsonl(OUT / run / f"{tag}.extractions.jsonl", exts)
+    write_jsonl(OUT / run / f"{tag}.cards.jsonl", records)
+    # one complete receipt per distinct transcript (the last attempt), from the extractor itself
+    final_receipts = [e.receipt for e in cache.store.values() if e.receipt is not None]
+    summary = summarise(records, final_receipts, model_rung=rung.model is not None)
+    summary.update(
+        rung=rung.describe(),
+        mode=mode,
+        distinct_transcripts=len(cache.store),
+        cache_hits=cache.hits,
+        wall_s=round(time.time() - t0, 1),
+        receipts=str(rpath.relative_to(ROOT)) if rung.model is not None else None,
+        extractions=str((OUT / run / f"{tag}.extractions.jsonl").relative_to(ROOT)),
+        cards=str((OUT / run / f"{tag}.cards.jsonl").relative_to(ROOT)),
+    )
+    summary["meets_rule"] = meets_rule(summary)
+    return summary
+
+
+def parse_judge(obj: object) -> tuple[str | None, str | None]:
+    """LLM-judge JSON -> (verdict or None for 'no instruction', problem)."""
+    if not isinstance(obj, dict) or set(obj) != set(JUDGE_KEYS):
+        return ABSTAIN, "malformed judge output"
+    if not isinstance(obj["instruction_present"], bool) or not isinstance(obj["readback_present"], bool):
+        return ABSTAIN, "malformed judge output"
+    fields = [obj[k] for k in ("action_match", "tag_match", "line_match")]
+    if any(f not in ("yes", "no", "n/a") for f in fields):
+        return ABSTAIN, "malformed judge output"
+    if not obj["instruction_present"]:
+        return None, None
+    if not obj["readback_present"]:
+        return NO_READBACK, None
+    return (MISMATCH if "no" in fields else VERIFIED), None
+
+
+def run_llm_judge(run: str, rung: Rung, cards: list[dict], pacer: Pacer, budget: Budget) -> dict:
+    rpath = RECEIPTS / f"text-{run}-{rung.name}.judge.jsonl"
+    client = open_client(rpath)
+    records, receipts = [], []
+    t0 = time.time()
+    try:
+        for card in cards:
+            lines = [f"{i + 1}. {SPEAKER[role]}: {text}" for i, (_, _, _, role, text) in enumerate(script_turns(card))]
+            msgs = [{"role": "system", "content": JUDGE_PROMPT}, {"role": "user", "content": "\n".join(lines)}]
+            obj, na, rec = None, None, None
+            if budget.exceeded:
+                na = "budget guard"
+            else:
+                for attempt in range(4):
+                    pacer.wait()
+                    try:
+                        content, _, r = client.chat(
+                            rung.model,  # type: ignore[arg-type]
+                            msgs,
+                            schema={},
+                            response_mode="json_object",
+                            max_tokens=rung.max_tokens,
+                            stage="judge",
+                            reasoning_effort=rung.reasoning_effort,
+                        )
+                        rec = r.to_dict()
+                        try:
+                            obj = json.loads(content.strip().removeprefix("```json").removesuffix("```").strip())
+                        except json.JSONDecodeError:
+                            obj = {"_invalid": content[:200]}
+                        break
+                    except NotAuditing as e:
+                        rec = e.receipt.to_dict() if e.receipt else None
+                        if e.status == 429 and attempt < 3:
+                            time.sleep(15.0 * (attempt + 1))
+                            continue
+                        na = e.reason
+                        break
+            cost = ((rec or {}).get("usage") or {}).get("cost")
+            budget.add(cost if isinstance(cost, int | float) else None)
+            if rec is not None:
+                rec.update(llm_on_amd=1 if rec.get("on_amd") else 0, cost_usd=cost)
+                receipts.append(rec)
+            if na is not None:
+                verdict, problem = NOT_AUDITED, na
+            else:
+                verdict, problem = parse_judge(obj)
+            records.append(
+                {
+                    "exchange_id": card["exchange_id"],
+                    "set": card["set"],
+                    "row": row_of(card),
+                    "lang": card["lang"],
+                    "error_type": card["error_type"],
+                    "expected": (card["expected"] or {}).get("label"),
+                    "expected_verdict": (card["expected"] or {}).get("verdict"),
+                    "verdict": verdict,
+                    "label": verdict,
+                    "labels": [verdict] if verdict else [],
+                    "live_cards": int(verdict in LIVE),
+                    "caught": False,
+                    "judge_output": obj,
+                    "problem": problem,
+                    "request_id": (rec or {}).get("request_id"),
+                    "turns": [],
+                }
+            )
+    finally:
+        client.close()
+    write_jsonl(OUT / run / f"{rung.name}.judge.cards.jsonl", records)
+    # the judge returns a verdict only, so exact-label comparisons use the verdict alone
+    for r in records:
+        r["expected"] = r["expected_verdict"]
+    summary = summarise(records, receipts, model_rung=False)
+    summary["calls"] = receipt_metrics(receipts)
+    summary.update(
+        rung=rung.describe(),
+        mode="llm-judge (per-field yes/no; speaker roles given; no registry)",
+        wall_s=round(time.time() - t0, 1),
+        receipts=str(rpath.relative_to(ROOT)),
+        cards=str((OUT / run / f"{rung.name}.judge.cards.jsonl").relative_to(ROOT)),
+    )
+    summary["meets_rule"] = meets_rule(summary)
+    return summary
+
+
+def metadata(run: str, cards: list[dict], extra: dict) -> dict:
+    return {
+        "run": run,
+        "provenance": PROVENANCE,
+        "provenance_note": "turn transcripts are the card scripts (no audio, no ASR): the ASR-free ceiling per rung",
+        "headline_note": "the pre-registered headline is the 0 dB audio row (bench/PROTOCOL.md §5): not run",
+        "git_head": git_head(),
+        "cards_sha256": sha256(CARDS_PATH.read_bytes()),
+        "span_prompt_sha256": sha256(SYSTEM_PROMPT + SCHEMA_IN_PROMPT),
+        "canonical_prompt_sha256": sha256(CANON_PROMPT),
+        "judge_prompt_sha256": sha256(JUDGE_PROMPT),
+        "n_cards": len(cards),
+        "started_at": datetime.now(UTC).isoformat(timespec="seconds"),
+        "shift_assumption": f"{SHIFT_EXCHANGES} exchanges per shift, {SHIFT_ERRORS[0]}-{SHIFT_ERRORS[1]} real errors",
+        **extra,
+    }
+
+
+def select_cards(cards: list[dict], subset: str) -> list[dict]:
+    if subset == "dev":
+        return [c for c in cards if c["dev_slice"]]
+    return cards
+
+
+def cmd_ladder(args) -> int:
+    registry, cards = Registry.load(), select_cards(load_cards(), args.subset)
+    names = args.rungs.split(",") if args.rungs else list(DEFAULT_LADDER)
+    rungs = [CANDIDATES[n] for n in names]
+    paid = any(r.model for r in rungs)
+    allowed, snap = check_daily(args.budget) if paid else (0.0, {})
+    if paid and allowed <= 0:
+        print(f"daily spend guard: {snap}", file=sys.stderr)
+        return 2
+    budget, pacer = Budget(allowed), Pacer(PACE_S)
+    run = args.run or f"{args.subset}-{datetime.now(UTC).strftime('%Y%m%dT%H%M%SZ')}"
+    meta = metadata(run, cards, {"subset": args.subset, "budget_usd": round(allowed, 4), "usage_before": snap})
+    with ThreadPoolExecutor(max_workers=max(1, len(rungs))) as pool:
+        futs = {r.name: pool.submit(run_extraction_rung, run, r, cards, registry, pacer, budget) for r in rungs}
+        results = {n: f.result() for n, f in futs.items()}
+    order = sorted(rungs, key=lambda r: (r.params_b is None, r.params_b or 0.0))
+    headline = next((r.name for r in order if results[r.name]["meets_rule"]["literal"]), None)
+    out = {
+        **meta,
+        "finished_at": datetime.now(UTC).isoformat(timespec="seconds"),
+        "spent_usd": round(budget.spent, 6),
+        "ladder_order": [r.name for r in order],
+        "rule": "smallest rung with 0 false-VERIFIED AND false-alarm load <= 5 % (held_out row, text·scripted)",
+        "smallest_rung_meeting_rule": headline,
+        "rungs": results,
+    }
+    path = OUT / f"{run}.json"
+    write_json(path, out)
+    print(json.dumps({n: _brief(s) for n, s in results.items()}, indent=1))
+    print(f"wrote {path.relative_to(ROOT)} · spent ${budget.spent:.4f} · smallest rung meeting rule: {headline}")
+    return 0
+
+
+def _brief(s: dict) -> dict:
+    h = s["rows"]["held_out"]
+    d = s["rows"]["dev"]
+    return {
+        "held_out_label_exact": h["label_exact"]["rate"],
+        "held_out_false_verified": h["false_verified"]["count"],
+        "held_out_fa": h["false_alarm_load"]["rate"],
+        "held_out_flagged": h["errors_flagged"]["rate"],
+        "dev_label_exact": d["label_exact"]["rate"],
+        "dev_fa": d["false_alarm_load"]["rate"],
+        "refusal": s["rows"]["refusal"],
+        "chatter_false_cards": s["rows"]["chatter"]["false_cards"],
+        "ungrounded": (h.get("ungrounded_rate") or {}).get("rate"),
+        "p50": (s.get("calls") or {}).get("latency_s_p50"),
+        "cost": (s.get("calls") or {}).get("cost_usd"),
+    }
+
+
+def cmd_single(args, kind: str) -> int:
+    registry, cards = Registry.load(), select_cards(load_cards(), args.subset)
+    rung = CANDIDATES[args.model]
+    allowed, snap = check_daily(args.budget)
+    if allowed <= 0:
+        print(f"daily spend guard: {snap}", file=sys.stderr)
+        return 2
+    budget, pacer = Budget(allowed), Pacer(PACE_S)
+    run = args.run or f"{kind}-{datetime.now(UTC).strftime('%Y%m%dT%H%M%SZ')}"
+    meta = metadata(run, cards, {"subset": args.subset, "budget_usd": round(allowed, 4), "usage_before": snap})
+    if kind == "ablate-grounding":
+        res = {
+            "with_grounding": run_extraction_rung(run, rung, cards, registry, pacer, budget, "spans"),
+            "without_grounding": run_extraction_rung(run, rung, cards, registry, pacer, budget, "canonical"),
+        }
+    else:
+        res = {"llm_judge": run_llm_judge(run, rung, cards, pacer, budget)}
+    out = {
+        **meta,
+        "kind": kind,
+        "finished_at": datetime.now(UTC).isoformat(timespec="seconds"),
+        "spent_usd": round(budget.spent, 6),
+        "results": res,
+    }
+    path = OUT / f"{run}.json"
+    write_json(path, out)
+    print(json.dumps({k: _brief(v) for k, v in res.items()}, indent=1))
+    print(f"wrote {path.relative_to(ROOT)} · spent ${budget.spent:.4f}")
+    return 0
+
+
+# ---------------------------------------------------------------------------------------------------- rescore
+
+VOLATILE = {"wall_s", "started_at", "finished_at", "git_head", "usage_before", "budget_usd", "spent_usd", "calls"}
+
+
+def _strip(o):
+    if isinstance(o, dict):
+        return {k: _strip(v) for k, v in o.items() if k not in VOLATILE}
+    if isinstance(o, list):
+        return [_strip(v) for v in o]
+    return o
+
+
+def rescore_summary(summary: dict, cards: list[dict], registry: Registry) -> dict:
+    """Re-judge one rung's stored extractions with today's referee; returns the recomputed summary."""
+    mode = summary.get("mode", "spans")
+    analyzer = analyze_canonical if mode == "canonical" else analyze
+    rows = read_jsonl(ROOT / summary["extractions"]) if summary.get("extractions") else []
+    stored = {c["exchange_id"]: c for c in read_jsonl(ROOT / summary["cards"])}
+    subset = [c for c in cards if c["exchange_id"] in stored]
+    fn = regex_extraction if summary["rung"]["model"] is None else stored_extractor(rows)
+    records = [judge_card(c, fn, registry, analyzer) for c in subset]
+    receipts = read_jsonl(ROOT / summary["receipts"]) if summary.get("receipts") else []
+    new = summarise(records, receipts, model_rung=summary["rung"]["model"] is not None)
+    return new
+
+
+def rescore_judge(summary: dict) -> dict:
+    """Re-map the stored judge outputs to verdicts and recompute the summary."""
+    records = read_jsonl(ROOT / summary["cards"])
+    for r in records:
+        if r["verdict"] != NOT_AUDITED:
+            r["verdict"], _ = parse_judge(r["judge_output"])
+        r["label"], r["labels"], r["live_cards"] = r["verdict"], [r["verdict"]] if r["verdict"] else [], 0
+        r["live_cards"] = int(r["verdict"] in LIVE)
+        r["expected"] = r["expected_verdict"]
+    return summarise(records, [], model_rung=False)
+
+
+def cmd_rescore(args) -> int:
+    registry, cards = Registry.load(), load_cards()
+    paths = [Path(p) for p in args.files] if args.files else sorted(OUT.glob("*.json"))
+    bad = 0
+    for p in paths:
+        doc = json.loads(p.read_text(encoding="utf-8"))
+        groups = doc.get("rungs") or doc.get("results") or {}
+        for name, summary in groups.items():
+            new = rescore_judge(summary) if name == "llm_judge" else rescore_summary(summary, cards, registry)
+            same = _strip(new["rows"]) == _strip(summary["rows"])
+            bad += not same
+            print(f"{'OK  ' if same else 'DIFF'} {p.name} :: {name}")
+            if not same:
+                for row in new["rows"]:
+                    if _strip(new["rows"][row]) != _strip(summary["rows"][row]):
+                        print(f"     row {row} differs")
+    return 1 if bad else 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    g = ap.add_mutually_exclusive_group(required=True)
+    g.add_argument("--ladder", action="store_true")
+    g.add_argument("--ablate", choices=["grounding"])
+    g.add_argument("--baseline", choices=["llm-judge"])
+    g.add_argument("--rescore", action="store_true")
+    ap.add_argument("--rungs", help="comma-separated rung names (default: the ladder)")
+    ap.add_argument("--model", default="DeepSeek-V4-Flash")
+    ap.add_argument("--subset", choices=["dev", "all"], default="all")
+    ap.add_argument(
+        "--budget", type=float, default=0.50, help="USD this run may spend (also capped by the daily guard)"
+    )
+    ap.add_argument("--run", help="run name (default: subset + UTC time)")
+    ap.add_argument("files", nargs="*", help="--rescore: result files (default: all of bench/results/text/*.json)")
+    args = ap.parse_args(argv)
+    try:
+        if args.ladder:
+            return cmd_ladder(args)
+        if args.ablate:
+            return cmd_single(args, "ablate-grounding")
+        if args.baseline:
+            return cmd_single(args, "llm-judge")
+        return cmd_rescore(args)
+    except MissingCredentials as e:
+        print(f"no Token Factory key: {e}", file=sys.stderr)
+        return 3
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
