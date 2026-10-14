@@ -29,3 +29,6 @@ graphify-out/
 node_modules/
 .next/
 .DS_Store
+
+# queue server state (reviews, live-call receipts)
+var/
