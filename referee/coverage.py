@@ -2,7 +2,8 @@
 
 Grounding catches invented words; coverage catches the model pointing at the *wrong* real words. Code scans the whole
 transcript with the alias tables (`aliases.all_mentions`: actions, tags, line letters after a line word) and every
-mention must overlap a command span or a retraction that code accepted. A retraction is accepted only if a cue from the
+mention must overlap a command span of its own field (or a retraction that code accepted), and a span may hold words
+of its own field only. A retraction is accepted only if a cue from the
 closed list ("correction", "koreksi", "ralat", "bukan", "no") sits between the retracted words and the operative words
 that replace them. A turn with an action and a negator ("do not open", "jangan tutup", "unable to close") is never
 read as the command: the referee abstains.
@@ -55,12 +56,22 @@ def check(transcript: str, g: Grounded) -> None:
             )
 
     if al.action_mentions(toks):
-        for m in al.negation_mentions(toks):
+        for m in al.negation_mentions(toks, transcript):
             raise CoverageError(
                 "coverage", f"negated command: {transcript[m.start : m.end]!r} — never read as the command"
             )
 
-    accounted = [sp for _, sp in command_spans] + list(g.retracted)
-    for m in al.all_mentions(transcript):
-        if not any(_overlaps((m.start, m.end), sp) for sp in accounted):
-            raise CoverageError("coverage", f"{m.field} {transcript[m.start : m.end]!r} is not covered by any span")
+    mentions = al.all_mentions(transcript)
+    # field purity: a span holds words of its own field only — a wide span ("closing two-oh-eight" as the action,
+    # "line Bravo and opening two-oh-eight" as the line) cannot swallow a tag or a verb the model did not report
+    for f, sp in command_spans:
+        for m in mentions:
+            if _overlaps((m.start, m.end), sp) and m.field != _SPAN_FIELD[f]:
+                held = transcript[m.start : m.end]
+                raise CoverageError("coverage", f"{f} {transcript[sp[0] : sp[1]]!r} also holds the {m.field} {held!r}")
+    for m in mentions:
+        own = [sp for f, sp in command_spans if _SPAN_FIELD[f] == m.field] + list(g.retracted)
+        if not any(_overlaps((m.start, m.end), sp) for sp in own):
+            raise CoverageError(
+                "coverage", f"{m.field} {transcript[m.start : m.end]!r} is not covered by a {m.field} span"
+            )

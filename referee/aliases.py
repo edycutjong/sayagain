@@ -212,37 +212,23 @@ SAY_AGAIN_PHRASES: tuple[tuple[str, ...], ...] = (
 REPEAT_OPENERS: tuple[tuple[str, ...], ...] = (("i", "say", "again"), ("saya", "ulangi"), ("i", "repeat"))
 
 # negators: a negated command ("do not open", "jangan tutup", "unable to close") is never read as the command
-NEGATORS: frozenset[str] = frozenset(
-    {
-        "not",
-        "never",
-        "unable",
-        "cannot",
-        "dont",
-        "wont",
-        "cant",
-        "didnt",
-        "jangan",
-        "tidak",
-        "tak",
-        "belum",
-        "nggak",
-        "gak",
-        "enggak",
-        "ndak",
-    }
-)
-NEGATOR_PAIRS: frozenset[tuple[str, str]] = frozenset(
-    {
-        ("don", "t"),
-        ("won", "t"),
-        ("can", "t"),
-        ("didn", "t"),
-        ("isn", "t"),
-        ("doesn", "t"),
-        ("shouldn", "t"),
-    }
-)
+# A closed list: words outside it are a stated limitation, not a guess.
+# fmt: off
+NEGATORS: frozenset[str] = frozenset({
+    # English
+    "not", "never", "unable", "cannot", "dont", "wont", "cant", "didnt", "negative", "refuse", "refused", "refusing",
+    "cancel", "cancelled", "canceled", "cancelling", "canceling", "avoid", "avoiding", "fail", "failed", "failing",
+    "disregard", "abort", "aborted", "skip", "skipped", "ignore", "without", "neither", "nor", "none",
+    # Bahasa Indonesia (incl. chat / radio short forms)
+    "jangan", "tidak", "tak", "belum", "nggak", "ngga", "gak", "ga", "enggak", "engga", "ndak", "tdk", "gabisa",
+    "gakbisa", "batal", "batalkan", "dibatalkan", "tunda", "tunggu",
+})
+NEGATOR_PAIRS: frozenset[tuple[str, str]] = frozenset({
+    ("don", "t"), ("won", "t"), ("can", "t"), ("didn", "t"), ("isn", "t"), ("doesn", "t"), ("shouldn", "t"),
+    ("couldn", "t"), ("wouldn", "t"), ("hasn", "t"), ("haven", "t"), ("hadn", "t"), ("aren", "t"), ("wasn", "t"),
+    ("weren", "t"), ("mustn", "t"), ("needn", "t"), ("shan", "t"), ("ain", "t"), ("hold", "off"), ("call", "off"),
+})
+# fmt: on
 
 # units after a number mean "a quantity", never a tag ("150 psi", "10 minutes")
 UNIT_WORDS: frozenset[str] = frozenset(
@@ -650,26 +636,45 @@ def state_mentions(tokens: list[Token]) -> list[Mention]:
 
 
 def bare_letter_mentions(tokens: list[Token]) -> list[Mention]:
-    """NATO letters not right after a line word ("…two-oh-three, Alpha."). Only the coverage scan uses these: a stray
-    letter in an exchange turn must be accounted for, or the referee abstains."""
+    """NATO letters not right after a line word ("…two-oh-three, Alpha."), and not part of a tag ("thirty-one
+    Alpha"). Only the coverage scan uses these: a stray letter in an exchange turn must be accounted for."""
+    in_tags = [(m.start, m.end) for m in tag_mentions(tokens)]
     out = []
     for i, t in enumerate(tokens):
         if t.norm in NATO and t.norm != "lima" and not (i > 0 and tokens[i - 1].norm in LINE_WORDS):
-            out.append(Mention("line", t.start, t.end, NATO[t.norm]))
+            if not any(s <= t.start and t.end <= e for s, e in in_tags):
+                out.append(Mention("line", t.start, t.end, NATO[t.norm]))
     return out
 
 
-def negation_mentions(tokens: list[Token]) -> list[Mention]:
-    """Negators, except an operator-correction cue opening the turn ("Tidak, close valve …")."""
+def negation_mentions(tokens: list[Token], text: str = "") -> list[Mention]:
+    """Negators anywhere in the turn — plus "no" right before a verb ("no closing").
+
+    One exemption: an operator-correction cue that opens the turn, followed by punctuation and then an imperative
+    ("Tidak, close valve …", "Negative, close valve …"), or alone ("Negative."). "Negative, closing …" or
+    "Tidak menutup …" are negations: the referee never reads them as the command.
+    """
     out = []
     for i, t in enumerate(tokens):
-        if i == 0 and t.norm in OPERATOR_CORRECTION_CUES:
+        if i == 0 and t.norm in OPERATOR_CORRECTION_CUES and _cue_then_imperative(tokens, text):
             continue
         if t.norm in NEGATORS:
             out.append(Mention("negation", t.start, t.end, t.norm))
+        elif t.norm == "no" and i + 1 < len(tokens) and tokens[i + 1].norm in ACTION_WORDS:
+            out.append(Mention("negation", t.start, tokens[i + 1].end, "no"))
         elif i + 1 < len(tokens) and (t.norm, tokens[i + 1].norm) in NEGATOR_PAIRS:
-            out.append(Mention("negation", t.start, tokens[i + 1].end, t.norm + "'t"))
+            out.append(Mention("negation", t.start, tokens[i + 1].end, f"{t.norm} {tokens[i + 1].norm}"))
     return out
+
+
+def _cue_then_imperative(tokens: list[Token], text: str) -> bool:
+    if len(tokens) < 2:
+        return True  # "Negative." alone: a bare correction cue, nothing to negate
+    gap = text[tokens[0].end : tokens[1].start] if text else ""
+    if not any(ch in gap for ch in ",.;:!—-"):
+        return False
+    nxt = tokens[1].norm
+    return nxt in IMPERATIVE_ACTIONS or nxt in TAG_NOUNS or nxt in ("i", "saya", "tolong", "please")
 
 
 def all_mentions(text: str) -> list[Mention]:
