@@ -205,7 +205,11 @@ def test_submit_stage_refuses_other_dated_slot_spellings(tmp_path: Path, slot: s
 
 @pytest.mark.parametrize(
     "link",
-    ["https://www.github.com/e/s/tree/main/docs/replay/", "https://raw.githubusercontent.com/e/s/main/docs/replay/"],
+    [
+        "https://www.github.com/e/s/tree/main/docs/replay/",
+        "https://raw.githubusercontent.com/e/s/main/docs/replay/",
+        "https://github.com:443/e/s/tree/main/docs/replay/",
+    ],
 )
 def test_submit_stage_wants_the_site_not_github_for_the_replay(tmp_path: Path, link: str) -> None:
     files = {"bench/results/text/ladder-r1.json": "{}", "bench/results/access-gate.json": "{}"}

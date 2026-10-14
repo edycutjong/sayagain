@@ -58,8 +58,8 @@ class TurnAnalysis:
     opens_window: bool = False
     disagrees: bool = False  # prompted vs unprompted ASR read differently (only with an unprompted pass)
     # what code hears in the turn (alias tables), whatever the model returned:
-    safety_words: bool = False  # any action, tag or line (letters too): the words coverage counts
-    names_work: bool = False  # an action and a tag that names equipment: work someone could be doing
+    safety_words: bool = False  # an action, a tag or a line ("line Bravo", or a bare letter that is a plant line)
+    names_work: bool = False  # work someone could be doing: an action + a tag naming equipment, or a noun + its number
 
     @property
     def id(self) -> str:
@@ -233,8 +233,17 @@ def _code_kinds(turn: Turn, registry: Registry) -> tuple[TurnAnalysis, bool]:
     a.ack_only = is_ack_only(text)
     a.verb_first = verb_first(text)
     a.stand_by = is_stand_by(text)
-    a.safety_words = bool(al.all_mentions(text))
-    a.names_work = _scan_opens_window(text, registry)
+    toks = al.tokenize(text)
+    tags = al.tag_mentions(toks)
+    # a bare NATO word counts only if it is one of the plant's lines: "Roger, Mike." is not a read-back
+    a.safety_words = bool(
+        al.action_mentions(toks)
+        or tags
+        or al.line_mentions(toks)
+        or any(m.value in registry.lines for m in al.bare_letter_mentions(toks))
+    )
+    # "turning off pump one-forty": the verb is not in the tables, the pump is; a bare number ("level two-fifty") is not
+    a.names_work = _scan_opens_window(text, registry) or any(m.prefix is not None for m in tags)
     if turn.alt_transcript is not None:
         a.disagrees = canonical_tuples(text, registry) != canonical_tuples(turn.alt_transcript, registry)
     return a, opens_with_correction(text)

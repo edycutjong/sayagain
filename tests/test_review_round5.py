@@ -312,7 +312,7 @@ def test_the_benchmark_stops_on_a_referee_error_after_writing_its_extractions(mo
     monkeypatch.setattr(coverage, "check", _boom)
     assert ev.judge_card(card, ev.regex_extraction, REG)["referee_errors"]  # before the fix: a quiet NOT_AUDITED
     monkeypatch.setattr(ev, "OUT", tmp_path)
-    with pytest.raises(SystemExit, match="referee error"):
+    with pytest.raises(SystemExit, match="referee error.*new --run name"):
         ev.run_extraction_rung("t", REGEX, [card], REG, Pacer(0.0), ev.Budget(0.0))
     assert (tmp_path / "t" / "regex.extractions.jsonl").exists() and (tmp_path / "t" / "regex.cards.jsonl").exists()
 
@@ -399,6 +399,7 @@ def test_a_pairing_crash_makes_every_turn_its_own_not_audited_exchange(monkeypat
     rep = audit(turns, REG, spot_checks=0)
     assert [j.exchange.instruction.id for j in rep.judged] == ["t0", "t1", "t2"]
     assert all(j.verdict.verdict == "NOT_AUDITED" and j.referee_errors for j in rep.judged)
+    assert rep.judged[0].referee_errors is not rep.judged[1].referee_errors  # one list per exchange
 
 
 def test_try_the_refused_one_refuses_another_origin(tmp_path) -> None:
@@ -438,3 +439,36 @@ def test_unreadable_chatter_that_names_no_work_is_not_an_orphan() -> None:
         empty = {"kind": "other", "commands": [], "retracted_spans": []}
         rep = audit([Turn("c", "CH-01", 0.0, 2.5, said, empty)], REG, spot_checks=0)
         assert not rep.orphans and not rep.judged, said
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Loop-QA round 3: a NATO name is a line only if the plant has that line; a named pump is work with an unknown verb.
+
+
+def test_an_unreadable_ack_with_a_nato_name_raises_no_card() -> None:
+    from referee.regex_extractor import extract as regex_extract
+
+    for said in ("Roger, Mike.", "Affirmative, Victor.", "Siap, Hotel.", "Roger, see you in November."):
+        texts = ("Close valve two-oh-three, line Bravo.", "Copy, closing valve two-oh-three, line Bravo.", said)
+        turns = [Turn(f"t{k}", "CH-01", 3.5 * k, 3.5 * k + 2.5, x, regex_extract(x)) for k, x in enumerate(texts)]
+        turns[2].extraction = {"kind": "other", "commands": [], "retracted_spans": []}
+        assert audit(turns, REG, spot_checks=0).judged[0].verdict.verdict == "VERIFIED", said
+
+
+def test_an_unreadable_readback_naming_a_pump_with_an_unknown_verb_is_an_orphan() -> None:
+    text = "Copy, turning off pump one-forty, line Alpha."  # "turning off" is not in the alias tables
+    rb = {**ex(("turning", "pump one-forty", None, "line Alpha")), "kind": "readback"}
+    rep = audit([Turn("r", "CH-01", 0.0, 2.5, text, rb)], REG, spot_checks=0)
+    assert [o.id for o in rep.orphans] == ["r"]  # it vanished as chatter in the previous round
+
+
+def test_the_rescore_stop_says_to_rescore_again(monkeypatch) -> None:
+    import json
+
+    from referee import coverage
+
+    ev = _eval_module()
+    summary = json.loads((ev.OUT / "ladder-r1-reaudit.json").read_text(encoding="utf-8"))["rungs"]["regex"]
+    monkeypatch.setattr(coverage, "check", _boom)
+    with pytest.raises(SystemExit, match="run --rescore again"):
+        ev.rescore_summary(summary, ev.load_cards(), REG)

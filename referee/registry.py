@@ -61,6 +61,11 @@ class Registry:
     def __len__(self) -> int:
         return len(self.rows)
 
+    @property
+    def lines(self) -> frozenset[str]:
+        """The plant's line letters ("A" … "D")."""
+        return frozenset(r.line for r in self.rows.values())
+
     def line_of(self, tag: str) -> str | None:
         r = self.rows.get(tag)
         return r.line if r else None
