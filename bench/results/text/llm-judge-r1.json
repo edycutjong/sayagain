@@ -1,0 +1,297 @@
+{
+ "budget_usd": 0.1,
+ "canonical_prompt_sha256": "22f984e087c93f49c4c7e7fdcb808a4320b75fb66672de0ecc6e035b52e309fb",
+ "cards_sha256": "02766dc15ff4edb90933fbef2ee85b87de7c1fb7b8c3103598d6623416e0f724",
+ "finished_at": "2026-10-14T07:42:00+00:00",
+ "git_head": "4f7c200",
+ "headline_note": "the pre-registered headline is the 0 dB audio row (bench/PROTOCOL.md §5): not run",
+ "judge_prompt_sha256": "0b62697b10c61b979446141b1635c1ddc16f80aa9677d7548cf4e6da39d31927",
+ "kind": "llm-judge",
+ "n_cards": 145,
+ "provenance": "text·scripted",
+ "provenance_note": "turn transcripts are the card scripts (no audio, no ASR): the ASR-free ceiling per rung",
+ "results": {
+  "llm_judge": {
+   "calls": {
+    "calls": 209,
+    "calls_failed": 90,
+    "calls_ok": 119,
+    "completion_tokens": 4454,
+    "cost_usd": 0.011059,
+    "hosts": [
+     "developer.amd.com.cn"
+    ],
+    "latency_s_p50": 6.0376,
+    "latency_s_p95": 59.2484,
+    "model_served": [
+     "self-dploy/DeepSeek-V4.1-Flash"
+    ],
+    "on_amd": [
+     true
+    ],
+    "prompt_tokens": 30587,
+    "rate_limited_attempts": 69,
+    "reasoning_tokens_reported": 0,
+    "schema_invalid": 0
+   },
+   "cards": "bench/results/text/llm-judge-r1/DeepSeek-V4.1-Flash.judge.cards.jsonl",
+   "meets_rule": {
+    "fully_audited": false,
+    "literal": false,
+    "strict": false
+   },
+   "mode": "llm-judge (per-field yes/no; speaker roles given; no registry)",
+   "receipts": "bench/results/receipts/text-llm-judge-r1-DeepSeek-V4.1-Flash.judge.jsonl",
+   "rows": {
+    "chatter": {
+     "false_card_exchanges": [
+      "C-12: ['NO_READBACK']"
+     ],
+     "false_cards": 1,
+     "n_cards": 15,
+     "n_turns": 0,
+     "per_channel_hour": "not measurable on text rows (no audio duration); measured on the audio rows"
+    },
+    "dev": {
+     "abstain_rate": {
+      "ci95": [
+       0.0,
+       0.0876
+      ],
+      "k": 0,
+      "n": 40,
+      "rate": 0.0
+     },
+     "cards_per_shift_assumption": {
+      "2_errors_per_180": 1.62,
+      "5_errors_per_180": 4.06
+     },
+     "caught_on_channel_detected": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "errors_flagged": {
+      "ci95": [
+       0.5699,
+       0.9341
+      ],
+      "k": 13,
+      "n": 16,
+      "rate": 0.8125
+     },
+     "false_alarm_exchanges": [],
+     "false_alarm_load": {
+      "ci95": [
+       0.0,
+       0.138
+      ],
+      "k": 0,
+      "n": 24,
+      "rate": 0.0
+     },
+     "false_verified": {
+      "ci95": [
+       0.0,
+       0.1936
+      ],
+      "count": 0,
+      "exchanges": [],
+      "k": 0,
+      "n": 16,
+      "rate": 0.0
+     },
+     "label_exact": {
+      "ci95": [
+       0.5717,
+       0.8389
+      ],
+      "k": 29,
+      "n": 40,
+      "rate": 0.725
+     },
+     "label_misses": [
+      "A2-001: expected 'VERIFIED', got 'NOT_AUDITED'",
+      "A2-008: expected 'MISMATCH', got 'NOT_AUDITED'",
+      "A2-016: expected 'VERIFIED', got 'NOT_AUDITED'",
+      "KT-09: expected 'VERIFIED', got 'NOT_AUDITED'",
+      "KT-10: expected 'VERIFIED', got 'NOT_AUDITED'",
+      "KT-12: expected 'VERIFIED', got 'NOT_AUDITED'",
+      "KT-15: expected 'VERIFIED', got 'NOT_AUDITED'",
+      "KT-16: expected 'MISMATCH', got 'NOT_AUDITED'",
+      "KT-17: expected 'VERIFIED', got 'NOT_AUDITED'",
+      "KT-18: expected 'MISMATCH', got 'NOT_AUDITED'",
+      "KT-19: expected 'VERIFIED', got 'NOT_AUDITED'"
+     ],
+     "mismatch_only_recall": {
+      "ci95": [
+       0.5481,
+       0.9295
+      ],
+      "k": 12,
+      "n": 15,
+      "rate": 0.8
+     },
+     "missed_no_card": {
+      "count": 0,
+      "exchanges": []
+     },
+     "n_cards": 40,
+     "n_correct": 24,
+     "n_seeded_errors": 16,
+     "not_audited": {
+      "ci95": [
+       0.1611,
+       0.4283
+      ],
+      "k": 11,
+      "n": 40,
+      "rate": 0.275
+     },
+     "precision_at_1pct_prevalence": 1.0,
+     "precision_at_corpus_prevalence": 1.0
+    },
+    "held_out": {
+     "abstain_rate": {
+      "ci95": [
+       0.0,
+       0.0414
+      ],
+      "k": 0,
+      "n": 89,
+      "rate": 0.0
+     },
+     "cards_per_shift_assumption": {
+      "2_errors_per_180": 5.17,
+      "5_errors_per_180": 7.3
+     },
+     "caught_on_channel_detected": {
+      "ci95": [
+       0.0,
+       0.3543
+      ],
+      "k": 0,
+      "n": 7,
+      "rate": 0.0
+     },
+     "errors_flagged": {
+      "ci95": [
+       0.5807,
+       0.8431
+      ],
+      "k": 30,
+      "n": 41,
+      "rate": 0.7317
+     },
+     "false_alarm_exchanges": [
+      "A2-036: MISMATCH"
+     ],
+     "false_alarm_load": {
+      "ci95": [
+       0.0037,
+       0.109
+      ],
+      "k": 1,
+      "n": 48,
+      "rate": 0.0208
+     },
+     "false_verified": {
+      "ci95": [
+       0.0043,
+       0.126
+      ],
+      "count": 1,
+      "exchanges": [
+       "A2-044"
+      ],
+      "k": 1,
+      "n": 41,
+      "rate": 0.0244
+     },
+     "label_exact": {
+      "ci95": [
+       0.7404,
+       0.8951
+      ],
+      "k": 74,
+      "n": 89,
+      "rate": 0.8315
+     },
+     "label_misses": [
+      "H-01: expected 'MISMATCH', got 'NOT_AUDITED'",
+      "A2-036: expected 'VERIFIED', got 'MISMATCH'",
+      "A2-044: expected 'MISMATCH', got 'VERIFIED'",
+      "A2-053: expected 'MISMATCH', got 'NOT_AUDITED'",
+      "A2-054: expected 'VERIFIED', got 'NOT_AUDITED'",
+      "A2-055: expected 'MISMATCH', got 'NOT_AUDITED'",
+      "A2-066: expected 'MISMATCH', got 'NOT_AUDITED'",
+      "A2-069: expected 'MISMATCH', got 'NOT_AUDITED'",
+      "A2-074: expected 'MISMATCH', got 'NOT_AUDITED'",
+      "A2-075: expected 'NO_READBACK', got 'NOT_AUDITED'",
+      "A2-089: expected 'MISMATCH', got 'NOT_AUDITED'",
+      "A2-092: expected 'MISMATCH', got 'NOT_AUDITED'",
+      "A2-093: expected 'MISMATCH', got 'NOT_AUDITED'",
+      "A2-094: expected 'VERIFIED', got 'NOT_AUDITED'",
+      "A2-095: expected 'VERIFIED', got 'NOT_AUDITED'"
+     ],
+     "mismatch_only_recall": {
+      "ci95": [
+       0.5799,
+       0.8503
+      ],
+      "k": 28,
+      "n": 38,
+      "rate": 0.7368
+     },
+     "missed_no_card": {
+      "count": 0,
+      "exchanges": []
+     },
+     "n_cards": 89,
+     "n_correct": 48,
+     "n_seeded_errors": 41,
+     "not_audited": {
+      "ci95": [
+       0.0874,
+       0.234
+      ],
+      "k": 13,
+      "n": 89,
+      "rate": 0.1461
+     },
+     "precision_at_1pct_prevalence": 0.2619,
+     "precision_at_corpus_prevalence": 0.9677
+    },
+    "refusal": [
+     {
+      "exchange_id": "R-01",
+      "expected": "ABSTAIN",
+      "got": "NOT_AUDITED"
+     }
+    ]
+   },
+   "rung": {
+    "max_tokens": 2048,
+    "model": "DeepSeek-V4.1-Flash",
+    "name": "DeepSeek-V4.1-Flash",
+    "params_b": null,
+    "reasoning_effort": null,
+    "thinking": "default"
+   },
+   "wall_s": 5331.0
+  }
+ },
+ "run": "llm-judge-r1",
+ "shift_assumption": "180 exchanges per shift, 2-5 real errors",
+ "span_prompt_sha256": "b79578f3acc9d4301958637513f2ead0848bf9c2a286a4a1947bc75aa0016d97",
+ "spent_usd": 0.037059,
+ "started_at": "2026-10-14T06:13:09+00:00",
+ "subset": "all",
+ "usage_before": {
+  "daily_cost_limit_usd": 1,
+  "daily_cost_used_usd": 0.04505673795938492,
+  "daily_reset_at": "2026-10-14T16:00:00.000Z",
+  "rpm_limit": 20
+ }
+}

@@ -511,7 +511,11 @@ def parse_judge(obj: object) -> tuple[str | None, str | None]:
     return (MISMATCH if "no" in fields else VERIFIED), None
 
 
-def run_llm_judge(run: str, rung: Rung, cards: list[dict], pacer: Pacer, budget: Budget) -> dict:
+def run_llm_judge(
+    run: str, rung: Rung, cards: list[dict], pacer: Pacer, budget: Budget, prior: list[dict] | None = None
+) -> dict:
+    """`prior` (re-audit): the card records of a first pass — only its NOT_AUDITED cards are asked again."""
+    done = {r["exchange_id"]: r for r in (prior or []) if r["verdict"] != NOT_AUDITED}
     rpath = RECEIPTS / f"text-{run}-{rung.name}.judge.jsonl"
     if rpath.exists():
         raise SystemExit(f"{rpath.relative_to(ROOT)} exists: pick a new --run name (receipts never mix runs)")
@@ -520,6 +524,9 @@ def run_llm_judge(run: str, rung: Rung, cards: list[dict], pacer: Pacer, budget:
     t0 = time.time()
     try:
         for card in cards:
+            if card["exchange_id"] in done:
+                records.append({**done[card["exchange_id"]], "reused_from_first_pass": True})
+                continue
             lines = [f"{i + 1}. {SPEAKER[role]}: {text}" for i, (_, _, _, role, text) in enumerate(script_turns(card))]
             msgs = [{"role": "system", "content": JUDGE_PROMPT}, {"role": "user", "content": "\n".join(lines)}]
             obj, na, rec = None, None, None
@@ -732,7 +739,13 @@ def cmd_single(args, kind: str) -> int:
             "without_grounding": run_extraction_rung(run, rung, cards, registry, pacer, budget, "canonical"),
         }
     else:
-        res = {"llm_judge": run_llm_judge(run, rung, cards, pacer, budget)}
+        prior = None
+        if args.reaudit:
+            first_path = Path(args.reaudit).resolve()
+            first = json.loads(first_path.read_text(encoding="utf-8"))
+            meta["reaudit_of"] = str(first_path.relative_to(ROOT))
+            prior = read_jsonl(ROOT / first["results"]["llm_judge"]["cards"])
+        res = {"llm_judge": run_llm_judge(run, rung, cards, pacer, budget, prior)}
     out = {
         **meta,
         "kind": kind,
