@@ -326,7 +326,9 @@ def guarded(fn: Callable[[str], Extraction], budget: Budget) -> Callable[[str], 
             return Extraction(text, None, "budget guard")
         e = fn(text)
         cost = (e.receipt or {}).get("cost_usd")
-        budget.add(cost if cost is not None else UNKNOWN_COST_USD)  # no cost reported: count a pessimistic one
+        if cost is None:  # an answered call without a cost: count a pessimistic one; a failed call (no usage) is free
+            cost = UNKNOWN_COST_USD if e.not_audited is None else 0.0
+        budget.add(cost)
         return e
 
     return call
@@ -701,7 +703,21 @@ def cmd_single(args, kind: str) -> int:
     budget, pacer = Budget(allowed), Pacer(args.pace)
     run = args.run or f"{kind}-{datetime.now(UTC).strftime('%Y%m%dT%H%M%SZ')}"
     meta = metadata(run, cards, {"subset": args.subset, "budget_usd": round(allowed, 4), "usage_before": snap})
-    if kind == "ablate-grounding":
+    if kind == "ablate-grounding" and args.reaudit:  # re-request only the first pass's NOT_AUDITED transcripts
+        first_path = Path(args.reaudit).resolve()
+        first = json.loads(first_path.read_text(encoding="utf-8"))
+        if first["cards_sha256"] != meta["cards_sha256"] or first["subset"] != args.subset:
+            print("--reaudit: the first pass used other cards", file=sys.stderr)
+            return 2
+        meta["reaudit_of"] = str(first_path.relative_to(ROOT))
+        prior = read_jsonl(ROOT / first["results"]["without_grounding"]["extractions"])
+        res = {
+            "with_grounding": first["results"]["with_grounding"],
+            "without_grounding": run_extraction_rung(
+                run, rung, cards, registry, pacer, budget, "canonical", prior=prior
+            ),
+        }
+    elif kind == "ablate-grounding":
         if args.reuse:  # "with grounding" = that model's rung in a ladder run on the same cards (no second call)
             reuse = Path(args.reuse).resolve()
             ladder = json.loads(reuse.read_text(encoding="utf-8"))
