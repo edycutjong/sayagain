@@ -126,8 +126,10 @@ def audit(
     audio_gate: str | None = None,
     spot_checks: int = SPOT_CHECKS_PER_SHIFT,
     seed: int = 1018,
+    analyzer=analyze,
 ) -> ShiftReport:
-    analyses = [analyze(t, registry) for t in turns]
+    """`analyzer` is `turns.analyze` (the product); `turns.analyze_canonical` only for the grounding ablation."""
+    analyses = [analyzer(t, registry) for t in turns]
     paired = pair(analyses)
     judged: list[Judged] = []
     for ex in paired.exchanges:

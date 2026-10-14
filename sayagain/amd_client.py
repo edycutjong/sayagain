@@ -116,6 +116,7 @@ class Receipt:
     asr_language: str | None = None
     asr_prompt: str | None = None
     error_body: str | None = None  # first 300 chars of a failed response's body
+    model_served: str | None = None  # the model id the API echoes back (e.g. "self-dploy/Qwen3.8-27B")
     client_id: str = field(default_factory=lambda: uuid.uuid4().hex[:12])
 
     def to_dict(self) -> dict:
@@ -130,7 +131,9 @@ class TokenFactory:
         timeout: float = 20.0,
         transport: httpx.BaseTransport | None = None,
         receipts_path: Path | None = None,
-        thinking_off: str = "chat_template_kwargs",  # or "no_think" (Qwen3 soft switch), chosen by the access gate
+        # how to ask for thinking off: "chat_template_kwargs" | "no_think" (Qwen3 soft switch) | None (send nothing —
+        # the Token Factory gateway drops chat_template_kwargs silently; use `reasoning_effort` per call instead)
+        thinking_off: str | None = "chat_template_kwargs",
         min_interval_s: float = 0.0,  # client-side pacing: unpaced bursts drew HTTP 429 from the Token Factory
     ):
         self.config = config
@@ -201,6 +204,7 @@ class TokenFactory:
                 latency_s=round(time.perf_counter() - t0, 4),
                 ok=True,
                 usage=body.get("usage"),
+                model_served=body.get("model") if isinstance(body.get("model"), str) else None,
                 params=params or {},
                 rate_limit={h: headers[h] for h in _RATE_HEADERS if h in headers},
                 asr_language=asr_language,
@@ -228,6 +232,12 @@ class TokenFactory:
 
     # ------------------------------------------------------------------------------------------- calls
 
+    def usage(self) -> tuple[dict, Receipt]:
+        """The account's daily spend and limits (`GET /usage`): checked before a paid run."""
+        data, rec = self._call("usage", "GET", "/usage")
+        self._record(rec)
+        return (data if isinstance(data, dict) else {}), rec
+
     def models(self) -> tuple[list[dict], Receipt]:
         data, rec = self._call("models", "GET", "/models")
         self._record(rec)
@@ -247,8 +257,10 @@ class TokenFactory:
         max_tokens: int = 512,
         stage: str = "chat",
         record: bool = True,
+        reasoning_effort: str | None = None,
     ) -> tuple[str, dict, Receipt]:
         """One chat completion with thinking off. Returns (content without any think block, raw JSON, receipt).
+        `reasoning_effort` ("none" / "low" / …) is the gateway's documented thinking control; None sends nothing.
         `record=False` leaves recording to the caller (it adds fields first)."""
         body: dict = {
             "model": model,
@@ -267,6 +279,8 @@ class TokenFactory:
             body["chat_template_kwargs"] = {"enable_thinking": False}
         elif self.thinking_off == "no_think":
             body["messages"][-1]["content"] = body["messages"][-1]["content"] + " /no_think"
+        if reasoning_effort is not None:
+            body["reasoning_effort"] = reasoning_effort
         if logprobs:
             body["logprobs"], body["top_logprobs"] = True, 1
         params = {
@@ -275,6 +289,7 @@ class TokenFactory:
             "response_mode": response_mode if schema is not None else None,
             "logprobs": logprobs,
             "max_tokens": max_tokens,
+            "reasoning_effort": reasoning_effort,
         }
         raw, rec = self._call(stage, "POST", "/chat/completions", model=model, params=params, json=body)
         try:

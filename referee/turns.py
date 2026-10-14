@@ -9,13 +9,14 @@ alias tables, never taken from the model's `kind`.
 from __future__ import annotations
 
 import math
+import re
 from dataclasses import dataclass, field
 
 from referee import aliases as al
 from referee import coverage, grounding
 from referee.regex_extractor import extract as regex_extract
 from referee.registry import Registry
-from referee.schema import validate_extraction
+from referee.schema import CANON_ACTIONS, CANON_STATES, validate_canonical, validate_extraction
 from referee.verdict import R_COVERAGE, R_GROUNDING, CanonCommand, r_unmapped
 
 # fillers that may precede the verb of an operator's repeat ("tolong tutup …", "operator, close …")
@@ -218,11 +219,11 @@ def _prev_word(text: str, start: int) -> str | None:
     return toks[-1].text if toks else None
 
 
-def analyze(turn: Turn, registry: Registry) -> TurnAnalysis:
+def _code_kinds(turn: Turn, registry: Registry) -> tuple[TurnAnalysis, bool]:
+    """The turn kinds code decides from the alias tables (never from the model). Returns (analysis, correction cue)."""
     a = TurnAnalysis(turn=turn, status="ok")
     text = turn.transcript or ""
     a.say_again = is_say_again(text)
-    correction_cue = opens_with_correction(text)
     a.imperative = is_imperative(text)
     a.readback_shaped = readback_shaped(text)
     a.query = has_query(text)
@@ -231,6 +232,12 @@ def analyze(turn: Turn, registry: Registry) -> TurnAnalysis:
     a.stand_by = is_stand_by(text)
     if turn.alt_transcript is not None:
         a.disagrees = canonical_tuples(text, registry) != canonical_tuples(turn.alt_transcript, registry)
+    return a, opens_with_correction(text)
+
+
+def analyze(turn: Turn, registry: Registry) -> TurnAnalysis:
+    a, correction_cue = _code_kinds(turn, registry)
+    text = turn.transcript or ""
     if turn.not_audited:
         a.status, a.reason = "not_audited", turn.not_audited
         return a
@@ -308,6 +315,65 @@ def analyze(turn: Turn, registry: Registry) -> TurnAnalysis:
     # a turn opens a pairing window only with >= 1 grounded command that has an action and a tag that resolves to a
     # full tag (spoken prefix, or a bare number the registry knows); chatter and status talk ("pump one-forty is
     # running") never open one
+    a.opens_window = (
+        not a.readback_shaped
+        and has_order_verb(text)
+        and any(c.action is not None and _full_tag(c.tag, c.tag_status) for c in cmds)
+    )
+    a.operator_correction = correction_cue and (cue_only(text) or a.opens_window)
+    return a
+
+
+_CANON_TAG = re.compile(r"^(?:([A-Z]{1,3})\s*-?\s*)?(\d{2,3}[A-Z]?)$")
+
+
+def analyze_canonical(turn: Turn, registry: Registry) -> TurnAnalysis:
+    """GROUNDING ABLATION ONLY (`scripts/eval.py --ablate grounding`), never the product path.
+
+    The model returned normalised values (`referee.schema.CANON_PROMPT`) instead of copied words, so there is nothing
+    to ground and nothing to cover: grounding, coverage and the alias tables are skipped and the values are trusted.
+    Registry resolution, pairing kinds and the verdict are the same code as `analyze`.
+    """
+    a, correction_cue = _code_kinds(turn, registry)
+    text = turn.transcript or ""
+    if turn.not_audited:
+        a.status, a.reason = "not_audited", turn.not_audited
+        return a
+    if turn.extraction is None:
+        a.status, a.reason = "not_audited", "no extraction"
+        return a
+
+    def fail(reason: str, detail: str) -> TurnAnalysis:
+        a.status, a.reason, a.detail = "abstain", reason, detail
+        a.opens_window = not a.readback_shaped and has_order_verb(text) and _scan_opens_window(text, registry)
+        a.operator_correction = correction_cue and (cue_only(text) or a.opens_window)
+        return a
+
+    problem = validate_canonical(turn.extraction)
+    if problem:
+        return fail(R_GROUNDING, f"malformed extraction: {problem}")
+    cmds: list[CanonCommand] = []
+    prev_action: str | None = None
+    for c in turn.extraction["commands"]:
+        action, tag, line, state = ((c[k] or "").strip().upper() or None for k in ("action", "tag", "line", "state"))
+        if action is not None and action not in CANON_ACTIONS:
+            return fail(r_unmapped(action), "action not in the canonical set")
+        if line is not None and not (len(line) == 1 and line.isalpha()):
+            return fail(r_unmapped(line), "line is not one letter")
+        if state is not None and state not in CANON_STATES:
+            return fail(r_unmapped(state), "state not in the canonical set")
+        vals: dict = {"action": action or prev_action, "line": line, "state": state}
+        prev_action = vals["action"]
+        if tag is not None:
+            m = _CANON_TAG.match(tag)
+            if m is None:
+                return fail(r_unmapped(tag), "tag is not PREFIX-NUMBER")
+            res = registry.resolve(m.group(1), m.group(2))
+            vals.update(tag=res.tag, tag_status=res.status, registry_line=res.line)
+        if vals["action"] is None and tag is None:
+            continue
+        cmds.append(CanonCommand(**vals))
+    a.commands = cmds
     a.opens_window = (
         not a.readback_shaped
         and has_order_verb(text)
