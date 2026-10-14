@@ -140,6 +140,6 @@ def audit(
                 v = v2
         judged.append(Judged(ex, v, caught))
     verified = [j for j in judged if j.verdict.verdict == VERIFIED]
-    for j in random.Random(seed).sample(verified, min(spot_checks, len(verified))):
+    for j in random.Random(seed).sample(verified, max(0, min(spot_checks, len(verified)))):
         j.spot_check = True
     return ShiftReport(judged, paired.other, paired.not_audited, paired.orphans)

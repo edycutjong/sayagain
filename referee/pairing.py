@@ -124,6 +124,10 @@ def _pair_channel(turns: list[TurnAnalysis], window_s: float, out: Paired) -> No
             elif t.status != "not_audited" and t.imperative and t.opens_window and _tags(t) != _tags(ex.instruction):
                 close()  # a cue-less order for other equipment: a new exchange, not this one's read-back
                 idle(t)
+            elif t.status != "not_audited" and t.ack_only:
+                ex.turn_ids.append(t.id)  # "Roger." — acknowledged, not read back: wait for the read-back
+                ex.events.append("ack without read-back")
+                deadline = t.turn.t_end + window_s
             elif t.status != "not_audited" and t.stand_by:
                 ex.turn_ids.append(t.id)  # "Stand by." — the read-back is still coming
                 ex.events.append("stand by")
@@ -158,7 +162,10 @@ def _pair_channel(turns: list[TurnAnalysis], window_s: float, out: Paired) -> No
                 ex.turn_ids.append(t.id)
                 state, deadline = _AWAIT_ACK, t.turn.t_end + window_s
         elif state == _AWAIT_ACK:
-            if t.status != "not_audited" and t.operator_correction:
+            if t.status != "not_audited" and t.operator_correction and t.commands and _tags(t) != _tags(ex.instruction):
+                close()  # "No problem, open valve two-oh-seven": a new order, not a correction of this read-back
+                idle(t)
+            elif t.status != "not_audited" and t.operator_correction:
                 assert ex.readback is not None
                 ex.caught.append((ex.instruction, ex.readback))
                 ex.events.append("caught on channel")
@@ -170,13 +177,18 @@ def _pair_channel(turns: list[TurnAnalysis], window_s: float, out: Paired) -> No
                 else:
                     state = _AWAIT_REPEAT  # "Negative." — the repeat follows in the next turn
                 deadline = t.turn.t_end + window_s
-            elif t.status == "ok" and t.commands and not (t.imperative and t.opens_window):
+            elif (
+                t.status == "ok"
+                and t.commands
+                and (t.readback_shaped or t.verb_first)
+                and not (t.imperative and t.opens_window and _tags(t) != _tags(ex.instruction))
+            ):
                 ex.more_readbacks.append(t)  # a second read-back: judged too, never dropped as an "ack"
                 ex.turn_ids.append(t.id)
                 ex.events.append("second read-back")
                 deadline = t.turn.t_end + window_s
-            elif t.status != "not_audited" and not t.opens_window and not t.say_again and not t.commands:
-                ex.turn_ids.append(t.id)  # "Correct." / "Betul." — the operator's acknowledgement
+            elif t.status != "not_audited" and not t.opens_window and not t.say_again:
+                ex.turn_ids.append(t.id)  # "Correct." / "Valve 203 is now closed." — acknowledgement or status
                 close()
             else:
                 close()
