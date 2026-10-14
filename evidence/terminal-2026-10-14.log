@@ -1,4 +1,4 @@
-# recorded 2026-10-14T17:42:54+07:00 in build/ at c57de6a (macOS arm64); stdout kept verbatim
+# recorded 2026-10-14T18:48:05+07:00 in build/ at 53e9114 (macOS arm64); stdout kept verbatim
 $ uv run python scripts/eval.py --rescore
 OK   ablate-grounding-r1-reaudit.json :: without_grounding (rows, calls, meets_rule)
 OK   ablate-grounding-r1.json :: without_grounding (rows, calls, meets_rule)
@@ -24,7 +24,17 @@ OK   ladder-r1.json :: Qwen3.8-27B (rows, calls, meets_rule)
 OK   ladder-r1.json :: regex (rows, calls, meets_rule)
 OK   llm-judge-r1-reaudit.json :: llm_judge (rows, calls, meets_rule)
 OK   llm-judge-r1.json :: llm_judge (rows, calls, meets_rule)
-# exit 0 · wall 3.0 s
+# exit 0 · wall 2.9 s
+$ jq -r '.rungs | to_entries[] | "\(.key)  false-VERIFIED \(.value.rows.held_out.false_verified.k)  false alarms \(.value.rows.held_out.false_alarm_load.k)/\(.value.rows.held_out.false_alarm_load.n)"' bench/results/text/ladder-r1-reaudit.json
+DeepSeek-V4-Flash  false-VERIFIED 0  false alarms 4/48
+Gemma-4-31B-IT  false-VERIFIED 0  false alarms 2/48
+MiniCPM5-2B  false-VERIFIED 0  false alarms 48/48
+Qwen3.8-27B  false-VERIFIED 0  false alarms 4/48
+regex  false-VERIFIED 0  false alarms 0/48
+# exit 0 · wall 0.0 s
+$ jq -r '.results.llm_judge.rows.held_out | "llm_judge  false-VERIFIED \(.false_verified.k)  false alarms \(.false_alarm_load.k)/\(.false_alarm_load.n)"' bench/results/text/llm-judge-r1-reaudit.json
+llm_judge  false-VERIFIED 2  false alarms 1/48
+# exit 0 · wall 0.0 s
 $ jq -r '.events[] | select(.type=="judged" and .card.exchange_id=="H-01") | .card.verdict.trace[]' docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json
 instruction: grounded + covered (1 command(s))
 read-back: grounded + covered (1 command(s))

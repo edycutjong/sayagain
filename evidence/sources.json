@@ -82,5 +82,52 @@
       "figure": "USD 5.7 M",
       "assumption": "1,318 x 30 % x 6 channels x USD 2,400 = about USD 5.7 M a year: the mills line only, the floor of the Indonesian beachhead."
     }
+  ],
+  "competitors": [
+    {
+      "id": "nice-inform-ai",
+      "product": "NICE Inform AI",
+      "documented": "records 911, radio and CAD; transcribes as recorded; keyword search, call categorisation, QA",
+      "read_back_check": "not in public docs",
+      "plant_tag_registry": "no (built around CAD / public safety)",
+      "url": "https://www.silicon.co.uk/press-release/nice-unveils-nice-inform-ai-for-emergency-communications-centers",
+      "read": "2026-10-09"
+    },
+    {
+      "id": "eventide",
+      "product": "Eventide NexLog DX + Speech Factor AI",
+      "documented": "radio and phone logger; transcription and real-time phrase spotting with alerts; Speech Factor uses cloud-based AI",
+      "read_back_check": "not in public docs (phrase spotting, not pairwise comparison)",
+      "plant_tag_registry": "not in public docs",
+      "url": "https://www.eventidecommunications.com/?p=10085",
+      "read": "2026-10-09"
+    },
+    {
+      "id": "motorola-assist",
+      "product": "Motorola Solutions Assist for real-time operators",
+      "documented": "real-time transcripts of responder radio, keyword highlighting",
+      "read_back_check": "not in public docs",
+      "plant_tag_registry": "not in public docs",
+      "url": "https://www.motorolasolutions.com/en_us/ai/real-time-operator.html",
+      "read": "2026-10-09"
+    },
+    {
+      "id": "intellipermit",
+      "product": "IntelliPERMIT (control of work)",
+      "documented": "generates and records verification codes radioed from the control room to the worker isolating equipment",
+      "read_back_check": "radioed codes, not speech",
+      "plant_tag_registry": "yes (permits and isolations)",
+      "url": "https://m.engineeringnews.co.za/article/multinational-mining-company-reinforces-safety-with-intellipermit-2022-04-04",
+      "read": "2026-10-09"
+    },
+    {
+      "id": "haawaii",
+      "product": "HAAWAII (SESAR research, DLR, Idiap)",
+      "documented": "speech recognition and understanding for air-traffic read-back error detection",
+      "read_back_check": "yes, aviation research",
+      "plant_tag_registry": "no (ICAO phraseology and call signs)",
+      "url": "https://publications.idiap.ch/publications/show/4942",
+      "read": "2026-10-09"
+    }
   ]
 }

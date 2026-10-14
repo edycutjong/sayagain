@@ -7,6 +7,7 @@
   var RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   var STILL = /(^|[?&])still\b/.test(location.search);
   var MOTION = !RM && !STILL;
+  if (STILL) root.classList.add('settled');
   function $(s, r) { return (r || doc).querySelector(s); }
   function $$(s, r) { return Array.prototype.slice.call((r || doc).querySelectorAll(s)); }
   function later(fn, ms) { return setTimeout(fn, ms); }
@@ -69,33 +70,38 @@
   }
 
   // ------------------------------------------------------------------ the opening card: the read-back arrives, two-oh-eight turns red
-  var opening = $('.fold-card .xcard'), timers = [];
-  function play(card, keep) {
+  var opening = $('.fold-card .xcard');
+  // full: words arrive, the model's spans underline, connectors, the red block, the verdict (~2.1 s to the verdict)
+  // quick: a picked card settles in under a second, so ten cards can be compared without waiting
+  function play(card, force, quick) {
     if (!card) return;
-    timers.forEach(clearTimeout); timers = [];
+    (card._timers || []).forEach(clearTimeout);
+    var T = card._timers = [];
     var cls = ['armed', 'p-point', 'p-link', 'p-slam', 'p-verdict', 'settled'];
     cls.forEach(function (c) { card.classList.remove(c); });
-    if (!MOTION && !keep) { drawLinks(card); return; }
+    if (!MOTION && !force) { drawLinks(card); return; }
+    if (!MOTION) { drawLinks(card); return; }
     var turns = $$('.xc-turn', card);
     turns.forEach(function (t) { var s = $('.said', t); if (s) tokenize(s); });
     $$('.w', card).forEach(function (w) { w.classList.remove('on'); });
     void card.offsetWidth;
     card.classList.add('armed');
-    var t0 = 280;
+    var t0 = quick ? 0 : 150;
     turns.forEach(function (turn, i) {
-      var ws = $$('.w', turn), step = Math.min(95, 900 / Math.max(ws.length, 1));
-      ws.forEach(function (w, j) { timers.push(later(function () { w.classList.add('on'); }, t0 + j * step)); });
-      t0 += ws.length * step + (i === 0 ? 520 : 340);
+      var ws = $$('.w', turn), step = quick ? 0 : Math.min(55, 420 / Math.max(ws.length, 1));
+      ws.forEach(function (w, j) { T.push(later(function () { w.classList.add('on'); }, t0 + j * step)); });
+      t0 += quick ? 0 : ws.length * step + (i === 0 ? 260 : 200);
     });
-    timers.push(later(function () { card.classList.add('p-point'); }, t0));
-    timers.push(later(function () { drawLinks(card); card.classList.add('p-link'); }, t0 + 420));
-    timers.push(later(function () { card.classList.add('p-slam'); }, t0 + 900));
-    timers.push(later(function () { card.classList.add('p-verdict'); }, t0 + 1500));
-    timers.push(later(function () {
+    var g = quick ? [60, 160, 320, 520, 1000] : [0, 300, 600, 950, 1900];
+    T.push(later(function () { card.classList.add('p-point'); }, t0 + g[0]));
+    T.push(later(function () { drawLinks(card); card.classList.add('p-link'); }, t0 + g[1]));
+    T.push(later(function () { card.classList.add('p-slam'); }, t0 + g[2]));
+    T.push(later(function () { card.classList.add('p-verdict'); }, t0 + g[3]));
+    T.push(later(function () {
       cls.forEach(function (c) { card.classList.remove(c); });
       $$('.w', card).forEach(function (w) { w.classList.remove('on'); });
       card.classList.add('settled'); drawLinks(card);
-    }, t0 + 2600));
+    }, t0 + g[4]));
   }
   if (opening) {
     if (MOTION) later(function () { play(opening); }, 120); else drawLinks(opening);
@@ -133,7 +139,7 @@
     rows.forEach(function (r) { r.setAttribute('aria-selected', r.getAttribute('data-pick') === id ? 'true' : 'false'); });
     $$('[data-pick-detail]').forEach(function (d) { d.hidden = d.getAttribute('data-pick-detail') !== id; });
     var det = $('[data-pick-detail="' + id + '"]'), card = det && $('.xcard', det);
-    if (card) { drawLinks(card); if (MOTION) play(card, true); }
+    if (card) { drawLinks(card); if (MOTION) play(card, true, true); }
     if (focusRow) { var r = $('.row[data-pick="' + id + '"]', list); if (r) r.focus(); }
     if (det && window.innerWidth < 1024) det.scrollIntoView({ behavior: MOTION ? 'smooth' : 'auto', block: 'start' });
   }
@@ -172,12 +178,12 @@
       if (isCmd) {
         var txt = l.textContent, n = txt.length;
         termTimers.push(later(function () { l.hidden = false; l.textContent = ''; }, t));
-        for (var k = 1; k <= n; k += 3) (function (k) { termTimers.push(later(function () { l.textContent = txt.slice(0, k); pre.scrollTop = pre.scrollHeight; }, t + k * 7)); })(k);
-        t += n * 7 + 260;
+        for (var k = 1; k <= n; k += 4) (function (k) { termTimers.push(later(function () { l.textContent = txt.slice(0, k); pre.scrollTop = pre.scrollHeight; }, t + k * 3)); })(k);
+        t += n * 3 + 220;
         termTimers.push(later(function () { l.innerHTML = full; }, t));
       } else {
         termTimers.push(later(function () { l.hidden = false; pre.scrollTop = pre.scrollHeight; }, t));
-        t += l.classList.contains('com') ? 220 : 48;
+        t += l.classList.contains('com') ? 200 : 34;
       }
     });
     termTimers.push(later(function () { pre.scrollTop = 0; }, t + 1600));
