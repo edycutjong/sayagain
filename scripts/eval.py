@@ -858,8 +858,17 @@ def report_lines(path: Path) -> list[str]:
     groups = doc.get("rungs") or doc.get("results") or {}
     out = [
         f"### {doc['run']} — `{doc['provenance']}`, row `{row}`, {doc['n_cards']} cards run, "
-        f"spent ${doc.get('spent_usd', 0):.4f}",
+        f"this run spent ${doc.get('spent_usd', 0)} ({rel})",
         "",
+        *(
+            [
+                f"Re-audit of {doc['reaudit_of']}: only the transcripts that pass could not audit were requested "
+                "again; latency and cost columns cover those calls only.",
+                "",
+            ]
+            if doc.get("reaudit_of")
+            else []
+        ),
         "| Rung | Thinking | False-VERIFIED | No card | Errors flagged [Wilson CI] | MISMATCH-only recall | "
         "False-alarm load [Wilson CI] | Label exact | Ungrounded | Refusal R-01 | Chatter false cards | "
         "Median / 95th-pct latency, s | Source |",

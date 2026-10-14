@@ -39,11 +39,38 @@ The referee half of that design exists and is tested today; the speech half does
 | Local kill test (Whisper-large-v3 on a laptop, off-AMD) | `scripts/kill_test_local.py` | harness ready, waiting for recordings |
 | Human recordings, audio eval rows, queue UI | — | not built yet |
 
+## First measurements: the card scripts, no audio yet (2026-10-14)
+
+These rows feed the **written words of the 145 recording cards** to each extractor (`text·scripted`): no microphone,
+no speech-to-text. They are each rung's ceiling on clean words, not the audio result the protocol pre-registers
+(bench/PROTOCOL.md). Scored on the 89 held-out cards: the hero, its secondary, and A2 without the 40-card dev slice.
+Full tables with Wilson intervals: bench/results/text/RESULTS.md.
+
+- **No wrong read-back was marked VERIFIED by any rung of the referee:** 0 false-VERIFIED for the regex rung and for all
+  four models extracting spans on the AMD Token Factory (bench/results/text/ladder-r1-reaudit.json).
+- **The plain regex rung already meets the pre-registered rule on clean words:**
+  41/41 seeded errors flagged, 0/48 false alarms (bench/results/text/ladder-r1-reaudit.json).
+  By that rule, on scripted words no language model is needed. Whether that survives real speech, noise and other
+  people's phrasing is what the audio rows will measure.
+- **Smallest model that meets the rule:** Gemma-4-31B-IT,
+  0 false-VERIFIED and 2/48 false alarms (bench/results/text/ladder-r1-reaudit.json), after one re-audit of the calls
+  the gateway answered with HTTP 500; the as-run first pass is bench/results/text/ladder-r1.json.
+- **Models that miss fail toward a human:** MiniCPM5-2B returns malformed or misplaced spans, and the referee abstains on
+  all 48 correct read-backs too, 48/48 false alarms, none passed (bench/results/text/ladder-r1-reaudit.json).
+- **Grounding ablation:** the same model returning normalised values instead of copied words raised false alarms from
+  2/48 to 6/48. It rewrote motor-valve tags into tags the registry does not have (bench/results/text/ablate-grounding-r1-reaudit.json).
+- **LLM-as-judge baseline:** asked for a per-field verdict, DeepSeek-V4.1-Flash passed 2 wrong read-backs as VERIFIED
+  (both left out the action word) and passed the refusal card, a valve that is not in the plant, as VERIFIED
+  (bench/results/text/llm-judge-r1-reaudit.json).
+
+Every call above has a receipt in bench/results/receipts/, and `uv run python scripts/eval.py --rescore` re-judges
+every stored model output offline and checks each number.
+
 The access probe (bench/results/access-gate.json) found 8 instruct models on the AMD Token Factory whose span extraction
 of the hero read-back the referee reads as `CLOSE · XV-208 · line B`. The model list has no speech-to-text model, so
 transcription will run elsewhere, and every stage will be labelled with where it ran.
 
-473 tests (`uv run pytest`; one runs only with local Whisper weights), lint with ruff, a CI workflow for every push. Friction log:
+474 tests (`uv run pytest`; one runs only with local Whisper weights), lint with ruff, a CI workflow for every push. Friction log:
 [docs/DX-REPORT.md](docs/DX-REPORT.md).
 
 ## Run it
