@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" role="img" aria-label="SayAgain — lockout tag with the read-back field that differs blocked in red">
+  <!-- 16 px favicon variant: tag silhouette, grommet, one grey bar, the red block — nothing finer survives at this size -->
+  <path d="M4 .8 H12 L15.2 4 V14.2 Q15.2 15.2 14.2 15.2 H1.8 Q.8 15.2 .8 14.2 V4 Z" fill="#272A2B" stroke="#A9AEA6" stroke-width="1.2" stroke-linejoin="round"/>
+  <circle cx="8" cy="4.2" r="1.5" fill="#1E2122" stroke="#ECE6D6" stroke-width="1"/>
+  <rect x="3" y="7.4" width="5" height="1.6" rx=".4" fill="#A9AEA6"/>
+  <rect x="3" y="10.6" width="4" height="1.6" rx=".4" fill="#A9AEA6"/>
+  <rect x="8.6" y="9.4" width="4.6" height="4" rx=".6" fill="#E23B2E"/>
+</svg>

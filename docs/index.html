@@ -1,0 +1,925 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SayAgain · checks every radio read-back of a safety instruction</title>
+<meta name="description" content="SayAgain checks the read-back of every radio safety instruction: a model on the AMD Token Factory points at the words, plain code decides, a shift supervisor closes every card.">
+<meta name="theme-color" content="#272A2B">
+<meta name="color-scheme" content="dark">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SayAgain">
+<meta property="og:title" content="Nobody on the channel noticed. The radio log did.">
+<meta property="og:description" content="The read-back said two-oh-eight. The order was two-oh-three. SayAgain puts the one wrong word in front of the shift supervisor.">
+<meta property="og:image" content="assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SayAgain: the read-back two-oh-eight blocked red under the order two-oh-three, verdict MISMATCH">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="assets/fonts/SairaStencilOne-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/IBMPlexMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/site.css">
+<script>document.documentElement.classList.add('js')</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="world" aria-hidden="true">
+<div class="pool"></div>
+<ol class="tape">
+<li><span>29:00</span><span>01</span><span class="v-VERIFIED">SPOT-CHECK</span><span></span><span>ISOLATE XV-201 line D</span></li>
+<li><span>28:49</span><span>01</span><span class="v-VERIFIED">VERIFIED</span><span></span><span>ISOLATE XV-202 line B</span></li>
+<li><span>28:38</span><span>01</span><span class="v-MISMATCH">MISMATCH</span><span>tag</span><span>XV-203 → XV-208</span></li>
+<li><span>28:27</span><span>01</span><span class="v-VERIFIED">VERIFIED</span><span></span><span>OPEN MOV-28H line C</span></li>
+<li><span>28:16</span><span>01</span><span class="v-MISMATCH">MISMATCH</span><span>line</span><span>C → B</span></li>
+<li><span>28:05</span><span>01</span><span class="v-VERIFIED">SPOT-CHECK</span><span></span><span>OPEN XV-271 line C</span></li>
+<li><span>27:54</span><span>01</span><span class="v-VERIFIED">VERIFIED</span><span></span><span>STOP P-149 line D</span></li>
+<li><span>27:43</span><span>01</span><span class="v-MISMATCH">MISMATCH</span><span>tag</span><span>P-114 → P-140</span></li>
+<li><span>27:32</span><span>01</span><span class="v-VERIFIED">VERIFIED</span><span></span><span>ISOLATE XV-247 line D</span></li>
+<li><span>27:21</span><span>01</span><span class="v-VERIFIED">VERIFIED</span><span></span><span>CLOSE XV-234 line C</span></li>
+<li><span>27:10</span><span>01</span><span class="v-VERIFIED">VERIFIED</span><span></span><span>OPEN XV-219 line D</span></li>
+<li><span>26:59</span><span>01</span><span class="v-VERIFIED">VERIFIED</span><span></span><span>OPEN MOV-30C line A</span></li>
+<li><span>26:48</span><span>01</span><span class="v-MISMATCH">MISMATCH</span><span>tag</span><span>MOV-31A → MOV-31H</span></li>
+<li><span>26:37</span><span>01</span><span class="v-VERIFIED">VERIFIED</span><span></span><span>OPEN XV-275 line D</span></li>
+<li><span>26:26</span><span>01</span><span class="v-ABSTAIN">ABSTAIN</span><span>coverage</span><span>P-134</span></li>
+<li><span>26:15</span><span>01</span><span class="v-VERIFIED">VERIFIED</span><span></span><span>ISOLATE P-149 line D</span></li>
+<li><span>26:04</span><span>01</span><span class="v-VERIFIED">SPOT-CHECK</span><span></span><span>OPEN XV-293 line D</span></li>
+<li><span>25:53</span><span>01</span><span class="v-MISMATCH">MISMATCH</span><span>tag</span><span>XV-203 → XV-208</span></li>
+<li><span>25:42</span><span>01</span><span class="v-VERIFIED">VERIFIED</span><span></span><span>START P-181 line D</span></li>
+<li><span>25:31</span><span>01</span><span class="v-VERIFIED">VERIFIED</span><span></span><span>OPEN XV-224 line C</span></li>
+<li><span>22:35</span><span>01</span><span class="v-MISMATCH">MISMATCH</span><span>command</span><span> → omitted</span></li>
+<li><span>22:24</span><span>01</span><span class="v-VERIFIED">VERIFIED</span><span></span><span>OPEN XV-275 line D</span></li>
+<li><span>22:13</span><span>01</span><span class="v-MISMATCH">MISMATCH</span><span>tag</span><span>XV-203 → XV-208</span></li>
+<li><span>22:02</span><span>01</span><span class="v-VERIFIED">VERIFIED</span><span></span><span>ISOLATE P-117 line C</span></li>
+<li><span>21:51</span><span>01</span><span class="v-VERIFIED">VERIFIED</span><span></span><span>STOP P-112 line A</span></li>
+<li><span>21:30</span><span>01</span><span class="v-VERIFIED">SPOT-CHECK</span><span></span><span>OPEN XV-296 line D</span></li>
+</ol>
+</div>
+
+<header class="nav" id="top">
+<a class="brand" href="#top" aria-label="SayAgain, top of page"><img src="assets/icon.svg" alt="" width="34" height="34"><span>SAYAGAIN</span></a>
+<nav aria-label="Sections">
+<ul class="links">
+<li><a href="#consequence">The problem</a></li>
+<li><a href="#try">Try it</a></li>
+<li><a href="#ladder">Ladder</a></li>
+<li><a href="#how">How it decides</a></li>
+<li><a href="#amd">AMD</a></li>
+<li><a href="#pays">Who pays</a></li>
+<li><a href="#faq">FAQ</a></li>
+</ul>
+</nav>
+<div class="nav-cta">
+<a class="btn ghost" href="pitch/">Pitch deck</a>
+<a class="btn ink" href="https://github.com/edycutjong/sayagain"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.8c-2.8.6-3.4-1.2-3.4-1.2-.5-1.1-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.4 1.1 2.9.8.1-.7.4-1.1.6-1.3-2.2-.3-4.6-1.1-4.6-5a3.9 3.9 0 0 1 1-2.7c-.1-.2-.4-1.3.1-2.7 0 0 .8-.3 2.7 1a9.4 9.4 0 0 1 5 0c1.9-1.3 2.7-1 2.7-1 .5 1.4.2 2.5.1 2.7a3.9 3.9 0 0 1 1 2.7c0 3.9-2.4 4.7-4.6 5 .4.3.7.9.7 1.9V21c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg>GitHub</a>
+</div>
+</header>
+
+<main id="main">
+
+<section class="fold" aria-labelledby="h1">
+<div class="fold-h">
+<p class="lab">CH-01 · AMD Developer Hackathon ACT III · Intelligent Industry</p>
+<h1 id="h1"><span class="s1">Nobody on the channel noticed.</span> <span class="s2">The radio log did.</span></h1>
+</div>
+<div class="fold-card" id="opening">
+<article class="xcard v-MISMATCH" id="x-open" data-x="H-01" data-ins="H-01-0" data-rb="H-01-1">
+<header class="xc-h">
+<p class="xc-v"><i class="ring" aria-hidden="true"></i><span>MISMATCH</span></p>
+<p class="xc-meta"><b>H-01</b> · CH-01 · English</p>
+</header>
+<p class="xc-diff"><b>tag: XV-203 ≠ XV-208</b> <span>XV-208 is on line A (registry)</span></p>
+<div class="xc-strip">
+<div class="xc-turn ins" data-t="H-01-0" data-role="operator">
+<p class="who"><b>OPERATOR</b><span>H-01-0</span><span>no recording</span></p>
+<p class="said"><span class="sp" data-f="action" data-c="0">Close</span> <span class="sp" data-f="tag" data-c="0">valve two-oh-three</span>, <span class="sp" data-f="line" data-c="0">line Bravo</span>.</p>
+</div>
+<div class="xc-turn rb" data-t="H-01-1" data-role="field">
+<p class="who"><b>FIELD TECH</b><span>H-01-1</span><span>no recording</span></p>
+<p class="said">Copy, <span class="sp" data-f="action" data-c="0">closing</span> <span class="sp" data-f="tag" data-c="0"><mark class="red">two-oh-eight</mark></span>, <span class="sp" data-f="line" data-c="0">line Bravo</span>.</p>
+</div>
+<svg class="connectors" aria-hidden="true"></svg>
+</div>
+<div class="xc-act">
+<button type="button" class="btn ink" data-act="confirm">Confirm error</button>
+<button type="button" class="btn" data-act="dismiss">Dismiss…</button>
+<form class="why" hidden><label>Reason <input name="why" maxlength="120" required placeholder="e.g. the tech corrected it on the channel"></label><button class="btn" type="submit">Dismiss</button></form>
+<p class="stamp" role="status" aria-live="polite"></p>
+</div>
+<ul class="xc-badges">
+<li>speaker <b>text·scripted</b></li>
+<li>radio <b>none (no audio)</b></li>
+<li class="amd">extraction <b>Gemma-4-31B-IT · AMD-hosted API</b></li>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">referee <b>local · 0.77 ms</b></li>
+</ul>
+</article>
+<div class="fold-cap">
+<button type="button" class="btn ghost sm" id="replay-strip" aria-label="Play the read-back again"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 3-6.2M4 4v4h4"/></svg>Play again</button>
+<p>Card H-01 as the queue draws it: written words, the stored Gemma-4-31B-IT extraction, the referee’s verdict. No recording yet.</p>
+</div>
+</div>
+<div class="fold-l">
+<p class="lede">A field technician hears “Close valve two-oh-three, line Bravo” and answers “Copy, closing <b>two-oh-eight</b>, line Bravo.” Valve XV-208 is on line A. SayAgain has a model on the AMD Token Factory point at the words, lets <b>plain code decide</b>, and puts the one wrong word in front of the <b>shift supervisor</b>.</p>
+<div class="cta">
+<a class="btn ink lg" href="https://github.com/edycutjong/sayagain"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.8c-2.8.6-3.4-1.2-3.4-1.2-.5-1.1-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.4 1.1 2.9.8.1-.7.4-1.1.6-1.3-2.2-.3-4.6-1.1-4.6-5a3.9 3.9 0 0 1 1-2.7c-.1-.2-.4-1.3.1-2.7 0 0 .8-.3 2.7 1a9.4 9.4 0 0 1 5 0c1.9-1.3 2.7-1 2.7-1 .5 1.4.2 2.5.1 2.7a3.9 3.9 0 0 1 1 2.7c0 3.9-2.4 4.7-4.6 5 .4.3.7.9.7 1.9V21c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/></svg>GitHub</a>
+<a class="btn lg" href="pitch/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18v12H3zM12 16v4M8 20h8"/></svg>Pitch deck</a>
+<a class="btn lg" href="replay/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 3-6.2M4 4v4h4"/><path d="M10 9l5 3-5 3z"/></svg>Open the replay</a>
+</div>
+<p class="proof"><span>text·scripted</span><span>145 exchanges replayed</span><span>extraction: Gemma-4-31B-IT, AMD Token Factory</span><span>referee: plain Python</span><span>audio rows: Oct 16</span></p>
+</div>
+</section>
+
+<section class="receipts" aria-label="Receipts">
+<p class="lab">Receipts · held-out exchanges · text·scripted</p>
+<ul>
+<li data-src="bench/results/text/ladder-r1-reaudit.json"><b class="num" data-count="0">0</b><span>wrong read-backs marked VERIFIED, on all 5 rungs</span><code>bench/results/text/ladder-r1-reaudit.json</code></li>
+<li data-src="bench/results/text/ladder-r1-reaudit.json"><b class="num"><span data-count="41">41</span>/41</b><span>seeded errors sent to the supervisor, on every rung</span><code>bench/results/text/ladder-r1-reaudit.json</code></li>
+<li data-src="bench/results/text/ladder-r1-reaudit.json"><b class="num"><span data-count="2">2</span>/48</b><span>false alarms on correct read-backs, Gemma-4-31B-IT</span><code>bench/results/text/ladder-r1-reaudit.json</code></li>
+<li aria-label="501 tests, collected by pytest at build time"><b class="num" data-count="501">501</b><span>tests, collected by pytest at build time</span><code>tests/</code></li>
+</ul>
+</section>
+
+<section class="sec consequence" id="consequence" aria-labelledby="h-con">
+<div class="sec-head">
+<p class="lab">XV-203 → XV-208 · where the read-back points</p>
+<h2 id="h-con">One digit moves the crew to another line.</h2>
+<p class="lede">In the plant registry the demo runs on, XV-203 is an on/off valve on line B at the press station. XV-208 is on line A, in clarification. The read-back exists so the operator hears that difference. Sometimes nobody does.</p>
+</div>
+<figure class="mimic" id="mimic">
+<svg viewBox="0 0 1200 330" role="img" aria-labelledby="mimic-t">
+<title id="mimic-t">Process graphic of the fictional plant: valve XV-208 on line A, valve XV-203 on line B. The order named XV-203; the read-back named XV-208.</title>
+<g class="ln a"><text x="24" y="44" class="lt">LINE A · CLARIFICATION</text><path class="pipe" d="M24 104 H1176"/><path class="flow" d="M24 104 H1176"/></g>
+<g class="ln b"><text x="24" y="210" class="lt">LINE B · PRESS STATION</text><path class="pipe" d="M24 270 H1176"/><path class="flow" d="M24 270 H1176"/></g>
+<g class="vl to" transform="translate(700 104)"><path class="body" d="M-30 -20 L30 20 L30 -20 L-30 20 Z"/><path class="stem" d="M0 -20 V-52 M-18 -52 H18"/><text x="52" y="-50" class="tg">XV-208</text><text x="52" y="-24" class="tn">the read-back named this valve</text></g>
+<g class="vl from" transform="translate(700 270)"><path class="body" d="M-30 -20 L30 20 L30 -20 L-30 20 Z"/><path class="stem" d="M0 -20 V-52 M-18 -52 H18"/><text x="52" y="-50" class="tg">XV-203</text><text x="52" y="-24" class="tn">the order was for this one</text></g>
+<path class="jump" d="M670 232 C 600 196, 600 160, 668 128"/>
+</svg>
+<figcaption><code>data/registry.csv</code> · fictional plant, 120 tags: <span class="nw">XV-203 · on/off valve · line B · press station</span> · <span class="nw">XV-208 · on/off valve · line A · clarification</span></figcaption>
+</figure>
+<div class="context">
+<blockquote data-src="evidence/sources.json"><p class="fig"><b class="num">63 % · 50 %</b></p><p>of pilots’ read-back errors are caught by tower and by approach controllers, in the air-traffic literature. The rest go through.</p><cite>Helmke et al., ATM Seminar 2021 · aviation, not plant radio · evidence/sources.json</cite></blockquote>
+<blockquote><p class="fig"><b class="num">1 killed, 6 injured</b></p><p>Goodyear, Houston, 2008. An isolation valve was left closed after maintenance and the remaining relief path was then blocked.</p><cite>US Chemical Safety Board case study · evidence/sources.json</cite></blockquote>
+<blockquote><p class="fig"><b class="num">No rate</b></p><p>of read-back errors on industrial plant radio has been published that we could find. Measuring it is the pilot’s first job.</p><cite>Our search, Oct 2026 · the check is called three-way communication (DOE-HDBK-1028-2009)</cite></blockquote>
+</div>
+</section>
+
+<section class="sec demo" id="demo" aria-labelledby="h-demo">
+<div class="sec-head">
+<p class="lab">Replay · run ladder-r1-reaudit · Gemma-4-31B-IT</p>
+<h2 id="h-demo">A whole shift, replayed and judged again.</h2>
+<p class="lede">The supervisor queue replays 145 exchanges from a stored run. The referee judges each one again from the model output the run recorded, and every card lists the receipt of each model call behind it. The terminal is the real session, recorded on 2026-10-14.</p>
+</div>
+<div class="pair">
+<figure class="browser">
+<div class="bar"><i></i><i></i><i></i><span>sayagain · supervisor queue · replay</span></div>
+<a href="replay/" class="shot"><img src="assets/shots/queue-h01-1440.webp" width="1440" height="900" loading="lazy" decoding="async" alt="SayAgain supervisor queue replaying the stored shift: the list of exchanges on the left, card H-01 on the right with two-oh-eight blocked red and the buttons Confirm error and Dismiss"></a>
+<figcaption>Real capture of <code>docs/replay/</code>: the same page as the live queue, verdicts precomputed. <a href="replay/">Open it</a>.</figcaption>
+</figure>
+<figure class="term" id="term">
+<div class="bar"><span>zsh · build/</span><button type="button" class="tbtn" id="term-play" aria-label="Replay the terminal session">replay</button></div>
+<pre tabindex="0" aria-label="Terminal session recorded on 2026-10-14"><span class="ln com" data-src="evidence/terminal-2026-10-14.log"># recorded 2026-10-14T17:42:54+07:00 in build/ at c57de6a (macOS arm64); stdout kept verbatim</span><span class="ln cmd">uv run python scripts/eval.py --rescore</span><span class="ln ok"><b>OK</b>   ablate-grounding-r1-reaudit.json :: without_grounding (rows, calls, meets_rule)</span><span class="ln ok"><b>OK</b>   ablate-grounding-r1.json :: without_grounding (rows, calls, meets_rule)</span><span class="ln ok"><b>OK</b>   dev-r1.json :: DeepSeek-V4-Flash (rows, calls, meets_rule)</span><span class="ln ok"><b>OK</b>   dev-r1.json :: Gemma-4-31B-IT (rows, calls, meets_rule)</span><span class="ln ok"><b>OK</b>   dev-r1.json :: MiMo-V2.6-Flash (rows, calls, meets_rule)</span><span class="ln ok"><b>OK</b>   dev-r1.json :: MiniCPM5-2B (rows, calls, meets_rule)</span><span class="ln ok"><b>OK</b>   dev-r1.json :: Qwen3.8-27B (rows, calls, meets_rule)</span><span class="ln ok"><b>OK</b>   dev-r1.json :: regex (rows, calls, meets_rule)</span><span class="ln ok"><b>OK</b>   dev-r2-repro-reaudit.json :: DeepSeek-V4-Flash (rows, calls, meets_rule)</span><span class="ln ok"><b>OK</b>   dev-r2-repro-reaudit.json :: regex (rows, calls, meets_rule)</span><span class="ln ok"><b>OK</b>   dev-r2-repro.json :: DeepSeek-V4-Flash (rows, calls, meets_rule)</span><span class="ln ok"><b>OK</b>   dev-r2-repro.json :: regex (rows, calls, meets_rule)</span><span class="ln ok"><b>OK</b>   ladder-r1-reaudit.json :: DeepSeek-V4-Flash (rows, calls, meets_rule)</span><span class="ln ok"><b>OK</b>   ladder-r1-reaudit.json :: Gemma-4-31B-IT (rows, calls, meets_rule)</span><span class="ln ok"><b>OK</b>   ladder-r1-reaudit.json :: MiniCPM5-2B (rows, calls, meets_rule)</span><span class="ln ok"><b>OK</b>   ladder-r1-reaudit.json :: Qwen3.8-27B (rows, calls, meets_rule)</span><span class="ln ok"><b>OK</b>   ladder-r1-reaudit.json :: regex (rows, calls, meets_rule)</span><span class="ln ok"><b>OK</b>   ladder-r1.json :: DeepSeek-V4-Flash (rows, calls, meets_rule)</span><span class="ln ok"><b>OK</b>   ladder-r1.json :: Gemma-4-31B-IT (rows, calls, meets_rule)</span><span class="ln ok"><b>OK</b>   ladder-r1.json :: MiniCPM5-2B (rows, calls, meets_rule)</span><span class="ln ok"><b>OK</b>   ladder-r1.json :: Qwen3.8-27B (rows, calls, meets_rule)</span><span class="ln ok"><b>OK</b>   ladder-r1.json :: regex (rows, calls, meets_rule)</span><span class="ln ok"><b>OK</b>   llm-judge-r1-reaudit.json :: llm_judge (rows, calls, meets_rule)</span><span class="ln ok"><b>OK</b>   llm-judge-r1.json :: llm_judge (rows, calls, meets_rule)</span><span class="ln com" data-src="evidence/terminal-2026-10-14.log"># exit 0 · wall 3.0 s</span><span class="ln cmd">jq -r &#x27;.events[] | select(.type==&quot;judged&quot; and .card.exchange_id==&quot;H-01&quot;) | .card.verdict.trace[]&#x27; docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json</span><span class="ln">instruction: grounded + covered (1 command(s))</span><span class="ln">read-back: grounded + covered (1 command(s))</span><span class="ln">audio: no gate (no token probabilities, no unprompted pass)</span><span class="ln">instruction: XV-203 line B (registry ok)</span><span class="ln diff">compare: tag: XV-203 ≠ XV-208</span><span class="ln com" data-src="evidence/terminal-2026-10-14.log"># exit 0 · wall 0.0 s</span><span class="ln cmd">jq -c &#x27;.events[] | select(.type==&quot;judged&quot; and .card.exchange_id==&quot;H-01&quot;) | .card.turns[].receipt | {request_id, model_served, host, latency_s}&#x27; docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json</span><span class="ln">{&quot;request_id&quot;:&quot;980edf5c577d429b906b24cfae299218&quot;,&quot;model_served&quot;:&quot;self-dploy/Gemma-4-31B-IT&quot;,&quot;host&quot;:&quot;developer.amd.com.cn&quot;,&quot;latency_s&quot;:10.7585}</span><span class="ln">{&quot;request_id&quot;:&quot;c9647a04cfcc4eeaadbfa965a4d74c6d&quot;,&quot;model_served&quot;:&quot;self-dploy/Gemma-4-31B-IT&quot;,&quot;host&quot;:&quot;developer.amd.com.cn&quot;,&quot;latency_s&quot;:35.4972}</span><span class="ln com" data-src="evidence/terminal-2026-10-14.log"># exit 0 · wall 0.0 s</span></pre>
+<figcaption>Transcript: <code>evidence/terminal-2026-10-14.log</code> (build c57de6a). <button type="button" class="copy" data-copy="uv run python scripts/eval.py --rescore">Copy the command</button></figcaption>
+</figure>
+</div>
+</section>
+
+<section class="sec try" id="try" aria-labelledby="h-try">
+<div class="sec-head">
+<p class="lab" data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">Pick a transmission · 10 of 145 · stored run, verdicts precomputed</p>
+<h2 id="h-try">Ten real cards from the stored shift.</h2>
+<p class="lede">Each card is the referee’s own output for the stored Gemma-4-31B-IT run: the verdict, the field diff, the trace, and the receipt of every model call. Nothing on this page judges in your browser. Two of the ten fooled the LLM-as-judge baseline; one is a false alarm of ours.</p>
+<button type="button" class="btn amb lg refused" data-pick="R-01"><span>Try the refused one</span><b>XV-205</b></button>
+</div>
+<div class="console">
+<div class="log" role="listbox" aria-label="Exchanges" id="picklist">
+<div class="log-h" aria-hidden="true"><span>T+</span><span>VERDICT</span><span>FIELD</span><span>FROM → TO</span></div>
+<button type="button" role="option" class="row v-MISMATCH" data-pick="H-01" aria-selected="true"><span class="t">00:06</span><span class="vw">MISMATCH</span><span class="f">tag</span><span class="ft">XV-203 → <b>XV-208</b></span><span class="why">The two-oh-eight read-back. The tag differs; the registry puts XV-208 on line A.</span></button>
+<button type="button" role="option" class="row v-ABSTAIN" data-pick="R-01" aria-selected="false"><span class="t">00:28</span><span class="vw">ABSTAIN</span><span class="f">unknown tag</span><span class="ft">XV-205</span><span class="why">The refused one. XV-205 is not in the plant registry, so the referee will not clear it.</span></button>
+<button type="button" role="option" class="row v-MISMATCH" data-pick="A2-066" aria-selected="false"><span class="t">14:29</span><span class="vw">MISMATCH</span><span class="f">action</span><span class="ft">START → <b>missing</b></span><span class="why">The action word never came back. The LLM-as-judge baseline passed this as VERIFIED.</span></button>
+<button type="button" role="option" class="row v-MISMATCH" data-pick="A2-044" aria-selected="false"><span class="t">09:49</span><span class="vw">MISMATCH</span><span class="f">action</span><span class="ft">ISOLATE → <b>missing</b></span><span class="why">Bahasa read-back without the action word. The LLM-as-judge baseline passed it too.</span></button>
+<button type="button" role="option" class="row v-MISMATCH" data-pick="A2-053" aria-selected="false"><span class="t">11:59</span><span class="vw">MISMATCH</span><span class="f">line</span><span class="ft">C → <b>A</b></span><span class="why">“Say again?” The window stays open; the second read-back says line Alpha.</span></button>
+<button type="button" role="option" class="row v-VERIFIED" data-pick="A2-026" aria-selected="false"><span class="t">05:59</span><span class="vw">VERIFIED</span><span class="f"></span><span class="ft">CLOSE XV-203 line B</span><span class="why">Caught on the channel: the operator says “Negative” and the tech reads back again.</span></button>
+<button type="button" role="option" class="row v-MISMATCH" data-pick="A2-031" aria-selected="false"><span class="t">07:05</span><span class="vw">MISMATCH</span><span class="f">line</span><span class="ft">A → <b>C</b></span><span class="why">The operator corrected the line; the read-back kept the old one.</span></button>
+<button type="button" role="option" class="row v-NO_READBACK" data-pick="A2-082" aria-selected="false"><span class="t">17:18</span><span class="vw">NO-READBACK</span><span class="f">read-back</span><span class="ft">no reply in the window</span><span class="why">An instruction nobody read back.</span></button>
+<button type="button" role="option" class="row v-MISMATCH" data-pick="A2-003" aria-selected="false"><span class="t">01:08</span><span class="vw">MISMATCH</span><span class="f">tag</span><span class="ft">P-114 → <b>P-140</b></span><span class="why">Look-alike pump tag in Bahasa: satu satu empat read back as satu empat nol.</span></button>
+<button type="button" role="option" class="row v-MISMATCH" data-pick="A2-050" aria-selected="false"><span class="t">11:19</span><span class="vw">MISMATCH</span><span class="f">line</span><span class="ft">B → <b>C</b></span><span class="why">One of the 2 false alarms: one spoken line for two pumps. Wrong, toward a human.</span></button>
+</div>
+<div class="detail" aria-live="polite">
+<div class="pick" data-pick-detail="H-01">
+<article class="xcard v-MISMATCH" id="x-H-01" data-x="H-01" data-ins="H-01-0" data-rb="H-01-1">
+<header class="xc-h">
+<p class="xc-v"><i class="ring" aria-hidden="true"></i><span>MISMATCH</span></p>
+<p class="xc-meta"><b>H-01</b> · CH-01 · English</p>
+</header>
+<p class="xc-diff"><b>tag: XV-203 ≠ XV-208</b> <span>XV-208 is on line A (registry)</span></p>
+<div class="xc-strip">
+<div class="xc-turn ins" data-t="H-01-0" data-role="operator">
+<p class="who"><b>OPERATOR</b><span>H-01-0</span><span>no recording</span></p>
+<p class="said"><span class="sp" data-f="action" data-c="0">Close</span> <span class="sp" data-f="tag" data-c="0">valve two-oh-three</span>, <span class="sp" data-f="line" data-c="0">line Bravo</span>.</p>
+</div>
+<div class="xc-turn rb" data-t="H-01-1" data-role="field">
+<p class="who"><b>FIELD TECH</b><span>H-01-1</span><span>no recording</span></p>
+<p class="said">Copy, <span class="sp" data-f="action" data-c="0">closing</span> <span class="sp" data-f="tag" data-c="0"><mark class="red">two-oh-eight</mark></span>, <span class="sp" data-f="line" data-c="0">line Bravo</span>.</p>
+</div>
+<svg class="connectors" aria-hidden="true"></svg>
+</div>
+<div class="xc-act">
+<button type="button" class="btn ink" data-act="confirm">Confirm error</button>
+<button type="button" class="btn" data-act="dismiss">Dismiss…</button>
+<form class="why" hidden><label>Reason <input name="why" maxlength="120" required placeholder="e.g. the tech corrected it on the channel"></label><button class="btn" type="submit">Dismiss</button></form>
+<p class="stamp" role="status" aria-live="polite"></p>
+</div>
+<ul class="xc-badges">
+<li>speaker <b>text·scripted</b></li>
+<li>radio <b>none (no audio)</b></li>
+<li class="amd">extraction <b>Gemma-4-31B-IT · AMD-hosted API</b></li>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">referee <b>local · 0.77 ms</b></li>
+</ul>
+</article>
+<div class="judge v-MISMATCH">
+<p class="lab">Same exchange · LLM-as-judge baseline</p>
+<p><b>MISMATCH</b> · DeepSeek-V4.1-Flash, given the whole exchange and no plant registry</p>
+</div>
+<details class="trace" open><summary>How the referee judged it <span>5 steps</span></summary><ol>
+<li>instruction: grounded + covered (1 command(s))</li>
+<li>read-back: grounded + covered (1 command(s))</li>
+<li>audio: no gate (no token probabilities, no unprompted pass)</li>
+<li>instruction: XV-203 line B (registry ok)</li>
+<li>compare: tag: XV-203 ≠ XV-208</li>
+</ol></details>
+<details class="rcpt"><summary>Receipts <span>2 model calls</span></summary><ul>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json"><b>H-01-0</b> <code>980edf5c577d429b906b24cfae299218</code> self-dploy/Gemma-4-31B-IT · developer.amd.com.cn · latency 10.7585 s · cost_usd 1.29535e-05</li>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json"><b>H-01-1</b> <code>c9647a04cfcc4eeaadbfa965a4d74c6d</code> self-dploy/Gemma-4-31B-IT · developer.amd.com.cn · latency 35.4972 s · cost_usd 4.8937e-06</li>
+</ul></details>
+</div>
+<div class="pick" data-pick-detail="R-01" hidden>
+<article class="xcard v-ABSTAIN" id="x-R-01" data-x="R-01" data-ins="R-01-0" data-rb="R-01-1">
+<header class="xc-h">
+<p class="xc-v"><i class="ring" aria-hidden="true"></i><span>ABSTAIN</span></p>
+<p class="xc-meta"><b>R-01</b> · CH-01 · English</p>
+</header>
+<p class="xc-diff amb"><b>ABSTAIN · unknown tag</b> <span>cannot clear this exchange: a human must check it</span></p>
+<div class="xc-strip">
+<div class="xc-turn ins" data-t="R-01-0" data-role="operator">
+<p class="who"><b>OPERATOR</b><span>R-01-0</span><span>no recording</span></p>
+<p class="said"><span class="sp" data-f="action" data-c="0">Close</span> <span class="sp amb" data-f="tag" data-c="0">valve two-oh-five</span>, <span class="sp" data-f="line" data-c="0">line Charlie</span>.</p>
+<p class="chip amb">XV-205 not in registry</p>
+</div>
+<div class="xc-turn rb" data-t="R-01-1" data-role="field">
+<p class="who"><b>FIELD TECH</b><span>R-01-1</span><span>no recording</span></p>
+<p class="said">Copy, <span class="sp" data-f="action" data-c="0">closing</span> <span class="sp" data-f="tag" data-c="0">two-oh-five</span>, <span class="sp" data-f="line" data-c="0">line Charlie</span>.</p>
+</div>
+<svg class="connectors" aria-hidden="true"></svg>
+</div>
+<div class="xc-act">
+<button type="button" class="btn ink" data-act="confirm">Confirm: needs follow-up</button>
+<button type="button" class="btn" data-act="dismiss">Dismiss…</button>
+<form class="why" hidden><label>Reason <input name="why" maxlength="120" required placeholder="e.g. the tech corrected it on the channel"></label><button class="btn" type="submit">Dismiss</button></form>
+<p class="stamp" role="status" aria-live="polite"></p>
+</div>
+<ul class="xc-badges">
+<li>speaker <b>text·scripted</b></li>
+<li>radio <b>none (no audio)</b></li>
+<li class="amd">extraction <b>Gemma-4-31B-IT · AMD-hosted API</b></li>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">referee <b>local · 0.607 ms</b></li>
+</ul>
+</article>
+<div class="judge v-VERIFIED">
+<p class="lab">Same exchange · LLM-as-judge baseline</p>
+<p><b>VERIFIED</b> · DeepSeek-V4.1-Flash, given the whole exchange and no plant registry · <span class="wrong">an order for equipment the registry does not have, passed</span></p>
+</div>
+<details class="trace" open><summary>How the referee judged it <span>4 steps</span></summary><ol>
+<li>instruction: grounded + covered (1 command(s))</li>
+<li>read-back: grounded + covered (1 command(s))</li>
+<li>audio: no gate (no token probabilities, no unprompted pass)</li>
+<li>instruction: unknown tag</li>
+</ol></details>
+<details class="rcpt"><summary>Receipts <span>2 model calls</span></summary><ul>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json"><b>R-01-0</b> <code>bedcfa9abacf42fd8a45e4f0c52526ce</code> self-dploy/Gemma-4-31B-IT · developer.amd.com.cn · latency 46.0285 s · cost_usd 4.6529e-06</li>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json"><b>R-01-1</b> <code>d1a37fe88a3d41fab45cb507d428ff4a</code> self-dploy/Gemma-4-31B-IT · developer.amd.com.cn · latency 24.1268 s · cost_usd 4.6536e-06</li>
+</ul></details>
+</div>
+<div class="pick" data-pick-detail="A2-066" hidden>
+<article class="xcard v-MISMATCH" id="x-A2-066" data-x="A2-066" data-ins="A2-066-0" data-rb="A2-066-1">
+<header class="xc-h">
+<p class="xc-v"><i class="ring" aria-hidden="true"></i><span>MISMATCH</span></p>
+<p class="xc-meta"><b>A2-066</b> · CH-01 · English</p>
+</header>
+<p class="xc-diff"><b>action: missing (expected START)</b></p>
+<div class="xc-strip">
+<div class="xc-turn ins" data-t="A2-066-0" data-role="operator">
+<p class="who"><b>OPERATOR</b><span>A2-066-0</span><span>no recording</span></p>
+<p class="said"><span class="sp" data-f="action" data-c="0">Start</span> <span class="sp" data-f="tag" data-c="0">pump one-two-seven</span>, <span class="sp" data-f="line" data-c="0">line Alpha</span>.</p>
+</div>
+<div class="xc-turn rb" data-t="A2-066-1" data-role="field">
+<p class="who"><b>FIELD TECH</b><span>A2-066-1</span><span>no recording</span></p>
+<p class="said">Roger, <span class="sp" data-f="tag" data-c="0">pump one-two-seven</span>, <span class="sp" data-f="line" data-c="0">line Alpha</span>. <span class="gap">no action word</span></p>
+</div>
+<svg class="connectors" aria-hidden="true"></svg>
+</div>
+<div class="xc-act">
+<button type="button" class="btn ink" data-act="confirm">Confirm error</button>
+<button type="button" class="btn" data-act="dismiss">Dismiss…</button>
+<form class="why" hidden><label>Reason <input name="why" maxlength="120" required placeholder="e.g. the tech corrected it on the channel"></label><button class="btn" type="submit">Dismiss</button></form>
+<p class="stamp" role="status" aria-live="polite"></p>
+</div>
+<ul class="xc-badges">
+<li>speaker <b>text·scripted</b></li>
+<li>radio <b>none (no audio)</b></li>
+<li class="amd">extraction <b>Gemma-4-31B-IT · AMD-hosted API</b></li>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">referee <b>local · 0.541 ms</b></li>
+</ul>
+</article>
+<div class="judge v-VERIFIED">
+<p class="lab">Same exchange · LLM-as-judge baseline</p>
+<p><b>VERIFIED</b> · DeepSeek-V4.1-Flash, given the whole exchange and no plant registry · <span class="wrong">a wrong read-back passed</span></p>
+</div>
+<details class="trace" open><summary>How the referee judged it <span>5 steps</span></summary><ol>
+<li>instruction: grounded + covered (1 command(s))</li>
+<li>read-back: grounded + covered (1 command(s))</li>
+<li>audio: no gate (no token probabilities, no unprompted pass)</li>
+<li>instruction: P-127 line A (registry ok)</li>
+<li>compare: action: missing (expected START)</li>
+</ol></details>
+<details class="rcpt"><summary>Receipts <span>2 model calls</span></summary><ul>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json"><b>A2-066-0</b> <code>f9865ae58e204a05bb358fad58ee910f</code> self-dploy/Gemma-4-31B-IT · developer.amd.com.cn · latency 1.5654 s · cost_usd 4.8587e-06</li>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json"><b>A2-066-1</b> <code>efe40af5e62348b7b3a0a926ee2382cc</code> self-dploy/Gemma-4-31B-IT · developer.amd.com.cn · latency 1.5373 s · cost_usd 4.8937e-06</li>
+</ul></details>
+</div>
+<div class="pick" data-pick-detail="A2-044" hidden>
+<article class="xcard v-MISMATCH" id="x-A2-044" data-x="A2-044" data-ins="A2-044-0" data-rb="A2-044-1">
+<header class="xc-h">
+<p class="xc-v"><i class="ring" aria-hidden="true"></i><span>MISMATCH</span></p>
+<p class="xc-meta"><b>A2-044</b> · CH-01 · Bahasa + English</p>
+</header>
+<p class="xc-diff"><b>action: missing (expected ISOLATE)</b></p>
+<div class="xc-strip">
+<div class="xc-turn ins" data-t="A2-044-0" data-role="operator">
+<p class="who"><b>OPERATOR</b><span>A2-044-0</span><span>no recording</span></p>
+<p class="said"><span class="sp" data-f="action" data-c="0">Isolasi</span> <span class="sp" data-f="tag" data-c="0">pompa satu empat dua</span>, <span class="sp" data-f="line" data-c="0">line Bravo</span>.</p>
+</div>
+<div class="xc-turn rb" data-t="A2-044-1" data-role="field">
+<p class="who"><b>FIELD TECH</b><span>A2-044-1</span><span>no recording</span></p>
+<p class="said">Siap, <span class="sp" data-f="tag" data-c="0">pompa satu empat dua</span>, <span class="sp" data-f="line" data-c="0">line Bravo</span>. <span class="gap">no action word</span></p>
+</div>
+<svg class="connectors" aria-hidden="true"></svg>
+</div>
+<div class="xc-act">
+<button type="button" class="btn ink" data-act="confirm">Confirm error</button>
+<button type="button" class="btn" data-act="dismiss">Dismiss…</button>
+<form class="why" hidden><label>Reason <input name="why" maxlength="120" required placeholder="e.g. the tech corrected it on the channel"></label><button class="btn" type="submit">Dismiss</button></form>
+<p class="stamp" role="status" aria-live="polite"></p>
+</div>
+<ul class="xc-badges">
+<li>speaker <b>text·scripted</b></li>
+<li>radio <b>none (no audio)</b></li>
+<li class="amd">extraction <b>Gemma-4-31B-IT · AMD-hosted API</b></li>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">referee <b>local · 0.61 ms</b></li>
+</ul>
+</article>
+<div class="judge v-VERIFIED">
+<p class="lab">Same exchange · LLM-as-judge baseline</p>
+<p><b>VERIFIED</b> · DeepSeek-V4.1-Flash, given the whole exchange and no plant registry · <span class="wrong">a wrong read-back passed</span></p>
+</div>
+<details class="trace" open><summary>How the referee judged it <span>5 steps</span></summary><ol>
+<li>instruction: grounded + covered (1 command(s))</li>
+<li>read-back: grounded + covered (1 command(s))</li>
+<li>audio: no gate (no token probabilities, no unprompted pass)</li>
+<li>instruction: P-142 line B (registry ok)</li>
+<li>compare: action: missing (expected ISOLATE)</li>
+</ol></details>
+<details class="rcpt"><summary>Receipts <span>2 model calls</span></summary><ul>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json"><b>A2-044-0</b> <code>f471625d55224775804fc7f78d2ab8bf</code> self-dploy/Gemma-4-31B-IT · developer.amd.com.cn · latency 5.1617 s · cost_usd 4.8937e-06</li>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json"><b>A2-044-1</b> <code>e910020ab9c54236999dda674f3915fa</code> self-dploy/Gemma-4-31B-IT · developer.amd.com.cn · latency 9.8169 s · cost_usd 4.6858e-06</li>
+</ul></details>
+</div>
+<div class="pick" data-pick-detail="A2-053" hidden>
+<article class="xcard v-MISMATCH" id="x-A2-053" data-x="A2-053" data-ins="A2-053-2" data-rb="A2-053-3">
+<header class="xc-h">
+<p class="xc-v"><i class="ring" aria-hidden="true"></i><span>MISMATCH</span></p>
+<p class="xc-meta"><b>A2-053</b> · CH-01 · English</p>
+</header>
+<p class="xc-diff"><b>line: C ≠ A</b></p>
+<div class="xc-strip">
+<div class="xc-turn off" data-t="A2-053-0" data-role="operator">
+<p class="who"><b>OPERATOR</b><span>A2-053-0</span><span>no recording</span></p>
+<p class="said"><span class="sp" data-f="action" data-c="0">Close</span> <span class="sp" data-f="tag" data-c="0">valve two-four-four</span>, <span class="sp" data-f="line" data-c="0">line Charlie</span>.</p>
+</div>
+<div class="xc-turn off" data-t="A2-053-1" data-role="field">
+<p class="who"><b>FIELD TECH</b><span>A2-053-1</span><span>no recording</span></p>
+<p class="said">Say again?</p>
+</div>
+<div class="xc-turn ins" data-t="A2-053-2" data-role="operator">
+<p class="who"><b>OPERATOR</b><span>A2-053-2</span><span>no recording</span></p>
+<p class="said">I say again, <span class="sp" data-f="action" data-c="0">close</span> <span class="sp" data-f="tag" data-c="0">valve two-four-four</span>, <span class="sp" data-f="line" data-c="0">line Charlie</span>.</p>
+</div>
+<div class="xc-turn rb" data-t="A2-053-3" data-role="field">
+<p class="who"><b>FIELD TECH</b><span>A2-053-3</span><span>no recording</span></p>
+<p class="said">Copy, <span class="sp" data-f="action" data-c="0">closing</span> <span class="sp" data-f="tag" data-c="0">valve two-four-four</span>, <span class="sp" data-f="line" data-c="0">line <mark class="red">Alpha</mark></span>.</p>
+</div>
+<svg class="connectors" aria-hidden="true"></svg>
+</div>
+<div class="xc-act">
+<button type="button" class="btn ink" data-act="confirm">Confirm error</button>
+<button type="button" class="btn" data-act="dismiss">Dismiss…</button>
+<form class="why" hidden><label>Reason <input name="why" maxlength="120" required placeholder="e.g. the tech corrected it on the channel"></label><button class="btn" type="submit">Dismiss</button></form>
+<p class="stamp" role="status" aria-live="polite"></p>
+</div>
+<ul class="xc-badges">
+<li>speaker <b>text·scripted</b></li>
+<li>radio <b>none (no audio)</b></li>
+<li class="amd">extraction <b>Gemma-4-31B-IT · AMD-hosted API</b></li>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">referee <b>local · 1.0 ms</b></li>
+</ul>
+</article>
+<div class="judge v-MISMATCH">
+<p class="lab">Same exchange · LLM-as-judge baseline</p>
+<p><b>MISMATCH</b> · DeepSeek-V4.1-Flash, given the whole exchange and no plant registry</p>
+</div>
+<details class="trace" open><summary>How the referee judged it <span>5 steps</span></summary><ol>
+<li>instruction: grounded + covered (1 command(s))</li>
+<li>read-back: grounded + covered (1 command(s))</li>
+<li>audio: no gate (no token probabilities, no unprompted pass)</li>
+<li>instruction: XV-244 line C (registry ok)</li>
+<li>compare: line: C ≠ A</li>
+</ol></details>
+<details class="rcpt"><summary>Receipts <span>4 model calls</span></summary><ul>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json"><b>A2-053-0</b> <code>395fa4ab8538466e826b3683e5bae2a6</code> self-dploy/Gemma-4-31B-IT · developer.amd.com.cn · latency 3.8837 s · cost_usd 4.7215e-06</li>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json"><b>A2-053-1</b> <code>2acc414fab064395933e470390617f60</code> self-dploy/Gemma-4-31B-IT · developer.amd.com.cn · latency 2.3611 s · cost_usd 2.1287e-06</li>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json"><b>A2-053-2</b> <code>7c1c809486e74064b0b8996d46519fd6</code> self-dploy/Gemma-4-31B-IT · developer.amd.com.cn · latency 5.514 s · cost_usd 5.1387e-06</li>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json"><b>A2-053-3</b> <code>97ef2da447094c1fa8c77cdc8e3fe942</code> self-dploy/Gemma-4-31B-IT · developer.amd.com.cn · latency 28.6795 s · cost_usd 4.9301e-06</li>
+</ul></details>
+</div>
+<div class="pick" data-pick-detail="A2-026" hidden>
+<article class="xcard v-VERIFIED" id="x-A2-026" data-x="A2-026" data-ins="A2-026-2" data-rb="A2-026-3">
+<header class="xc-h">
+<p class="xc-v"><i class="ring" aria-hidden="true"></i><span>VERIFIED</span></p>
+<p class="xc-meta"><b>A2-026</b> · CH-01 · English</p>
+</header>
+<p class="xc-diff ok"><b>VERIFIED</b> <span>every field of the read-back matches the order · caught on the channel</span></p>
+<div class="xc-strip">
+<div class="xc-turn off" data-t="A2-026-0" data-role="operator">
+<p class="who"><b>OPERATOR</b><span>A2-026-0</span><span>no recording</span></p>
+<p class="said"><span class="sp" data-f="action" data-c="0">Close</span> <span class="sp" data-f="tag" data-c="0">valve two-oh-three</span>, <span class="sp" data-f="line" data-c="0">line Bravo</span>.</p>
+</div>
+<div class="xc-turn off" data-t="A2-026-1" data-role="field">
+<p class="who"><b>FIELD TECH</b><span>A2-026-1</span><span>no recording</span></p>
+<p class="said">Roger, <span class="sp" data-f="action" data-c="0">closing</span> <span class="sp" data-f="tag" data-c="0">valve two-oh-eight</span>, <span class="sp" data-f="line" data-c="0">line Bravo</span>.</p>
+</div>
+<div class="xc-turn ins" data-t="A2-026-2" data-role="operator">
+<p class="who"><b>OPERATOR</b><span>A2-026-2</span><span>no recording</span></p>
+<p class="said">Negative, <span class="sp" data-f="action" data-c="0">close</span> <span class="sp" data-f="tag" data-c="0">valve two-oh-three</span>, <span class="sp" data-f="line" data-c="0">line Bravo</span>.</p>
+</div>
+<div class="xc-turn rb" data-t="A2-026-3" data-role="field">
+<p class="who"><b>FIELD TECH</b><span>A2-026-3</span><span>no recording</span></p>
+<p class="said">Copy, <span class="sp" data-f="action" data-c="0">closing</span> <span class="sp" data-f="tag" data-c="0">two-oh-three</span>, <span class="sp" data-f="line" data-c="0">line Bravo</span>.</p>
+</div>
+<div class="xc-turn off" data-t="A2-026-4" data-role="operator">
+<p class="who"><b>OPERATOR</b><span>A2-026-4</span><span>no recording</span></p>
+<p class="said">Correct.</p>
+</div>
+<svg class="connectors" aria-hidden="true"></svg>
+</div>
+<ul class="xc-badges">
+<li>speaker <b>text·scripted</b></li>
+<li>radio <b>none (no audio)</b></li>
+<li class="amd">extraction <b>Gemma-4-31B-IT · AMD-hosted API</b></li>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">referee <b>local · 1.401 ms</b></li>
+</ul>
+</article>
+<div class="judge v-VERIFIED">
+<p class="lab">Same exchange · LLM-as-judge baseline</p>
+<p><b>VERIFIED</b> · DeepSeek-V4.1-Flash, given the whole exchange and no plant registry</p>
+</div>
+<details class="trace" open><summary>How the referee judged it <span>5 steps</span></summary><ol>
+<li>instruction: grounded + covered (1 command(s))</li>
+<li>read-back: grounded + covered (1 command(s))</li>
+<li>audio: no gate (no token probabilities, no unprompted pass)</li>
+<li>instruction: XV-203 line B (registry ok)</li>
+<li>compare: every field equal</li>
+</ol></details>
+<details class="rcpt"><summary>Receipts <span>5 model calls</span></summary><ul>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json"><b>A2-026-0</b> <code>980edf5c577d429b906b24cfae299218</code> self-dploy/Gemma-4-31B-IT · developer.amd.com.cn · latency 10.7585 s · cost_usd 1.29535e-05</li>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json"><b>A2-026-1</b> <code>bd45495374ae4e2db2caee374d8f20fc</code> self-dploy/Gemma-4-31B-IT · developer.amd.com.cn · latency 3.3286 s · cost_usd 4.8958e-06</li>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json"><b>A2-026-2</b> <code>281ebbf2d8584e8f92f4afc4258daeee</code> self-dploy/Gemma-4-31B-IT · developer.amd.com.cn · latency 4.5289 s · cost_usd 4.8944e-06</li>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json"><b>A2-026-3</b> <code>020cf5b5674f43cd92f9f9d7ecd27f46</code> self-dploy/Gemma-4-31B-IT · developer.amd.com.cn · latency 4.9228 s · cost_usd 4.8251e-06</li>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json"><b>A2-026-4</b> <code>b18a4bb810f74abaacc680ba5dde35e3</code> self-dploy/Gemma-4-31B-IT · developer.amd.com.cn · latency 2.0134 s · cost_usd 1.9537e-06</li>
+</ul></details>
+</div>
+<div class="pick" data-pick-detail="A2-031" hidden>
+<article class="xcard v-MISMATCH" id="x-A2-031" data-x="A2-031" data-ins="A2-031-0" data-rb="A2-031-1">
+<header class="xc-h">
+<p class="xc-v"><i class="ring" aria-hidden="true"></i><span>MISMATCH</span></p>
+<p class="xc-meta"><b>A2-031</b> · CH-01 · English</p>
+</header>
+<p class="xc-diff"><b>line: A ≠ C</b></p>
+<div class="xc-strip">
+<div class="xc-turn ins" data-t="A2-031-0" data-role="operator">
+<p class="who"><b>OPERATOR</b><span>A2-031-0</span><span>no recording</span></p>
+<p class="said"><span class="sp" data-f="action" data-c="0">Open</span> <span class="sp" data-f="tag" data-c="0">valve two-four-two</span>, line Charlie, correction, <span class="sp" data-f="line" data-c="0">line Alpha</span>.</p>
+</div>
+<div class="xc-turn rb" data-t="A2-031-1" data-role="field">
+<p class="who"><b>FIELD TECH</b><span>A2-031-1</span><span>no recording</span></p>
+<p class="said">Copy, <span class="sp" data-f="action" data-c="0">opening</span> <span class="sp" data-f="tag" data-c="0">two-four-two</span>, <span class="sp" data-f="line" data-c="0">line <mark class="red">Charlie</mark></span>.</p>
+</div>
+<svg class="connectors" aria-hidden="true"></svg>
+</div>
+<div class="xc-act">
+<button type="button" class="btn ink" data-act="confirm">Confirm error</button>
+<button type="button" class="btn" data-act="dismiss">Dismiss…</button>
+<form class="why" hidden><label>Reason <input name="why" maxlength="120" required placeholder="e.g. the tech corrected it on the channel"></label><button class="btn" type="submit">Dismiss</button></form>
+<p class="stamp" role="status" aria-live="polite"></p>
+</div>
+<ul class="xc-badges">
+<li>speaker <b>text·scripted</b></li>
+<li>radio <b>none (no audio)</b></li>
+<li class="amd">extraction <b>Gemma-4-31B-IT · AMD-hosted API</b></li>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">referee <b>local · 0.776 ms</b></li>
+</ul>
+</article>
+<div class="judge v-MISMATCH">
+<p class="lab">Same exchange · LLM-as-judge baseline</p>
+<p><b>MISMATCH</b> · DeepSeek-V4.1-Flash, given the whole exchange and no plant registry</p>
+</div>
+<details class="trace" open><summary>How the referee judged it <span>5 steps</span></summary><ol>
+<li>instruction: grounded + covered (1 command(s))</li>
+<li>read-back: grounded + covered (1 command(s))</li>
+<li>audio: no gate (no token probabilities, no unprompted pass)</li>
+<li>instruction: XV-242 line A (registry ok)</li>
+<li>compare: line: A ≠ C</li>
+</ol></details>
+<details class="rcpt"><summary>Receipts <span>2 model calls</span></summary><ul>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json"><b>A2-031-0</b> <code>4b790cfda14a4917a8b126c983758358</code> self-dploy/Gemma-4-31B-IT · developer.amd.com.cn · latency 4.5523 s · cost_usd 5.1737e-06</li>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json"><b>A2-031-1</b> <code>682383d635dc4dfcb1d252b2021e1ff1</code> self-dploy/Gemma-4-31B-IT · developer.amd.com.cn · latency 8.0199 s · cost_usd 4.8251e-06</li>
+</ul></details>
+</div>
+<div class="pick" data-pick-detail="A2-082" hidden>
+<article class="xcard v-NO_READBACK" id="x-A2-082" data-x="A2-082" data-ins="A2-082-0" data-rb="None">
+<header class="xc-h">
+<p class="xc-v"><i class="ring" aria-hidden="true"></i><span>NO-READBACK</span></p>
+<p class="xc-meta"><b>A2-082</b> · CH-01 · English</p>
+</header>
+<p class="xc-diff amb"><b>NO-READBACK</b> <span>no read-back inside the window</span></p>
+<div class="xc-strip">
+<div class="xc-turn ins" data-t="A2-082-0" data-role="operator">
+<p class="who"><b>OPERATOR</b><span>A2-082-0</span><span>no recording</span></p>
+<p class="said"><span class="sp" data-f="action" data-c="0">Start</span> <span class="sp" data-f="tag" data-c="0">pump two-one-five</span>, <span class="sp" data-f="line" data-c="0">line Bravo</span>.</p>
+</div>
+<div class="xc-turn none rb"><p class="who"><b>FIELD TECH</b><span>no turn inside the window</span></p><p class="said">no reply</p></div>
+<svg class="connectors" aria-hidden="true"></svg>
+</div>
+<div class="xc-act">
+<button type="button" class="btn ink" data-act="confirm">Confirm: call back</button>
+<button type="button" class="btn" data-act="dismiss">Dismiss…</button>
+<form class="why" hidden><label>Reason <input name="why" maxlength="120" required placeholder="e.g. the tech corrected it on the channel"></label><button class="btn" type="submit">Dismiss</button></form>
+<p class="stamp" role="status" aria-live="polite"></p>
+</div>
+<ul class="xc-badges">
+<li>speaker <b>text·scripted</b></li>
+<li>radio <b>none (no audio)</b></li>
+<li class="amd">extraction <b>Gemma-4-31B-IT · AMD-hosted API</b></li>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">referee <b>local · 0.282 ms</b></li>
+</ul>
+</article>
+<div class="judge v-NO_READBACK">
+<p class="lab">Same exchange · LLM-as-judge baseline</p>
+<p><b>NO-READBACK</b> · DeepSeek-V4.1-Flash, given the whole exchange and no plant registry</p>
+</div>
+<details class="trace" open><summary>How the referee judged it <span>4 steps</span></summary><ol>
+<li>instruction: grounded + covered (1 command(s))</li>
+<li>audio: no gate (no token probabilities, no unprompted pass)</li>
+<li>instruction: P-215 line B (registry ok)</li>
+<li>pairing: no read-back inside the window</li>
+</ol></details>
+<details class="rcpt"><summary>Receipts <span>1 model calls</span></summary><ul>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json"><b>A2-082-0</b> <code>05ffe82591404b019baaf298ab5edb5e</code> self-dploy/Gemma-4-31B-IT · developer.amd.com.cn · latency 4.0142 s · cost_usd 4.7901e-06</li>
+</ul></details>
+</div>
+<div class="pick" data-pick-detail="A2-003" hidden>
+<article class="xcard v-MISMATCH" id="x-A2-003" data-x="A2-003" data-ins="A2-003-0" data-rb="A2-003-1">
+<header class="xc-h">
+<p class="xc-v"><i class="ring" aria-hidden="true"></i><span>MISMATCH</span></p>
+<p class="xc-meta"><b>A2-003</b> · CH-01 · Bahasa + English</p>
+</header>
+<p class="xc-diff"><b>tag: P-114 ≠ P-140</b> <span>P-140 is on line C (registry)</span></p>
+<div class="xc-strip">
+<div class="xc-turn ins" data-t="A2-003-0" data-role="operator">
+<p class="who"><b>OPERATOR</b><span>A2-003-0</span><span>no recording</span></p>
+<p class="said">Tolong <span class="sp" data-f="action" data-c="0">matikan</span> <span class="sp" data-f="tag" data-c="0">pompa satu satu empat</span>, <span class="sp" data-f="line" data-c="0">jalur Charlie</span>.</p>
+</div>
+<div class="xc-turn rb" data-t="A2-003-1" data-role="field">
+<p class="who"><b>FIELD TECH</b><span>A2-003-1</span><span>no recording</span></p>
+<p class="said">Siap, <span class="sp" data-f="action" data-c="0">matikan</span> <span class="sp" data-f="tag" data-c="0">pompa satu empat <mark class="red">nol</mark></span>, <span class="sp" data-f="line" data-c="0">jalur Charlie</span>.</p>
+</div>
+<svg class="connectors" aria-hidden="true"></svg>
+</div>
+<div class="xc-act">
+<button type="button" class="btn ink" data-act="confirm">Confirm error</button>
+<button type="button" class="btn" data-act="dismiss">Dismiss…</button>
+<form class="why" hidden><label>Reason <input name="why" maxlength="120" required placeholder="e.g. the tech corrected it on the channel"></label><button class="btn" type="submit">Dismiss</button></form>
+<p class="stamp" role="status" aria-live="polite"></p>
+</div>
+<ul class="xc-badges">
+<li>speaker <b>text·scripted</b></li>
+<li>radio <b>none (no audio)</b></li>
+<li class="amd">extraction <b>Gemma-4-31B-IT · AMD-hosted API</b></li>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">referee <b>local · 0.628 ms</b></li>
+</ul>
+</article>
+<div class="judge v-MISMATCH">
+<p class="lab">Same exchange · LLM-as-judge baseline</p>
+<p><b>MISMATCH</b> · DeepSeek-V4.1-Flash, given the whole exchange and no plant registry</p>
+</div>
+<details class="trace" open><summary>How the referee judged it <span>5 steps</span></summary><ol>
+<li>instruction: grounded + covered (1 command(s))</li>
+<li>read-back: grounded + covered (1 command(s))</li>
+<li>audio: no gate (no token probabilities, no unprompted pass)</li>
+<li>instruction: P-114 line C (registry ok)</li>
+<li>compare: tag: P-114 ≠ P-140</li>
+</ol></details>
+<details class="rcpt"><summary>Receipts <span>2 model calls</span></summary><ul>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json"><b>A2-003-0</b> <code>a8c9926c29e146ca94fd650e960c7f37</code> self-dploy/Gemma-4-31B-IT · developer.amd.com.cn · latency 11.889 s · cost_usd 4.9637e-06</li>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json"><b>A2-003-1</b> <code>962e9250fdd3426fa133e0f1a517e214</code> self-dploy/Gemma-4-31B-IT · developer.amd.com.cn · latency 3.7852 s · cost_usd 4.8958e-06</li>
+</ul></details>
+</div>
+<div class="pick" data-pick-detail="A2-050" hidden>
+<article class="xcard v-MISMATCH" id="x-A2-050" data-x="A2-050" data-ins="A2-050-0" data-rb="A2-050-1">
+<header class="xc-h">
+<p class="xc-v"><i class="ring" aria-hidden="true"></i><span>MISMATCH</span></p>
+<p class="xc-meta"><b>A2-050</b> · CH-01 · English</p>
+</header>
+<p class="xc-diff"><b>line: B ≠ C</b></p>
+<div class="xc-strip">
+<div class="xc-turn ins" data-t="A2-050-0" data-role="operator">
+<p class="who"><b>OPERATOR</b><span>A2-050-0</span><span>no recording</span></p>
+<p class="said"><span class="sp" data-f="action" data-c="0">Start</span> <span class="sp" data-f="tag" data-c="0">pump one-four-two</span> and <span class="sp" data-f="action" data-c="1">start</span> <span class="sp" data-f="tag" data-c="1">pump one-five-six</span>, <span class="sp" data-f="line" data-c="1">line Charlie</span>.</p>
+</div>
+<div class="xc-turn rb" data-t="A2-050-1" data-role="field">
+<p class="who"><b>FIELD TECH</b><span>A2-050-1</span><span>no recording</span></p>
+<p class="said">Copy, <span class="sp" data-f="action" data-c="0">starting</span> <span class="sp" data-f="tag" data-c="0">one-four-two</span> and <span class="sp" data-f="action" data-c="1">starting</span> <span class="sp" data-f="tag" data-c="1">one-five-six</span>, <span class="sp" data-f="line" data-c="0">line Charlie</span>.</p>
+</div>
+<svg class="connectors" aria-hidden="true"></svg>
+</div>
+<div class="xc-act">
+<button type="button" class="btn ink" data-act="confirm">Confirm error</button>
+<button type="button" class="btn" data-act="dismiss">Dismiss…</button>
+<form class="why" hidden><label>Reason <input name="why" maxlength="120" required placeholder="e.g. the tech corrected it on the channel"></label><button class="btn" type="submit">Dismiss</button></form>
+<p class="stamp" role="status" aria-live="polite"></p>
+</div>
+<ul class="xc-badges">
+<li>speaker <b>text·scripted</b></li>
+<li>radio <b>none (no audio)</b></li>
+<li class="amd">extraction <b>Gemma-4-31B-IT · AMD-hosted API</b></li>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">referee <b>local · 0.972 ms</b></li>
+</ul>
+</article>
+<div class="judge v-VERIFIED">
+<p class="lab">Same exchange · LLM-as-judge baseline</p>
+<p><b>VERIFIED</b> · DeepSeek-V4.1-Flash, given the whole exchange and no plant registry</p>
+</div>
+<details class="trace" open><summary>How the referee judged it <span>5 steps</span></summary><ol>
+<li>instruction: grounded + covered (2 command(s))</li>
+<li>read-back: grounded + covered (2 command(s))</li>
+<li>audio: no gate (no token probabilities, no unprompted pass)</li>
+<li>instruction: P-142 line B, P-156 line C (registry ok)</li>
+<li>compare: line: B ≠ C</li>
+</ol></details>
+<details class="rcpt"><summary>Receipts <span>2 model calls</span></summary><ul>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json"><b>A2-050-0</b> <code>104da3a53e7a4eabaedaced2e935a768</code> self-dploy/Gemma-4-31B-IT · developer.amd.com.cn · latency 4.1025 s · cost_usd 7.4515e-06</li>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json"><b>A2-050-1</b> <code>5d028f54f8e34d2e8c1861ea77a4632e</code> self-dploy/Gemma-4-31B-IT · developer.amd.com.cn · latency 2.4817 s · cost_usd 7.5901e-06</li>
+</ul></details>
+</div>
+</div>
+</div>
+</section>
+
+<section class="sec ladder" id="ladder" aria-labelledby="h-lad">
+<div class="sec-head">
+<p class="lab" data-src="bench/results/text/ladder-r1-reaudit.json">Model ladder · 89 held-out exchanges · text·scripted</p>
+<h2 id="h-lad">Climb only as high as the rule needs.</h2>
+<p class="lede">The rule was pre-registered before the first model call: the smallest rung with 0 false-VERIFIED and at most 5 % false-alarm load. Every model rung extracts spans on the AMD Token Factory; the referee makes each one fail toward a human.</p>
+</div>
+<div class="rungs" role="table" aria-label="Model ladder results, held-out exchanges">
+<div class="rg-h" role="row"><span role="columnheader">Rung</span><span role="columnheader">False-VERIFIED</span><span role="columnheader">Seeded errors flagged</span><span role="columnheader">False alarms, 48 correct read-backs</span><span role="columnheader">Latency, median / 95th pct</span><span role="columnheader">Meets the rule</span></div>
+<div class="rg meets" role="row" data-rung="regex">
+<span role="cell" class="nm"><b>regex</b><small>rung 0 · no model</small></span>
+<span role="cell" class="fv" data-src="bench/results/text/ladder-r1-reaudit.json"><b class="num">0</b></span>
+<span role="cell" class="ef" data-src="bench/results/text/ladder-r1-reaudit.json">41/41</span>
+<span role="cell" class="fa" data-src="bench/results/text/ladder-r1-reaudit.json"><span class="cells"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><b>0/48</b></span>
+<span role="cell" class="lt" data-src="bench/results/text/ladder-r1.json">no model call</span>
+<span role="cell" class="mr" data-src="bench/results/text/ladder-r1-reaudit.json"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>meets</span>
+</div>
+<div class="rg" role="row" data-rung="MiniCPM5-2B">
+<span role="cell" class="nm"><b>MiniCPM5-2B</b><small>smallest model</small></span>
+<span role="cell" class="fv" data-src="bench/results/text/ladder-r1-reaudit.json"><b class="num">0</b></span>
+<span role="cell" class="ef" data-src="bench/results/text/ladder-r1-reaudit.json">41/41</span>
+<span role="cell" class="fa" data-src="bench/results/text/ladder-r1-reaudit.json"><span class="cells"><i class="on" title="A2-021: false alarm"></i><i class="on" title="A2-022: false alarm"></i><i class="on" title="A2-024: false alarm"></i><i class="on" title="A2-025: false alarm"></i><i class="on" title="A2-026: false alarm"></i><i class="on" title="A2-028: false alarm"></i><i class="on" title="A2-030: false alarm"></i><i class="on" title="A2-035: false alarm"></i><i class="on" title="A2-036: false alarm"></i><i class="on" title="A2-037: false alarm"></i><i class="on" title="A2-038: false alarm"></i><i class="on" title="A2-040: false alarm"></i><i class="on" title="A2-041: false alarm"></i><i class="on" title="A2-042: false alarm"></i><i class="on" title="A2-045: false alarm"></i><i class="on" title="A2-047: false alarm"></i><i class="on" title="A2-048: false alarm"></i><i class="on" title="A2-049: false alarm"></i><i class="on" title="A2-050: false alarm"></i><i class="on" title="A2-051: false alarm"></i><i class="on" title="A2-054: false alarm"></i><i class="on" title="A2-057: false alarm"></i><i class="on" title="A2-058: false alarm"></i><i class="on" title="A2-059: false alarm"></i><i class="on" title="A2-060: false alarm"></i><i class="on" title="A2-062: false alarm"></i><i class="on" title="A2-067: false alarm"></i><i class="on" title="A2-070: false alarm"></i><i class="on" title="A2-072: false alarm"></i><i class="on" title="A2-073: false alarm"></i><i class="on" title="A2-077: false alarm"></i><i class="on" title="A2-079: false alarm"></i><i class="on" title="A2-081: false alarm"></i><i class="on" title="A2-083: false alarm"></i><i class="on" title="A2-084: false alarm"></i><i class="on" title="A2-086: false alarm"></i><i class="on" title="A2-087: false alarm"></i><i class="on" title="A2-088: false alarm"></i><i class="on" title="A2-090: false alarm"></i><i class="on" title="A2-094: false alarm"></i><i class="on" title="A2-095: false alarm"></i><i class="on" title="A2-096: false alarm"></i><i class="on" title="A2-099: false alarm"></i><i class="on" title="A2-100: false alarm"></i><i class="on" title="A2-102: false alarm"></i><i class="on" title="A2-103: false alarm"></i><i class="on" title="A2-104: false alarm"></i><i class="on" title="A2-106: false alarm"></i></span><b>48/48</b></span>
+<span role="cell" class="lt" data-src="bench/results/text/ladder-r1.json">1.3975 s / 6.9094 s</span>
+<span role="cell" class="mr" data-src="bench/results/text/ladder-r1-reaudit.json">all 48 to a human</span>
+</div>
+<div class="rg meets" role="row" data-rung="Gemma-4-31B-IT">
+<span role="cell" class="nm"><b>Gemma-4-31B-IT</b><small>thinking off</small></span>
+<span role="cell" class="fv" data-src="bench/results/text/ladder-r1-reaudit.json"><b class="num">0</b></span>
+<span role="cell" class="ef" data-src="bench/results/text/ladder-r1-reaudit.json">41/41</span>
+<span role="cell" class="fa" data-src="bench/results/text/ladder-r1-reaudit.json"><span class="cells"><i></i><i></i><i></i><i></i><i></i><i></i><i class="on" title="A2-030: false alarm"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on" title="A2-050: false alarm"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><b>2/48</b></span>
+<span role="cell" class="lt" data-src="bench/results/text/ladder-r1.json">4.304 s / 35.8702 s</span>
+<span role="cell" class="mr" data-src="bench/results/text/ladder-r1-reaudit.json"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>meets</span>
+</div>
+<div class="rg" role="row" data-rung="DeepSeek-V4-Flash">
+<span role="cell" class="nm"><b>DeepSeek-V4-Flash</b><small>thinking off</small></span>
+<span role="cell" class="fv" data-src="bench/results/text/ladder-r1-reaudit.json"><b class="num">0</b></span>
+<span role="cell" class="ef" data-src="bench/results/text/ladder-r1-reaudit.json">41/41</span>
+<span role="cell" class="fa" data-src="bench/results/text/ladder-r1-reaudit.json"><span class="cells"><i></i><i></i><i></i><i></i><i></i><i></i><i class="on" title="A2-030: false alarm"></i><i class="on" title="A2-035: false alarm"></i><i></i><i class="on" title="A2-037: false alarm"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on" title="A2-051: false alarm"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><b>4/48</b></span>
+<span role="cell" class="lt" data-src="bench/results/text/ladder-r1.json">4.0574 s / 11.1292 s</span>
+<span role="cell" class="mr" data-src="bench/results/text/ladder-r1-reaudit.json">over budget</span>
+</div>
+<div class="rg" role="row" data-rung="Qwen3.8-27B">
+<span role="cell" class="nm"><b>Qwen3.8-27B</b><small>thinking on</small></span>
+<span role="cell" class="fv" data-src="bench/results/text/ladder-r1-reaudit.json"><b class="num">0</b></span>
+<span role="cell" class="ef" data-src="bench/results/text/ladder-r1-reaudit.json">41/41</span>
+<span role="cell" class="fa" data-src="bench/results/text/ladder-r1-reaudit.json"><span class="cells"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on" title="A2-037: false alarm"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on" title="A2-050: false alarm"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on" title="A2-088: false alarm"></i><i></i><i class="on" title="A2-094: false alarm"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><b>4/48</b></span>
+<span role="cell" class="lt" data-src="bench/results/text/ladder-r1.json">14.1714 s / 62.5185 s</span>
+<span role="cell" class="mr" data-src="bench/results/text/ladder-r1-reaudit.json">over budget</span>
+</div>
+<div class="rg judge" role="row">
+<span role="cell" class="nm"><b>LLM-as-judge</b><small>baseline · DeepSeek-V4.1-Flash · no registry</small></span>
+<span role="cell" class="fv" data-src="bench/results/text/llm-judge-r1-reaudit.json"><b class="num bad">2</b></span>
+<span role="cell" class="ef" data-src="bench/results/text/llm-judge-r1-reaudit.json">35/41</span>
+<span role="cell" class="fa" data-src="bench/results/text/llm-judge-r1-reaudit.json"><span class="cells"><i title="A2-021: VERIFIED"></i><i title="A2-022: VERIFIED"></i><i title="A2-024: VERIFIED"></i><i title="A2-025: VERIFIED"></i><i title="A2-026: VERIFIED"></i><i title="A2-028: VERIFIED"></i><i title="A2-030: VERIFIED"></i><i title="A2-035: VERIFIED"></i><i class="on" title="A2-036: false alarm"></i><i title="A2-037: VERIFIED"></i><i title="A2-038: VERIFIED"></i><i title="A2-040: VERIFIED"></i><i title="A2-041: VERIFIED"></i><i title="A2-042: VERIFIED"></i><i title="A2-045: VERIFIED"></i><i title="A2-047: VERIFIED"></i><i title="A2-048: VERIFIED"></i><i title="A2-049: VERIFIED"></i><i title="A2-050: VERIFIED"></i><i title="A2-051: VERIFIED"></i><i class="na" title="A2-054: call failed, not audited"></i><i title="A2-057: VERIFIED"></i><i title="A2-058: VERIFIED"></i><i title="A2-059: VERIFIED"></i><i title="A2-060: VERIFIED"></i><i title="A2-062: VERIFIED"></i><i title="A2-067: VERIFIED"></i><i title="A2-070: VERIFIED"></i><i title="A2-072: VERIFIED"></i><i title="A2-073: VERIFIED"></i><i title="A2-077: VERIFIED"></i><i title="A2-079: VERIFIED"></i><i title="A2-081: VERIFIED"></i><i title="A2-083: VERIFIED"></i><i title="A2-084: VERIFIED"></i><i title="A2-086: VERIFIED"></i><i title="A2-087: VERIFIED"></i><i title="A2-088: VERIFIED"></i><i title="A2-090: VERIFIED"></i><i title="A2-094: VERIFIED"></i><i title="A2-095: VERIFIED"></i><i title="A2-096: VERIFIED"></i><i title="A2-099: VERIFIED"></i><i title="A2-100: VERIFIED"></i><i title="A2-102: VERIFIED"></i><i title="A2-103: VERIFIED"></i><i title="A2-104: VERIFIED"></i><i title="A2-106: VERIFIED"></i></span><b>1/48</b></span>
+<span role="cell" class="lt">passed XV-205</span>
+<span role="cell" class="mr">no</span>
+</div>
+</div>
+<p class="legend" data-src="bench/results/text/ladder-r1.json">Cells: the 48 correct read-backs, filled where a rung sent one to a human anyway. Latency is the first pass of each model rung, from bench/results/text/ladder-r1.json. Hatched: the call failed and the exchange was not audited. The judge’s 2 is the number that matters: wrong read-backs it passed.</p>
+<div class="ladder-notes">
+<p class="note" data-src="bench/results/text/ladder-r1-reaudit.json"><b>On written words, rung 0 already meets the rule.</b> A frozen regex, no model: 41/41 errors flagged, 0/48 false alarms. Whether that survives real speech, noise and other people’s phrasing is what the audio rows measure.</p>
+<p class="note" data-src="bench/results/text/ablate-grounding-r1-reaudit.json"><b>Grounding is load-bearing.</b> The same model returning values instead of copied words: false alarms 2/48 → 6/48, in 4 of the 6 turning a spoken pump or motor-valve tag into a valve tag the registry does not have.</p>
+<p class="note" data-src="bench/results/text/llm-judge-r1-reaudit.json"><b>Judging is not the model’s job.</b> Given the whole exchange and no registry, the LLM-as-judge baseline passed 2 wrong read-backs as VERIFIED and passed the XV-205 order, a valve the plant does not have.</p>
+</div>
+</section>
+
+<section class="sec how" id="how" aria-labelledby="h-how">
+<div class="sec-head">
+<p class="lab">Referee · plain Python · pure function</p>
+<h2 id="h-how">The model points. Code decides. A human closes the card.</h2>
+</div>
+<div class="bento">
+<article class="b1">
+<svg class="ic" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 38 L20 10 L26 24 L40 20"/><circle cx="40" cy="20" r="4"/></svg>
+<h3>The model points at words</h3>
+<p>For each turn, the model on the AMD Token Factory returns the words that carry the action, the tag and the line: copied spans, never values. JSON mode, schema checked in code; any failed call is NOT_AUDITED, never a pass.</p>
+<pre class="json" aria-label="Stored extraction of the read-back in H-01">{
+  <span class="k">&quot;commands&quot;</span>: [
+    {
+      <span class="k">&quot;action_span&quot;</span>: <span class="s">&quot;closing&quot;</span>,
+      <span class="k">&quot;line_span&quot;</span>: <span class="s">&quot;line Bravo&quot;</span>,
+      <span class="k">&quot;state_span&quot;</span>: null,
+      <span class="k">&quot;tag_span&quot;</span>: <span class="s">&quot;two-oh-eight&quot;</span>
+    }
+  ],
+  <span class="k">&quot;kind&quot;</span>: <span class="s">&quot;readback&quot;</span>,
+  <span class="k">&quot;retracted_spans&quot;</span>: []
+}</pre>
+<p class="chip"><code>sayagain/extract.py</code> Gemma-4-31B-IT</p>
+</article>
+<article class="b2">
+<svg class="ic" viewBox="0 0 48 48" aria-hidden="true"><path d="M6 14h36M6 24h22M6 34h30"/><path d="M34 22l4 4 7-8"/></svg>
+<h3>The words must be there</h3>
+<p data-src="bench/results/text/ablate-grounding-r1-reaudit.json">Every span must appear in the transcript. Without that check, the same model raised false alarms from 2/48 to 6/48.</p>
+<p class="chip"><code>referee/grounding.py</code></p>
+</article>
+<article class="b3">
+<svg class="ic" viewBox="0 0 48 48" aria-hidden="true"><rect x="8" y="8" width="32" height="32" rx="2"/><path d="M14 18h20M14 26h12M14 34h16"/></svg>
+<h3>Every safety word counted</h3>
+<p>A read-back that drops the action word, or keeps a line the operator retracted, cannot verify.</p>
+<p class="chip"><code>referee/coverage.py</code></p>
+</article>
+<article class="b4">
+<svg class="ic" viewBox="0 0 48 48" aria-hidden="true"><path d="M10 6h20l8 8v28H10z"/><path d="M16 22h16M16 30h10"/><circle cx="34" cy="36" r="6"/></svg>
+<h3>The plant registry has the last word</h3>
+<p>Spoken digits and NATO letters become tags through alias tables. A tag the registry lacks, like XV-205, is refused.</p>
+<p class="chip"><code>data/registry.csv</code> 120 tags</p>
+</article>
+<article class="b5">
+<svg class="ic" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="16" r="8"/><path d="M8 42c2-9 8-13 16-13s14 4 16 13"/></svg>
+<h3>A human closes every card</h3>
+<p>Confirm, or dismiss with a reason. Ten random VERIFIED exchanges per shift go to an end-of-shift spot-check. Nothing is ever sent to the plant.</p>
+<p class="chip"><code>sayagain/server.py</code> FastAPI + server-sent events</p>
+</article>
+<article class="b6">
+<svg class="ic" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 24h10l4-10 6 20 4-10h8"/></svg>
+<h3>The verdict is a pure function</h3>
+<p>The verdict module imports no model code, and a test fails the build if it ever does.</p>
+<p class="chip"><code>tests/test_verdict.py</code></p>
+</article>
+</div>
+</section>
+
+<section class="sec amd" id="amd" aria-labelledby="h-amd">
+<div class="sec-head">
+<p class="lab">Receipts · where each stage ran</p>
+<h2 id="h-amd">Every stage says where it ran.</h2>
+<p class="lede">A card is only as honest as its stage line. These come from receipts, not from a slide: the gateway host, the model served, the request id and the cost of each call.</p>
+</div>
+<ol class="stages">
+<li class="pending"><p class="st">Speech-to-text</p><p class="where">not measured yet</p><p class="what">Local Whisper is planned and badged with where it ran. The Token Factory lists no transcription model.</p><p class="slot">measured Oct 16</p></li>
+<li class="on"><p class="st">Span extraction</p><p class="where">AMD Token Factory · developer.amd.com.cn</p><p class="what">Gemma-4-31B-IT, DeepSeek-V4-Flash, Qwen3.8-27B and MiniCPM5-2B served the ladder; every call has a receipt in <code>bench/results/receipts/</code>.</p></li>
+<li><p class="st">Referee</p><p class="where">local · plain Python</p><p class="what" data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">0.77 ms for card H-01, from the stored run.</p></li>
+<li><p class="st">Supervisor queue</p><p class="where">local · FastAPI</p><p class="what">Server-sent events to the queue page; reviews in SQLite.</p></li>
+</ol>
+<div class="probe" data-src="bench/results/access-gate.json">
+<p><b class="num">11</b> instruct models listed by the access probe · <b class="num">8</b> returned a span extraction the referee reads as CLOSE · XV-208 · line B · <b class="num">0</b> accepted JSON-schema output · <b class="num">0</b> returned token log-probs · <b class="num">0</b> transcription models.</p>
+<p class="src"><code>bench/results/access-gate.json</code> · friction log in <a href="DX-REPORT.md">docs/DX-REPORT.md</a></p>
+</div>
+<p class="why-amd">The ladder is also the sizing step for a plant: the smallest model that never waves a wrong read-back through is the one a site would run on its own servers. That benchmark is the next step, not a claim on this page.</p>
+</section>
+
+<section class="sec pays" id="pays" aria-labelledby="h-pay">
+<div class="sec-head">
+<p class="lab">Who pays · assumptions labelled</p>
+<h2 id="h-pay">Sold per radio channel, to the people who own the audit.</h2>
+</div>
+<div class="pay-grid">
+<div class="pay-calc">
+<p class="calc"><span class="n">1,318</span><span class="u">palm-oil mills operating in Indonesia, 2022 (Trase)</span></p>
+<p class="calc" data-src="evidence/sources.json"><span class="op">×</span><span class="n">30 %</span><span class="u">addressable: group-owned, radio-run mills (assumption)</span></p>
+<p class="calc"><span class="op">×</span><span class="n">6</span><span class="u">radio channels per mill (assumption)</span></p>
+<p class="calc"><span class="op">×</span><span class="n">USD 2,400</span><span class="u">per channel-year licence (assumption)</span></p>
+<p class="calc total"><span class="op">≈</span><span class="n">USD 5.7 M</span><span class="u">a year, mills line only: the floor of the Indonesian beachhead</span></p>
+</div>
+<ul class="pay-facts">
+<li data-src="evidence/sources.json"><b>Buyer.</b> The HSE / K3 manager who owns the SMK3 audit (PP 50/2012), and the mill manager. A timestamped record of order, read-back, verdict and supervisor decision is audit evidence.</li>
+<li><b>Wedge.</b> A free 30-day listen-only baseline at one mill: measure the plant’s own read-back error rate, the number nobody has published.</li>
+<li data-src="evidence/sources.json"><b>Privacy.</b> Voice is personal data under Indonesia’s UU PDP 27/2022, so production is designed to run inside the company network, keep audio only for queue cards, and score procedures, never people.</li>
+<li data-src="bench/results/text/ladder-r1.json"><b>Compute.</b> The first Gemma-4-31B-IT pass over the shift made 300 calls and cost USD 0.000895 at the Token Factory’s price.</li>
+</ul>
+</div>
+</section>
+
+<section class="sec honest" id="honest" aria-labelledby="h-hon">
+<div class="sec-head">
+<p class="lab">README · honest limits</p>
+<h2 id="h-hon">Honest by design.</h2>
+</div>
+<div class="quotes">
+<blockquote><p>No recorded speech has been measured. Every result is <code>text·scripted</code>, each rung&#x27;s result on clean written words.</p><cite>build/README.md · Honest limits, 1</cite></blockquote>
+<blockquote><p>On scripted words the plain regex rung meets the rule with no model, so what a language model adds is unproven until the audio rows exist.</p><cite>build/README.md · Honest limits, 3</cite></blockquote>
+<blockquote><p>The plant, its 120 tags and every exchange are fictional; the error mix is seeded, not sampled from a real site.</p><cite>build/README.md · Honest limits, 4</cite></blockquote>
+</div>
+<div class="pending-wrap">
+<p class="lab">Measured next · Oct 16 · from the human recordings</p>
+<ul class="slots">
+<li><b>Audio row</b><span>errors flagged, false-alarm load and false-VERIFIED on recorded speech, 0 dB</span><em>measured Oct 16</em></li>
+<li><b>Failure case</b><span>−6 dB look-alike pairs: XV-203 vs XV-208, P-114 vs P-140, MOV-31A vs MOV-31H</span><em>measured Oct 16</em></li>
+<li><b>Kill test</b><span>Whisper-large-v3 on 20 own-voice clips: forced English, forced Bahasa, auto</span><em>measured Oct 16</em></li>
+<li><b>Blind auditor</b><span>minutes per exchange and errors caught, by ear against the queue</span><em>measured Oct 16</em></li>
+</ul>
+</div>
+</section>
+
+<section class="sec faq" id="faq" aria-labelledby="h-faq">
+<div class="sec-head">
+<p class="lab">Questions a judge would ask</p>
+<h2 id="h-faq">FAQ</h2>
+</div>
+<div class="qa">
+<details><summary>Where does the AMD Token Factory sit in the pipeline?</summary>
+<p>It does the one model job: span extraction. Each call returns the words for action, tag and line, and its receipt records the request id, the model served, the host and the cost.</p>
+<p>Speech-to-text has not run yet, because no recording has been measured; the Token Factory lists no transcription model. The referee and the queue are plain Python on the operator’s side.</p></details>
+<details><summary>Couldn’t an LLM just judge the read-back?</summary>
+<p data-src="bench/results/text/llm-judge-r1-reaudit.json">We measured that. DeepSeek-V4.1-Flash, given the whole exchange and no plant registry, passed 2 wrong read-backs as VERIFIED and passed the XV-205 order, a valve the plant does not have. In SayAgain the model only points at words; the verdict is code.</p></details>
+<details><summary>A regex already meets the rule. Why a model at all?</summary>
+<p>On clean written words it does: that is our own result, and the page says so. Real speech is not clean: recognition errors, code-switched Bahasa, other people’s phrasing. The audio rows decide whether a model earns its place; if they say it does not, the report will say that.</p></details>
+<details><summary>What happens when the radio is too noisy to hear?</summary>
+<p>The referee does not guess. A turn it cannot read is NOT_AUDITED, and an exchange it cannot clear reaches a human as ABSTAIN, in amber: listen yourself. The −6 dB look-alike failure case is measured on Oct 16.</p></details>
+<details><summary>Does SayAgain control anything in the plant?</summary>
+<p>No. It has no write path to the plant. A card leaves the queue only when a supervisor confirms it or dismisses it with a reason.</p></details>
+<details><summary>Isn’t this a way to watch workers?</summary>
+<p data-src="evidence/sources.json">It checks procedures, not people: no speaker identification, no per-person scores, audio kept only for cards in the queue. Voice is personal data under UU PDP 27/2022, so production is designed to run inside the company network.</p></details>
+<details><summary>Don’t radio loggers already do this?</summary>
+<p>They record and transcribe, and some spot keywords. Among the loggers we checked, none documents comparing an instruction with its read-back. Automatic read-back checking exists in air-traffic research (HAAWAII); we have not found it on plant radio.</p></details>
+<details><summary>What on this page is real today?</summary>
+<p>Every verdict, trace, receipt and count comes from files in this repository: <code>bench/results/</code>, <code>docs/replay/data/</code>, <code>evidence/</code>. The exchanges are written scripts for a fictional plant (text·scripted); no recording has been measured. Dashed boxes are results that do not exist yet.</p></details>
+</div>
+</section>
+
+</main>
+
+<footer class="foot">
+<div class="foot-in">
+<a class="brand" href="#top"><img src="assets/icon.svg" alt="" width="28" height="28"><span>SAYAGAIN</span></a>
+<p>Built for the AMD Developer Hackathon ACT III on lablab.ai, Intelligent Industry track.</p>
+<ul>
+<li><a href="https://github.com/edycutjong/sayagain">GitHub</a></li>
+<li><a href="pitch/">Pitch deck</a></li>
+<li><a href="replay/">Replay</a></li>
+<li><a href="DX-REPORT.md">DX report</a></li>
+<li><a href="https://github.com/edycutjong/sayagain/blob/main/LICENSE">MIT licence</a></li>
+</ul>
+<p class="ver">dev build c57de6a · no release tag yet · page built 2026-10-14</p>
+</div>
+</footer>
+<script src="assets/site.js" defer></script>
+</body>
+</html>
