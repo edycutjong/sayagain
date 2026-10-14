@@ -173,9 +173,9 @@ placeholder, a hardware or serving-stack name no receipt backs, or a number its 
 | Swapped actions between two commands cannot verify | A model that reports the swapped actions must not turn the error into a pass | `tests/test_review_round1.py:52` |
 | A retraction needs a spoken cue | A silent "correction" must not clear a wrong read-back | `tests/test_grounding_coverage.py:74` |
 | A retraction must be replaced by words of its own kind, after the cue | Otherwise a model that takes back the later tag verifies a technician's self-correction to the wrong valve, or one that takes back an order's verb and tag drops it from the live queue | `tests/test_review_round5.py:61` |
-| No extraction of a self-corrected read-back verifies a wrong final reading | 3,000 seeded read-backs with spoken corrections, each read by an extractor that groups and retracts the turn's real safety words at random: the referee may abstain or flag, never verify a wrong valve, action or line | `tests/test_review_round5.py:134` |
+| No sampled extraction of a self-corrected read-back verifies a wrong final reading | 3,000 seeded read-backs with spoken corrections, each read by an extractor that groups and retracts the turn's real safety words at random: the referee may abstain or flag, never verify a wrong valve, action or line | `tests/test_review_round5.py:134` |
 | A correction without a new read-back keeps the wrong one live | The operator saying "Negative" is not the technician fixing it | `tests/test_review_round1.py:91` |
-| An unreadable second read-back is judged, never taken as the acknowledgement | A failed extraction of "Copy, closing two-oh-eight" after a correct read-back must not let the exchange stand VERIFIED | `tests/test_review_round5.py:190` |
+| An unreadable second read-back is judged, never taken as the acknowledgement | An extraction the referee cannot read of "Copy, closing two-oh-eight" after a correct read-back must not let the exchange stand VERIFIED (a failed model call goes to the end-of-shift list as not audited) | `tests/test_review_round5.py:190` |
 | A `NOT_AUDITED` turn is never VERIFIED | A failed model call must not become a pass | `tests/test_verdict.py:196` |
 | A referee exception fails closed, while reading, pairing or judging a turn | A bug must reach a human, not a log, and never end the shift; the benchmark stops on one instead of counting it | `tests/test_verdict.py:203`, `tests/test_review_round5.py:168` |
 | The verdict module imports no model code | The verdict cannot be moved into the model | `tests/test_verdict.py:215` |
@@ -220,9 +220,9 @@ uv run python scripts/export_run.py                # static replay of the stored
 The queue replays a shift from a stored run: the referee judges each exchange from the model output the run
 recorded, and every card shows the receipt of each model call (request id, model served, host, latency, cost).
 `SAYAGAIN_LIVE_EXTRACT=1` lets the server call the AMD Token Factory for each turn instead of replaying the stored output
-(paced, capped per process; a failed call is `NOT_AUDITED`). The server is a local tool: it answers only to a localhost
-Host header, and the one write and the paid live calls refuse a request a browser marks as coming from another site, or
-from another port on this host.
+(paced, capped per process; a failed call is `NOT_AUDITED`). The server is a local tool: it answers only to a Host header
+that names this machine (`localhost` or the loopback address), and the one write and the paid live calls refuse a request
+a browser marks as coming from another site, or from another port on this host.
 
 ## 🧪 Testing & CI
 

@@ -520,7 +520,7 @@
     box.innerHTML = (dup > 0 ? '<p class="why eos-note">' + esc(eosIds().length) + ' exchanges; ' + esc(dup) + (dup === 1 ? ' appears' : ' appear') + ' in two lists.</p>' : '') +
       section('Spot-checks', e.spot_checks, 'Random VERIFIED exchanges a human re-checks at the end of the shift: how the plant learns whether the referee lets errors through.', 'No VERIFIED exchange to sample this shift.') +
       caughtSection(e.caught_on_channel) +
-      section('Not audited', e.not_audited, 'Each of these has at least one turn whose model call failed, so part of it was never judged. They are listed, never passed.', 'Every exchange was judged.') +
+      section('Not audited', e.not_audited, 'Each of these has at least one turn that was never judged (a model call failed, or the referee hit an error). They are listed, never passed.', 'Every exchange was judged.') +
       (orph.length ? section('Read-backs with no order heard', orph, 'A field read-back with no instruction heard before it on the channel: work nobody was heard ordering. Listed for a human, never passed.', '') : '');
     bindRows(box);
   }
@@ -711,10 +711,12 @@
       h += '<div class="diffline quiet"><span class="d">' + TICK + '</span><span class="note">Every field of the read-back matches the instruction, and the instruction matches the plant registry.' +
         (spot ? ' Drawn as a spot-check: a human re-checks it anyway.' : '') + '</span></div>';
     } else if (!v) {
-      h += '<div class="diffline quiet"><span class="note">No instruction on the channel: no exchange was opened, so there is nothing to judge.</span></div>';
+      h += '<div class="diffline quiet"><span class="note">' + (c.orphans && c.orphans.length
+        ? 'A read-back with no order heard before it on the channel: there is no instruction to judge it against, so it is on the end-of-shift list for a human.'
+        : 'No instruction on the channel: no exchange was opened, so there is nothing to judge.') + '</span></div>';
     }
     if (vk === 'ABSTAIN' && !opts.timing) h += '<p class="listen">' + (v.reason === 'audio' ? 'Cannot hear: listen yourself.' : 'Cannot clear this exchange: a human must check it.') + '</p>';
-    if (vk === 'NOT_AUDITED') h += '<p class="listen na">Not audited: a model call failed, so the referee did not judge this exchange. It is listed, never passed.</p>';
+    if (vk === 'NOT_AUDITED') h += '<p class="listen na">Not audited: ' + (v.reason === 'referee error' ? 'the referee hit an error on this exchange' : 'a model call failed') + ', so it was not judged. It is listed, never passed.</p>';
     // the read-back strip
     var ins = c.strip && turnById(c, c.strip.instruction), rb = c.strip && c.strip.readback && turnById(c, c.strip.readback);
     if (ins) {
@@ -740,7 +742,7 @@
     h += '<div class="badges">' +
       '<span class="bdg">speaker <b>' + esc(c.provenance.speaker) + '</b></span>' +
       '<span class="bdg">radio <b>' + esc(c.provenance.radio) + '</b></span>' +
-      (c.turns.some(function (t) { return t.receipt && t.receipt.on_amd; }) ? '<span class="bdg amd">extraction <b>' + esc(S.rung) + '</b> · <span class="nw">AMD-hosted API</span></span>'
+      (c.turns.some(function (t) { return t.receipt && t.receipt.on_amd && t.receipt.ok !== false; }) ? '<span class="bdg amd">extraction <b>' + esc(S.rung) + '</b> · <span class="nw">AMD-hosted API</span></span>'
         : '<span class="bdg">extraction <b>' + esc(S.rung === 'regex' ? 'regex' : S.rung) + '</b>' + (S.rung === 'regex' ? ', no model' : ', no successful call') + '</span>') +
       '<span class="bdg">referee <b>local</b> · <b>' + esc(c.referee_ms != null ? c.referee_ms.toFixed(2) + ' ms' : '') + '</b></span>' +
       '</div>';

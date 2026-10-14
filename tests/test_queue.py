@@ -97,7 +97,7 @@ def test_unknown_transcript_is_not_audited():
 @pytest.fixture()
 def client(tmp_path, monkeypatch):
     monkeypatch.delenv("SAYAGAIN_LIVE_EXTRACT", raising=False)
-    return TestClient(server.create_app(var=tmp_path))
+    return TestClient(server.create_app(var=tmp_path), base_url="http://127.0.0.1")
 
 
 def test_config_and_shift(client):

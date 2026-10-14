@@ -55,7 +55,7 @@ DECISIONS = ("confirmed", "dismissed")
 LIVE_BUDGET_USD = 0.05  # per server process; the account cap is $1/day
 PACE_S = 3.2  # 20 requests per minute per account
 MAX_SPEED = 64.0
-LOCAL_HOSTS = ["127.0.0.1", "localhost", "testserver"]  # testserver = FastAPI's TestClient
+LOCAL_HOSTS = ["127.0.0.1", "localhost"]  # the documented URL is http://127.0.0.1:8018/queue
 
 
 def live_allowed() -> bool:

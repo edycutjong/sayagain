@@ -244,7 +244,7 @@ def _client(tmp_path):
 
     from sayagain import server
 
-    return TestClient(server.create_app(var=tmp_path))
+    return TestClient(server.create_app(var=tmp_path), base_url="http://127.0.0.1")
 
 
 def test_the_queue_answers_only_to_a_localhost_host_header(tmp_path) -> None:
@@ -261,7 +261,7 @@ def test_a_cross_site_page_cannot_dismiss_a_card(tmp_path) -> None:
     body["reason"] = "not a real error"
     assert c.post("/api/review", json=body, headers={"origin": "http://evil.example"}).status_code == 403
     assert c.post("/api/review", json=body, headers={"sec-fetch-site": "cross-site"}).status_code == 403
-    assert c.post("/api/review", json=body, headers={"origin": "http://testserver"}).status_code == 201
+    assert c.post("/api/review", json=body, headers={"origin": "http://127.0.0.1"}).status_code == 201
 
 
 def test_a_cross_site_page_cannot_start_paid_live_calls(tmp_path) -> None:
