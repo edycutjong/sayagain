@@ -147,3 +147,37 @@ def test_no_extraction_of_a_self_corrected_readback_verifies_a_wrong_final_readi
         if v == "VERIFIED" and (still_open or final != right):
             wrong.append((text, rb))
     assert wrong == []
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Fail closed beyond judge(): a crash while reading one turn or pairing the turns is NOT_AUDITED, never a lost shift.
+
+
+def _boom(*_a, **_k):
+    raise RuntimeError("injected")
+
+
+def _hero_card() -> dict:
+    from sayagain import shift
+
+    card = next(c for c in shift.load_cards() if c["exchange_id"] == "H-01")
+    ext = shift.stored_extractor(shift.DEFAULT_RUN, shift.DEFAULT_RUNG)
+    return shift.judge_card(card, ext, REG, shift.DEFAULT_RUNG)
+
+
+def test_a_crash_while_reading_a_turn_is_not_audited(monkeypatch) -> None:
+    from referee import coverage
+
+    assert _hero_card()["verdict"]["verdict"] == "MISMATCH"
+    monkeypatch.setattr(coverage, "check", _boom)  # before the fix the RuntimeError escaped the shift
+    rec = _hero_card()
+    assert rec["verdict"]["verdict"] == "NOT_AUDITED" and rec["verdict"]["reason"] == "referee error"
+
+
+def test_a_crash_while_pairing_is_not_audited(monkeypatch) -> None:
+    from referee import audit as audit_mod
+
+    monkeypatch.setattr(audit_mod, "pair", _boom)
+    rec = _hero_card()
+    assert rec["verdict"]["verdict"] == "NOT_AUDITED"
+    assert "referee error (pairing)" in rec["trace"][0]

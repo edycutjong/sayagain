@@ -38,7 +38,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from referee.audit import _SEVERITY, LIVE, audit  # noqa: E402
+from referee.audit import _SEVERITY, LIVE, analyze_or_not_audited, audit  # noqa: E402
 from referee.registry import Registry  # noqa: E402
 from referee.schema import CANON_PROMPT, SYSTEM_PROMPT  # noqa: E402
 from referee.turns import Turn, analyze, analyze_canonical  # noqa: E402
@@ -127,7 +127,7 @@ def judge_card(card: dict, extract: Callable[[str], Extraction], registry: Regis
         turns.append(Turn(tid, card["exchange_id"], t0, t1, text, e.obj, not_audited=e.not_audited))
     rep = audit(turns, registry, analyzer=analyzer, spot_checks=0)
     judged = sorted(rep.judged, key=lambda j: -_SEVERITY[j.verdict.verdict])
-    analyses = [analyzer(t, registry) for t in turns]
+    analyses = [analyze_or_not_audited(t, registry, analyzer) for t in turns]
     return {
         "exchange_id": card["exchange_id"],
         "set": card["set"],

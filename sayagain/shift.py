@@ -25,10 +25,10 @@ from collections.abc import Callable, Iterator
 from functools import lru_cache
 from pathlib import Path
 
-from referee.audit import _SEVERITY, LIVE, SPOT_CHECKS_PER_SHIFT, audit, judge
+from referee.audit import _SEVERITY, LIVE, SPOT_CHECKS_PER_SHIFT, analyze_or_not_audited, audit, judge
 from referee.pairing import Exchange
 from referee.registry import Registry
-from referee.turns import Turn, TurnAnalysis, analyze
+from referee.turns import Turn, TurnAnalysis
 from referee.verdict import NOT_AUDITED, VERIFIED
 from sayagain.extract import Extraction
 
@@ -238,7 +238,7 @@ def judge_card(card: dict, extract: Callable[[str], Extraction], registry: Regis
     t = time.perf_counter()
     rep = audit(turns, registry, spot_checks=0)
     referee_ms = (time.perf_counter() - t) * 1000.0
-    analyses = {a.id: a for a in (analyze(tu, registry) for tu in turns)}
+    analyses = {a.id: a for a in (analyze_or_not_audited(tu, registry) for tu in turns)}
     ext_by_id = {tu.id: e for tu, e in zip(turns, exts, strict=True)}
     judged = sorted(rep.judged, key=lambda j: -_SEVERITY[j.verdict.verdict])
     top = judged[0] if judged else None

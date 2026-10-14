@@ -4,7 +4,8 @@ Routing (the shift budget in bench/PROTOCOL.md):
   * live queue (the supervisor's screen): MISMATCH, NO_READBACK, ABSTAIN;
   * end-of-shift list: caught-on-channel read-backs, NOT_AUDITED exchanges/turns, 10 random VERIFIED spot-checks;
   * VERIFIED otherwise: logged, no card.
-Fail closed: any exception while judging an exchange makes it NOT_AUDITED, never VERIFIED.
+Fail closed: any exception while reading a turn, pairing turns or judging an exchange makes it NOT_AUDITED, never
+VERIFIED, and never ends the shift.
 """
 
 from __future__ import annotations
@@ -35,6 +36,15 @@ class Judged:
 
 
 AUDIO_GATES = ("floor", "disagreement", "none")
+
+
+def analyze_or_not_audited(turn: Turn, registry: Registry, analyzer=analyze) -> TurnAnalysis:
+    """Fail closed per turn: a crash while reading one turn makes it NOT_AUDITED (an unreadable turn still opens a
+    pairing window, so its exchange reaches the end-of-shift list) instead of ending the shift."""
+    try:
+        return analyzer(turn, registry)
+    except Exception as e:  # noqa: BLE001 — fail closed, as in judge()
+        return TurnAnalysis(turn=turn, status="not_audited", reason="referee error", detail=f"{type(e).__name__}: {e}")
 
 
 def judge(ex: Exchange, *, floor: float | None = None, audio_gate: str | None = None) -> Verdict:
@@ -129,8 +139,20 @@ def audit(
     analyzer=analyze,
 ) -> ShiftReport:
     """`analyzer` is `turns.analyze` (the product); `turns.analyze_canonical` only for the grounding ablation."""
-    analyses = [analyzer(t, registry) for t in turns]
-    paired = pair(analyses)
+    analyses = [analyze_or_not_audited(t, registry, analyzer) for t in turns]
+    try:
+        paired = pair(analyses)
+    except Exception as e:  # noqa: BLE001 — a pairing crash: every turn becomes its own NOT_AUDITED exchange
+        trace = [f"referee error (pairing): {type(e).__name__}: {e}"]
+        return ShiftReport(
+            [
+                Judged(Exchange(a.turn.channel, a), Verdict(NOT_AUDITED, "referee error", trace=list(trace)))
+                for a in analyses
+            ],
+            [],
+            [],
+            [],
+        )
     judged: list[Judged] = []
     for ex in paired.exchanges:
         caught = [judge(Exchange(ex.channel, i, r), floor=floor, audio_gate=audio_gate) for i, r in ex.caught]
