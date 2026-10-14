@@ -32,7 +32,7 @@ the instruction; the card leaves the queue only through **Confirm** or **Dismiss
 
 | The hero exchange | The refused one | End of shift |
 |---|---|---|
-| ![MISMATCH card: tag XV-203 ≠ XV-208](docs/screenshots/replay-1440-2-hero.png) | ![ABSTAIN card: XV-205 is not in the plant registry](docs/screenshots/replay-1440-6-refused.png) | ![End-of-shift list: spot-checks, caught on channel, not audited](docs/screenshots/replay-1440-5-eos.png) |
+| ![MISMATCH card: tag XV-203 ≠ XV-208](docs/screenshots/replay-1440-2-hero.png) | ![ABSTAIN card: XV-205 is not in the plant registry](docs/screenshots/replay-1440-6-refused.png) | ![End-of-shift list: the ten spot-checks](docs/screenshots/replay-1440-5-eos.png) |
 
 Every card says where each stage ran (`speaker`, `radio`, `extraction`, `referee`) and lists the receipt of each model call
 behind it. The words on these cards are the recording cards' scripts (`text·scripted`): there is no audio yet, and the card
@@ -76,9 +76,9 @@ flowchart LR
 | Language, runtime | Python 3.11, `uv` |
 | Server | FastAPI, server-sent events, SQLite for reviews |
 | Extraction | AMD Token Factory (OpenAI-compatible), `json_object` mode, validated locally, fails closed to `NOT_AUDITED` |
-| Referee | pure Python, imports no model code (`tests/test_verdict.py`) |
+| Referee | pure Python; the verdict module imports no model code (`tests/test_verdict.py`) |
 | Front end | one static page, no framework: `web/` (live) and `docs/replay/` (static export of the same page) |
-| Quality | ruff, pytest, pip-audit, gitleaks, CodeQL |
+| Quality | ruff, pytest, pip-audit, gitleaks; GitHub Actions workflows and CodeQL |
 
 ### Build status (2026-10-14)
 
@@ -122,7 +122,8 @@ dev slice (the first 20 A2 cards and the 20 kill-test cards). Full tables with W
   0 false-VERIFIED and 2/48 false alarms (bench/results/text/ladder-r1-reaudit.json), after one re-audit of the 118
   transcripts whose first call failed (108 answered with HTTP status 500 by the gateway, 10 time-outs); the as-run first pass is
   bench/results/text/ladder-r1.json. Qwen3.8-27B and DeepSeek-V4-Flash also passed no wrong read-back but raised too
-  many false alarms for the shift budget.
+  many false alarms for the shift budget. Qwen3.8-27B needed a re-audit as well
+  (as run: 3 cards not audited, 39/41 errors flagged, bench/results/text/ladder-r1.json) and DeepSeek-V4-Flash one call.
 - **Models that miss fail toward a human:** MiniCPM5-2B returns malformed or misplaced spans, and the referee abstains on
   all 48 correct read-backs too, 48/48 false alarms, none passed (bench/results/text/ladder-r1-reaudit.json).
 - **Grounding ablation:** the same model returning normalised values instead of copied words raised false alarms
@@ -134,19 +135,20 @@ dev slice (the first 20 A2 cards and the 20 kill-test cards). Full tables with W
   still not audited after the re-audit.
 
 Every call above has a receipt in bench/results/receipts/, and `uv run python scripts/eval.py --rescore` re-judges
-every stored model output offline and re-derives every table in the result files. A second live run of
+every stored model output offline and re-derives every table in the result files (it reports OK for every result file). A second live run of
 DeepSeek-V4-Flash on the dev slice gave the same verdict on 40/40 cards (bench/results/text/repro-dev-DeepSeek-V4-Flash.json);
 temperature 0 gives no determinism guarantee at this gateway, so this is measured, not guaranteed.
 
-The access probe (bench/results/access-gate.json) found 8 instruct models on the AMD Token Factory whose span extraction
-of the hero read-back the referee reads as `CLOSE · XV-208 · line B`. The model list has no speech-to-text model, so
+The access probe (bench/results/access-gate.json) listed 11 instruct models on the AMD Token Factory; 8 of them returned a span
+extraction of the hero read-back that the referee reads as `CLOSE · XV-208 · line B` (the probe answer of Gemma-4-31B-IT was not
+valid JSON, and it passed in the ladder run). The model list has no speech-to-text model, so
 transcription will run elsewhere, and every stage will be labelled with where it ran. Friction log:
 [docs/DX-REPORT.md](docs/DX-REPORT.md).
 
 ## 📊 Engineering Rigor
 
-501 tests (`uv run pytest`; one runs only with local Whisper weights), ruff lint and format, `pip-audit`, gitleaks over the
-full history, CodeQL, and a readiness gate (`scripts/check_submission_readiness.py`) that fails the build on an unfilled
+501 tests (`uv run pytest`; one runs only with local Whisper weights), ruff lint and format, `pip-audit` and gitleaks over the
+full history (`make ci`, `make secrets`), CI workflows for the same checks plus CodeQL (see the CI badge for their state), and a readiness gate (`scripts/check_submission_readiness.py`) that fails the build on an unfilled
 placeholder, a hardware or serving-stack name no receipt backs, or a number its cited file does not contain.
 
 ### Attacks defeated
@@ -163,7 +165,7 @@ placeholder, a hardware or serving-stack name no receipt backs, or a number its 
 | A correction without a new read-back keeps the wrong one live | The operator saying "Negative" is not the technician fixing it | `tests/test_review_round1.py:91` |
 | A `NOT_AUDITED` turn is never VERIFIED | A failed model call must not become a pass | `tests/test_verdict.py:196` |
 | A referee exception fails closed | A bug must reach a human, not a log | `tests/test_verdict.py:203` |
-| The verdict module imports no model code | The judgment cannot be moved into the model | `tests/test_verdict.py:215` |
+| The verdict module imports no model code | The verdict cannot be moved into the model | `tests/test_verdict.py:215` |
 
 ### Honest limits (9)
 
