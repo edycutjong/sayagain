@@ -13,6 +13,7 @@ from dataclasses import dataclass, field
 
 from referee import aliases as al
 from referee import coverage, grounding
+from referee.regex_extractor import extract as regex_extract
 from referee.registry import Registry
 from referee.schema import validate_extraction
 from referee.verdict import R_COVERAGE, R_GROUNDING, CanonCommand, r_unmapped
@@ -48,7 +49,9 @@ class TurnAnalysis:
     say_again: bool = False
     operator_correction: bool = False
     imperative: bool = False
+    readback_shaped: bool = False  # opens with copy / roger / siap …: never opens a window of its own
     opens_window: bool = False
+    disagrees: bool = False  # prompted vs unprompted ASR read differently (only with an unprompted pass)
 
     @property
     def id(self) -> str:
@@ -86,6 +89,35 @@ def opens_with_correction(text: str) -> bool:
     return bool(toks) and toks[0].norm in al.OPERATOR_CORRECTION_CUES
 
 
+def cue_only(text: str) -> bool:
+    """'Negative.' / 'Koreksi, salah.' — nothing but correction cues and fillers ('No, hold on, stand by' is not)."""
+    toks = al.tokenize(text)
+    return bool(toks) and all(t.norm in al.OPERATOR_CORRECTION_CUES or t.norm in _LEAD_FILLERS for t in toks)
+
+
+def readback_shaped(text: str) -> bool:
+    toks = al.tokenize(text)
+    return bool(toks) and toks[0].norm in al.READBACK_CUES
+
+
+def canonical_tuples(text: str, registry: Registry) -> list[tuple[str, str, str]]:
+    """(action, tag, line) per command as the frozen regex + alias extractor reads it, tags resolved through the
+    registry; unreadable fields keep their words so two different unreadable readings still disagree."""
+    out = []
+    for c in regex_extract(text)["commands"]:
+        act = al.canon_action(c["action_span"]) if c["action_span"] else None
+        tag = al.canon_tag(c["tag_span"]) if c["tag_span"] else None
+        line = al.canon_line(c["line_span"]) if c["line_span"] else None
+        tag_s = registry.resolve(tag.prefix, tag.suffix or "").tag if isinstance(tag, al.Mention) else tag
+        out.append(
+            tuple(
+                "-" if v is None else (f"?{v.word}" if isinstance(v, al.Unmapped) else str(v))
+                for v in (act, tag_s, line)
+            )
+        )
+    return out  # type: ignore[return-value]
+
+
 def is_imperative(text: str) -> bool:
     """Opens with a bare imperative verb (after 'I say again', 'negative', 'tolong' …) — the operator's repeat.
 
@@ -114,8 +146,11 @@ def analyze(turn: Turn, registry: Registry) -> TurnAnalysis:
     a = TurnAnalysis(turn=turn, status="ok")
     text = turn.transcript or ""
     a.say_again = is_say_again(text)
-    a.operator_correction = opens_with_correction(text)
+    correction_cue = opens_with_correction(text)
     a.imperative = is_imperative(text)
+    a.readback_shaped = readback_shaped(text)
+    if turn.alt_transcript is not None:
+        a.disagrees = canonical_tuples(text, registry) != canonical_tuples(turn.alt_transcript, registry)
     if turn.not_audited:
         a.status, a.reason = "not_audited", turn.not_audited
         return a
@@ -125,7 +160,9 @@ def analyze(turn: Turn, registry: Registry) -> TurnAnalysis:
 
     def fail(reason: str, detail: str) -> TurnAnalysis:
         a.status, a.reason, a.detail = "abstain", reason, detail
-        a.opens_window = _scan_opens_window(text, registry)
+        a.opens_window = not a.readback_shaped and _scan_opens_window(text, registry)
+        # a correction must be cue-only ("Negative.") or carry the repeated command
+        a.operator_correction = correction_cue and (cue_only(text) or a.opens_window)
         return a
 
     problem = validate_extraction(turn.extraction)
@@ -175,11 +212,19 @@ def analyze(turn: Turn, registry: Registry) -> TurnAnalysis:
     # a turn opens a pairing window only with >= 1 grounded command that has an action and a tag that resolves to a
     # full tag (spoken prefix, or a bare number the registry knows); chatter and status talk ("pump one-forty is
     # running") never open one
-    a.opens_window = any(
-        c.action is not None and c.tag is not None and (c.tag_status in ("ok", "ambiguous") or "-" in c.tag)
-        for c in cmds
+    a.opens_window = not a.readback_shaped and any(
+        c.action is not None and _full_tag(c.tag, c.tag_status) for c in cmds
     )
+    a.operator_correction = correction_cue and (cue_only(text) or a.opens_window)
     return a
+
+
+def _full_tag(tag: str | None, status: str | None) -> bool:
+    """A tag that names equipment: in the registry, ambiguous, spoken with its prefix (XV-205), or a bare number in
+    registry suffix format (205) — so an unknown tag still opens a window and ends in ABSTAIN(unknown tag)."""
+    if tag is None:
+        return False
+    return status in ("ok", "ambiguous") or "-" in tag or al.is_suffix_format(tag)
 
 
 def _scan_opens_window(text: str, registry: Registry) -> bool:
@@ -193,7 +238,7 @@ def _scan_opens_window(text: str, registry: Registry) -> bool:
         return False
     for m in al.tag_mentions(toks):
         res = registry.resolve(m.prefix, m.suffix or "")
-        if res.status in ("ok", "ambiguous") or m.prefix is not None:
+        if _full_tag(res.tag, res.status):
             return True
     return False
 
@@ -201,18 +246,20 @@ def _scan_opens_window(text: str, registry: Registry) -> bool:
 def span_confidence(analyses: list[TurnAnalysis]) -> float | None:
     """Minimum ASR token probability inside the action, tag and line spans of every given turn.
 
-    None when any turn has no token probabilities (the ASR route does not expose them) — never invented.
+    None when it cannot be computed for every span — a turn without token probabilities, or a span no token overlaps.
+    Never invented, never partial: with a floor configured, None makes the referee abstain (audio).
     """
     probs: list[float] = []
     for a in analyses:
-        if a.turn.tokens is None:
+        if not a.turn.tokens:
             return None
         for cmd in a.spans:
             for f in ("action_span", "tag_span", "line_span"):
                 sp = cmd.get(f)
                 if sp is None:
                     continue
-                for s, e, lp in a.turn.tokens:
-                    if s < sp[1] and sp[0] < e:
-                        probs.append(math.exp(lp))
+                hit = [math.exp(lp) for s, e, lp in a.turn.tokens if s < sp[1] and sp[0] < e]
+                if not hit:
+                    return None
+                probs.extend(hit)
     return min(probs) if probs else None

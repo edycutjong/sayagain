@@ -87,6 +87,8 @@ def validate_instruction(cmds: list[CanonCommand]) -> str | None:
     if not cmds:
         return R_UNKNOWN
     for c in cmds:
+        if c.action is None:
+            return r_unmapped("no action")
         if c.tag is None or c.tag_status == "not_in_registry":
             return R_UNKNOWN
         if c.tag_status == "ambiguous":

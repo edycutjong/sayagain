@@ -33,7 +33,7 @@ Built and tested, nothing measured on recorded speech yet:
 The access probe found that the AMD Token Factory serves instruct models for span extraction but no speech-to-text
 model, so transcription will run elsewhere and every stage will be labelled with where it ran.
 
-320 tests (`uv run pytest`), lint with ruff, CI on every push. Friction log: [docs/DX-REPORT.md](docs/DX-REPORT.md).
+341 tests (`uv run pytest`), lint with ruff, CI on every push. Friction log: [docs/DX-REPORT.md](docs/DX-REPORT.md).
 
 ## Run it
 

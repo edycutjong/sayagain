@@ -2,15 +2,17 @@
 
 Speaker identity on a replayed channel rests on turn order (production would use the radio's unit ID), so the rules are
 written down and tested:
-  * no window open: a turn opens one only if it has >= 1 grounded command whose tag resolves (turns.analyze); anything
-    else is logged as `other` and makes no card;
+  * no window open: a turn opens one only if it has >= 1 grounded command with an action and a tag that names
+    equipment (turns.analyze); a read-back-shaped turn ("Copy, closing …") never opens one (orphan, end-of-shift list);
+    an unreadable (NOT_AUDITED) turn opens one so its reply cannot become a phantom card; anything else is `other`;
   * window open: the next turn within 8 s is the read-back candidate whatever its verb form — a word-for-word repeat is
     the most natural read-back;
   * a say-again from the technician extends the window by 8 s, and the operator's repeat (an imperative turn) replaces
     the instruction; it is never taken as the read-back;
   * after a read-back, an operator turn opening with "negative / koreksi / bukan / correction" within 8 s is the third
     leg: the first read-back goes to the end-of-shift list as "caught on channel", the repeat replaces the instruction
-    and the window re-opens. "Correct / betul" or silence closes the exchange;
+    and the window re-opens. The correction turn must be cue-only ("Negative.") or carry the repeat. If no new
+    read-back follows, the wrong read-back stands as the live verdict. "Correct / betul" or silence closes the exchange;
   * no read-back inside the window -> NO_READBACK. Radio is half-duplex: no overlap model.
 """
 
@@ -39,6 +41,7 @@ class Paired:
     exchanges: list[Exchange] = field(default_factory=list)
     other: list[TurnAnalysis] = field(default_factory=list)  # chatter / status talk: no card
     not_audited: list[TurnAnalysis] = field(default_factory=list)  # unreadable turns outside any exchange
+    orphans: list[TurnAnalysis] = field(default_factory=list)  # read-back-shaped turns with no open window
 
 
 _IDLE, _AWAIT_RB, _AWAIT_REPEAT, _AWAIT_ACK = "idle", "await_readback", "await_repeat", "await_ack"
@@ -63,16 +66,22 @@ def _pair_channel(turns: list[TurnAnalysis], window_s: float, out: Paired) -> No
     def close() -> None:
         nonlocal state, ex
         if ex is not None:
+            if ex.readback is None and ex.caught:
+                # the operator said "negative" but no new read-back came: the wrong read-back stands, live
+                ex.instruction, ex.readback = ex.caught.pop()
+                ex.events.append("correction not read back")
             out.exchanges.append(ex)
         state, ex = _IDLE, None
 
     def idle(t: TurnAnalysis) -> None:
         nonlocal state, ex, deadline
-        if t.status == "not_audited":
-            out.not_audited.append(t)
-        elif t.opens_window:
+        if t.status == "not_audited" or t.opens_window:
+            # an unreadable turn may be an instruction: it opens a window so its reply cannot become a phantom card;
+            # the exchange is then NOT_AUDITED (end-of-shift list)
             ex = Exchange(t.turn.channel, instruction=t, turn_ids=[t.id])
             state, deadline = _AWAIT_RB, t.turn.t_end + window_s
+        elif t.readback_shaped and t.status == "ok" and t.commands:
+            out.orphans.append(t)  # a read-back with no instruction heard: end-of-shift list, not a live card
         else:
             out.other.append(t)
 

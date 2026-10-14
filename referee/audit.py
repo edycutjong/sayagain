@@ -12,39 +12,13 @@ from __future__ import annotations
 import random
 from dataclasses import dataclass, field
 
-from referee import aliases as al
 from referee.pairing import Exchange, pair
-from referee.regex_extractor import extract as regex_extract
 from referee.registry import Registry
 from referee.turns import Turn, TurnAnalysis, analyze, span_confidence
-from referee.verdict import ABSTAIN, MISMATCH, NO_READBACK, NOT_AUDITED, VERIFIED, Verdict, verdict
+from referee.verdict import ABSTAIN, MISMATCH, NO_READBACK, NOT_AUDITED, R_AUDIO, VERIFIED, Verdict, verdict
 
 SPOT_CHECKS_PER_SHIFT = 10
 LIVE = (MISMATCH, NO_READBACK, ABSTAIN)
-
-
-def canonical_tuples(text: str) -> list[tuple[str | None, str | None, str | None]]:
-    """(action, tag, line) per command, read by the frozen regex + alias extractor — the disagreement gate's lens."""
-    out = []
-    ext = regex_extract(text)
-    for c in ext["commands"]:
-        act = al.canon_action(c["action_span"]) if c["action_span"] else None
-        tag = al.canon_tag(c["tag_span"]) if c["tag_span"] else None
-        line = al.canon_line(c["line_span"]) if c["line_span"] else None
-        out.append(
-            (
-                act if isinstance(act, str) else None,
-                tag.value if isinstance(tag, al.Mention) else None,
-                line if isinstance(line, str) else None,
-            )
-        )
-    return out
-
-
-def disagrees(a: TurnAnalysis) -> bool:
-    """Prompted vs unprompted ASR read differently on action / tag / line (only when an unprompted pass exists)."""
-    alt = a.turn.alt_transcript
-    return alt is not None and canonical_tuples(a.turn.transcript) != canonical_tuples(alt)
 
 
 @dataclass
@@ -86,7 +60,12 @@ def _judge(ins: TurnAnalysis, rb: TurnAnalysis | None, *, floor: float | None) -
     pair_turns = [ins] + ([rb] if rb is not None else [])
     conf = span_confidence(pair_turns)
     has_alt = all(a.turn.alt_transcript is not None for a in pair_turns)
-    disagree = any(disagrees(a) for a in pair_turns)
+    disagree = any(a.disagrees for a in pair_turns)
+    if floor is not None and conf is None and rb is not None:
+        v = verdict(ins.commands, None)
+        if v.verdict == ABSTAIN:
+            return Verdict(ABSTAIN, v.reason, trace=trace + v.trace)
+        return Verdict(ABSTAIN, R_AUDIO, trace=[*trace, "audio: floor set but no token probability over every span"])
     if conf is not None:
         trace.append(f"audio: span confidence {conf:.3f}" + (f" (floor {floor:.3f})" if floor is not None else ""))
     elif has_alt:
@@ -105,6 +84,7 @@ class ShiftReport:
     judged: list[Judged]
     other: list[TurnAnalysis]
     not_audited_turns: list[TurnAnalysis]
+    orphans: list[TurnAnalysis]
 
     @property
     def live_queue(self) -> list[Judged]:
@@ -116,6 +96,7 @@ class ShiftReport:
             "caught_on_channel": [j for j in self.judged if j.caught],
             "not_audited": [j for j in self.judged if j.verdict.verdict == NOT_AUDITED] + list(self.not_audited_turns),
             "spot_checks": [j for j in self.judged if j.spot_check],
+            "orphan_readbacks": list(self.orphans),
         }
 
 
@@ -136,4 +117,4 @@ def audit(
     verified = [j for j in judged if j.verdict.verdict == VERIFIED]
     for j in random.Random(seed).sample(verified, min(spot_checks, len(verified))):
         j.spot_check = True
-    return ShiftReport(judged, paired.other, paired.not_audited)
+    return ShiftReport(judged, paired.other, paired.not_audited, paired.orphans)

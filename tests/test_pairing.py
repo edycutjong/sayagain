@@ -137,10 +137,14 @@ def test_unreadable_instruction_still_makes_a_card(registry) -> None:
     assert rep.judged[0].verdict.verdict == "ABSTAIN" and rep.judged[0].verdict.reason == "grounding"
 
 
-def test_not_audited_turn_outside_window_goes_to_end_of_shift(registry) -> None:
-    ts = [make_turn(HERO_I, tid="u0", not_audited="timeout")]
+def test_not_audited_instruction_opens_a_window_and_goes_to_end_of_shift(registry) -> None:
+    """An unreadable turn may be an instruction: its reply is paired to it (no phantom NO-READBACK card) and the
+    exchange is NOT_AUDITED — end-of-shift list, never the live queue, never VERIFIED."""
+    ts = [make_turn(HERO_I, tid="u0", not_audited="timeout"), make_turn(OK_RB, t=3, tid="u1")]
     rep = audit(ts, registry)
-    assert rep.judged == [] and len(rep.end_of_shift["not_audited"]) == 1
+    assert [j.verdict.verdict for j in rep.judged] == ["NOT_AUDITED"]
+    assert rep.live_queue == [] and rep.end_of_shift["not_audited"] == rep.judged
+    assert rep.judged[0].exchange.turn_ids == ["u0", "u1"]
 
 
 def test_spot_checks_sampled_from_verified(registry) -> None:

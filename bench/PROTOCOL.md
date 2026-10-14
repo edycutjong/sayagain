@@ -141,3 +141,4 @@ exchange, errors caught / missed, seconds from card shown to decision. n = 1 aud
 | Date | Change | Why |
 |---|---|---|
 | 2026-10-14 | Editorial only: internal planning labels removed from two headings and the rung-0 rule reworded; no threshold, formula or rule changed | the labels referred to private planning notes |
+| 2026-10-14 | Referee hardening from code review, before any recording existed: the coverage scan also counts negators ("not", "jangan", "unable", "can't" …) and NATO letters without "line"; command spans must keep the order of their tags; with a floor set, missing token probabilities abstain; a bare unknown number in suffix format opens a window; read-back-shaped orphan turns and unreadable turns no longer create phantom live cards. The regex extractor's output is unchanged | each change closes a path that could mark a real error VERIFIED or create a false card; they apply to every rung alike |
