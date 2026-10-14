@@ -304,6 +304,12 @@ def rung_stage(run: str, rung: str) -> dict:
         served = sorted({r.get("model_served") for r in recs if r.get("model_served")})
         on_amd = sorted({bool(r.get("on_amd")) for r in recs})
         lat = [float(r["latency_s"]) for r in recs if isinstance(r.get("latency_s"), int | float)]
+        if not recs:  # missing evidence is not a non-AMD host
+            where = "no receipt found for this run"
+        elif on_amd == [True]:
+            where = "AMD-hosted API"
+        else:
+            where = "API host not AMD-operated / mixed"
         reaudit_of = _summary(run).get("reaudit_of")
         # a first pass owns all its calls (older receipts carry no `run` field); a re-audit reuses the rest
         own = sum(1 for r in recs if r.get("run") == run) if reaudit_of else len(recs)
@@ -311,7 +317,7 @@ def rung_stage(run: str, rung: str) -> dict:
             "name": rung,
             "model_served": served,
             # on_amd = the API host is AMD-operated (amd.com / amd.com.cn): where the API is hosted, never a GPU claim
-            "where": "AMD-hosted API" if on_amd == [True] else "API host not AMD-operated / mixed",
+            "where": where,
             "on_amd": True if on_amd == [True] else None,
             "hosts": hosts,
             "calls": len(recs),

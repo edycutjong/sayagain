@@ -233,3 +233,37 @@ def test_an_orphan_readback_reaches_the_end_of_shift_list() -> None:
     events = list(shift.shift_events(cards=[card], extract=regex_extraction, check_stored=False))
     assert events[-2]["card"]["verdict"] is None and events[-2]["card"]["orphans"]  # no card, but not nothing
     assert events[-1]["orphan_readbacks"] == ["T-ORPHAN"]  # before the fix the queue dropped it
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# The local queue: a DNS-rebinding page and a cross-site page cannot drive the one write or the paid live calls.
+
+
+def _client(tmp_path):
+    from fastapi.testclient import TestClient
+
+    from sayagain import server
+
+    return TestClient(server.create_app(var=tmp_path))
+
+
+def test_the_queue_answers_only_to_a_localhost_host_header(tmp_path) -> None:
+    c = _client(tmp_path)
+    assert c.get("/config.json").status_code == 200
+    assert c.get("/config.json", headers={"host": "evil.example"}).status_code == 400
+
+
+def test_a_cross_site_page_cannot_dismiss_a_card(tmp_path) -> None:
+    from sayagain import shift
+
+    c = _client(tmp_path)
+    body = {"run": shift.DEFAULT_RUN, "rung": shift.DEFAULT_RUNG, "exchange_id": "H-01", "decision": "dismissed"}
+    body["reason"] = "not a real error"
+    assert c.post("/api/review", json=body, headers={"origin": "http://evil.example"}).status_code == 403
+    assert c.post("/api/review", json=body, headers={"sec-fetch-site": "cross-site"}).status_code == 403
+    assert c.post("/api/review", json=body, headers={"origin": "http://testserver"}).status_code == 201
+
+
+def test_a_cross_site_page_cannot_start_paid_live_calls(tmp_path) -> None:
+    r = _client(tmp_path).get("/api/stream", params={"extract": "live"}, headers={"sec-fetch-site": "cross-site"})
+    assert r.status_code == 403 and "cross-site" in r.text

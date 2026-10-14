@@ -1,9 +1,15 @@
+import os
+import tempfile
+
 import pytest
 
 from referee.audit import Exchange, judge
 from referee.regex_extractor import extract
 from referee.registry import Registry
 from referee.turns import Turn, analyze
+
+# sayagain.server builds its app, and a reviews database under SAYAGAIN_VAR, at import: keep that out of the repo
+os.environ.setdefault("SAYAGAIN_VAR", tempfile.mkdtemp(prefix="sayagain-test-var-"))
 
 
 @pytest.fixture(scope="session")

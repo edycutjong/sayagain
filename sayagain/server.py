@@ -15,6 +15,9 @@ Routes:
 Extraction comes from the run's stored model output by default (`extract=stored`): the referee runs live, the model
 call is replayed with its receipt. `extract=live` calls the AMD Token Factory for every turn (paced at the account's
 20 requests per minute, capped at LIVE_BUDGET_USD per server process); any failed call is NOT_AUDITED, never a verdict.
+
+The queue is a local tool: it answers only to a localhost Host header (a DNS-rebinding page gets 400), and the one
+write and the paid live calls refuse a request a browser marks as cross-site.
 """
 
 from __future__ import annotations
@@ -28,12 +31,14 @@ import time
 from contextlib import closing
 from datetime import UTC, datetime
 from pathlib import Path
+from urllib.parse import urlparse
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from starlette.concurrency import iterate_in_threadpool, run_in_threadpool
+from starlette.concurrency import iterate_in_threadpool
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from referee.registry import Registry
 from sayagain import shift
@@ -49,6 +54,7 @@ DECISIONS = ("confirmed", "dismissed")
 LIVE_BUDGET_USD = 0.05  # per server process; the account cap is $1/day
 PACE_S = 3.2  # 20 requests per minute per account
 MAX_SPEED = 64.0
+LOCAL_HOSTS = ["127.0.0.1", "localhost", "testserver"]  # testserver = FastAPI's TestClient
 
 
 def live_allowed() -> bool:
@@ -184,6 +190,15 @@ class Try(BaseModel):
     extract: str = "stored"
 
 
+def _not_cross_site(request: Request) -> None:
+    """The one write and the paid live calls: a page on another site cannot drive them from a browser."""
+    if request.headers.get("sec-fetch-site") == "cross-site":
+        raise HTTPException(403, "cross-site request refused")
+    origin = request.headers.get("origin")
+    if origin is not None and urlparse(origin).netloc != request.headers.get("host"):
+        raise HTTPException(403, "cross-origin request refused")
+
+
 def _check_run(run: str, rung: str) -> None:
     for r in shift.list_runs():
         if r["run"] == run and rung in r["rungs"]:
@@ -193,6 +208,7 @@ def _check_run(run: str, rung: str) -> None:
 
 def create_app(var: Path = VAR) -> FastAPI:
     app = FastAPI(title="SayAgain queue", docs_url=None, redoc_url=None)
+    app.add_middleware(TrustedHostMiddleware, allowed_hosts=LOCAL_HOSTS)
     reviews = Reviews(var / "reviews.sqlite")
     live = LiveExtract(var)
 
@@ -220,7 +236,8 @@ def create_app(var: Path = VAR) -> FastAPI:
         return shift.run_meta(run, rung)
 
     @app.get("/api/stream")
-    async def stream(
+    def stream(  # sync: run discovery reads files, so FastAPI runs this in its threadpool, off the event loop
+        request: Request,
         run: str = shift.DEFAULT_RUN,
         rung: str = shift.DEFAULT_RUNG,
         speed: float = Query(8.0, ge=0.0, le=MAX_SPEED),
@@ -231,9 +248,11 @@ def create_app(var: Path = VAR) -> FastAPI:
         if extract not in ("stored", "live"):
             raise HTTPException(400, "extract must be stored or live")
         if extract == "live":
+            _not_cross_site(request)
             if not live_allowed():
                 raise HTTPException(403, "live extraction is off (SAYAGAIN_LIVE_EXTRACT=1 and credentials needed)")
-            # cards before `start` come from the process cache (already paid for): the end-of-shift list stays whole
+            # cards before `start` are judged again so the end-of-shift list stays whole: free when this process already
+            # paid for them (the cache), paid now otherwise
             events = shift.shift_events(run, rung, extract=live.for_rung(rung), start=start, check_stored=False)
         else:
             events = shift.shift_events(run, rung, start=start)
@@ -255,8 +274,8 @@ def create_app(var: Path = VAR) -> FastAPI:
             gen(), media_type="text/event-stream", headers={"Cache-Control": "no-store", "X-Accel-Buffering": "no"}
         )
 
-    @app.post("/api/try-refused")
-    async def try_refused(body: Try):
+    @app.post("/api/try-refused", dependencies=[Depends(_not_cross_site)])
+    def try_refused(body: Try):
         _check_run(body.run, body.rung)
         card = next((c for c in shift.run_cards(body.run, body.rung) if c["exchange_id"] == REFUSED_ID), None)
         if card is None:
@@ -269,13 +288,13 @@ def create_app(var: Path = VAR) -> FastAPI:
             fn = shift.stored_extractor(body.run, body.rung)
         else:
             raise HTTPException(400, "extract must be stored or live")
-        rec = await run_in_threadpool(shift.judge_card, card, fn, Registry.load(), body.rung)
+        rec = shift.judge_card(card, fn, Registry.load(), body.rung)
         rec["baseline"] = shift.judge_baseline().get(REFUSED_ID)
         rec["at"] = None
         return {"card": rec, "extract": body.extract, "measured_on": shift.run_meta(body.run, body.rung)[
             "referee_measured_on"]}  # fmt: skip
 
-    @app.post("/api/review", status_code=201)
+    @app.post("/api/review", status_code=201, dependencies=[Depends(_not_cross_site)])
     def post_review(body: Review):
         _check_run(body.run, body.rung)
         if body.decision not in DECISIONS:
