@@ -6,6 +6,7 @@
   'use strict';
 
   var $ = function (id) { return document.getElementById(id); };
+  var LANG = { en: 'English', id: 'Bahasa Indonesia', mix: 'English + Bahasa' };
   var VERDICT_WORD = { MISMATCH: 'MISMATCH', ABSTAIN: 'ABSTAIN', NO_READBACK: 'NO-READBACK', NOT_AUDITED: 'NOT AUDITED', VERIFIED: 'VERIFIED' };
   var TICK = '<svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.6l3.1 3.1L13 4.8"/></svg>';
   var DISMISS_REASONS = [
@@ -35,7 +36,8 @@
   }
   function usdFixed(x) {
     if (typeof x !== 'number') return null;
-    return '$' + (x === 0 ? '0' : x.toPrecision(3));
+    if (x === 0) return '$0';
+    return '$' + x.toFixed(Math.min(12, Math.max(2, 2 - Math.floor(Math.log10(Math.abs(x))))));
   }
   function secs(x) { return typeof x === 'number' ? x.toFixed(2) + ' s' : null; }
   function getJSON(url) {
@@ -118,6 +120,7 @@
       S.chime = !S.chime;
       $('chime').setAttribute('aria-pressed', String(S.chime));
       $('chime').querySelector('.t').textContent = S.chime ? 'Chime on' : 'Chime off';
+      $('chime').setAttribute('aria-label', S.chime ? 'Chime on' : 'Chime off');
       if (S.chime) chime(true);
     });
     ['live', 'eos', 'all'].forEach(function (t) { $('tab-' + t).addEventListener('click', function () { showTab(t); }); });
@@ -280,6 +283,7 @@
         S.liveIds.push(c.exchange_id);
         if (!bulk) {
           chime();
+          $('sr-live').textContent = 'New card: ' + c.exchange_id + ', ' + (c.verdict ? c.verdict.label : '');
           var n = $('count'); n.classList.remove('bump'); void n.offsetWidth; n.classList.add('bump');
         }
       }
@@ -295,7 +299,7 @@
       S.done = true; S.src = null; syncPlay();
       $('ch-line').classList.remove('tx');
       $('ch-who').textContent = 'Shift over';
-      $('ch-txt').textContent = S.cardsDone + ' exchanges judged · ' + S.liveIds.length + ' sent to the supervisor (error-dense test corpus)';
+      $('ch-txt').textContent = 'Error-dense test corpus: ' + S.liveIds.length + ' of ' + S.cardsDone + ' exchanges sent to the supervisor';
       if (S.eos) $('clock').textContent = clock(S.clockBase + S.eos.at);
       renderSub();
     }
@@ -364,6 +368,7 @@
     $('banner').innerHTML = lead + ' · fictional plant radio traffic · ' + esc(m.provenance) + ': each turn is the written script of a recording card, there is no recording yet' +
       (parts.length ? ' · this rung on the ' + esc(ho.n || '') + ' held-out cards: ' + parts.join(' · ') : '') +
       ' · <span class="data">' + esc(m.result_file) + '</span>.' + cpsTxt;
+    $('stage-sum').setAttribute('data-short', 'fictional radio · no audio · ' + (st.extract.on_amd ? 'AMD-hosted extraction' : 'local extraction'));
     $('stage-sum').innerHTML = 'Run <b>' + esc(m.run) + '</b> · fictional radio, written scripts, <b>no audio</b> · extraction <b>' +
       esc(st.extract.name) + '</b>' + (st.extract.on_amd ? ' on an <b>AMD-hosted API</b>' : '') + ' · referee <b>local</b>';
     var rf = m.refused;
@@ -449,7 +454,7 @@
     if (v.verdict === 'VERIFIED') {
       var ins = c.turns.filter(function (t) { return c.strip && t.id === c.strip.instruction; })[0];
       var cm = ins && ins.commands[0];
-      return { f: '', ft: cm ? '<span class="ok">' + esc([cm.action, cm.tag, cm.line ? 'line ' + cm.line : ''].filter(Boolean).join(' ')) + '</span>' : '' };
+      return { f: '', ft: cm ? '<span class="ok">' + esc(cm.action || '') + ' <span class="nw">' + esc(cm.tag || '') + '</span>' + (cm.line ? ' <span class="nw">line ' + esc(cm.line) + '</span>' : '') + '</span>' : '' };
     }
     if (v.verdict === 'NO_READBACK') return { f: 'read-back', ft: '<span>no reply in the window</span>' };
     return { f: esc(v.reason || ''), ft: esc(tagOf(c) || '') };
@@ -505,9 +510,25 @@
     var e = S.eos;
     box.innerHTML =
       section('Spot-checks', e.spot_checks, 'Random VERIFIED exchanges a human re-checks at the end of the shift: how the plant learns whether the referee lets errors through.', 'No VERIFIED exchange to sample this shift.') +
-      section('Caught on channel', e.caught_on_channel, 'The operator heard a wrong read-back and corrected it on air. The first, wrong read-back is listed here; the exchange itself is judged on what followed.', 'No read-back was corrected on air this shift.') +
+      caughtSection(e.caught_on_channel) +
       section('Not audited', e.not_audited, 'Each of these has at least one turn whose model call failed, so part of it was never judged. They are listed, never passed.', 'Every exchange was judged.');
     bindRows(box);
+  }
+  function caughtSection(ids) {
+    var title = '<h3>Caught on channel<span class="n">' + ids.length + '</span></h3>';
+    if (!ids.length) return title + '<p class="why">No read-back was corrected on air this shift.</p>';
+    return title + '<p class="why">The operator heard a wrong read-back and corrected it on air. Each row shows that first, wrong read-back; open it to see how the exchange ended.</p><ol class="rows">' +
+      ids.map(function (id) {
+        var c = S.cards[id];
+        if (!c) return '';
+        return (c.caught || []).map(function (k) {
+          var diff = String(k.label).split(' · ').slice(1).join(' · ');
+          return '<li><button type="button" class="row v-CAUGHT" data-id="' + esc(id) + '" aria-label="' + esc(id + ', caught on channel: ' + k.label) + '">' +
+            '<span class="t">' + clock(c._at) + '</span><span class="c">' + esc((S.meta.channel || 'CH-01').replace('CH-', '')) + '</span>' +
+            '<span class="vw">CAUGHT<span class="stamp">on air</span></span><span class="f">' + esc(String(diff).split(':')[0] || '') + '</span>' +
+            '<span class="ft"><b>' + esc(diff.split(': ').slice(1).join(': ') || k.label) + '</b> · then ' + esc(VERDICT_WORD[vkey(c)] || '') + '</span></button></li>';
+        }).join('');
+      }).join('') + '</ol>';
   }
   function section(title, ids, why, none) {
     if (!ids.length) return '<h3>' + esc(title) + '<span class="n">0</span></h3><p class="why">' + esc(none) + '</p>';
@@ -556,7 +577,8 @@
     // red covers only the words of the read-back span that the instruction's span of the same field does not have
     var text = t.text.slice(s.start, s.end);
     var ins = c.strip && turnById(c, c.strip.instruction), have = {};
-    if (ins) ins.spans.forEach(function (o) {
+    var sameCmd = ins ? ins.spans.filter(function (o) { return o.field === s.field && o.cmd === s.cmd; }) : [];
+    if (ins) (sameCmd.length ? sameCmd : ins.spans).forEach(function (o) {
       if (o.field === s.field) ins.text.slice(o.start, o.end).toLowerCase().split(/[^\w-]+/).forEach(function (w) { if (w) have[w] = 1; });
     });
     var parts = text.split(/(\s+)/), shared = parts.filter(function (p) { return p.trim() && have[p.toLowerCase().replace(/[^\w-]/g, '')]; }).length;
@@ -574,6 +596,7 @@
     return !!(c.verdict && c.verdict.diffs && c.verdict.diffs.some(function (d) { return d.field === field; }));
   }
   function lineHTML(c, t, role) {
+    var chip = false;
     var text = t.text, spans = t.spans.slice().sort(function (a, b) { return a.start - b.start; });
     var out = '', pos = 0, merged = [];
     spans.forEach(function (s) {  // shared spans (one verb for two commands) collapse to one mark
@@ -592,15 +615,17 @@
       else {
         var d = diffFor(c, t, s);
         var xi = role === 'ins' && insDiffers(c, s.field);
-        var amb = role === 'ins' && s.field === 'tag' && c.verdict && c.verdict.reason === 'unknown tag';
-        var attrs = ' data-f="' + esc(s.field) + '" data-c="' + esc(s.cmd) + '" data-side="' + role + '"';
+        var cmdS = t.commands[s.cmd];
+        var amb = role === 'ins' && s.field === 'tag' && c.verdict && c.verdict.reason === 'unknown tag' && cmdS && cmdS.tag_status === 'not_in_registry';
+        if (amb) chip = true;
+        var attrs = ' data-f="' + esc(s.field) + '" data-c="' + esc(s.cmd) + '" data-side="' + esc(role) + '"';
         if (d) out += blockHTML(c, t, s, attrs);
-        else out += '<span class="sp' + (s.field === 'state' ? ' st' : '') + (xi ? ' xi' : '') + (amb ? ' amb' : '') + '"' + attrs + ' title="' + esc(s.field) + ' span">' + w + '</span>' +
-          (amb ? '<span class="nreg">not in registry</span>' : '');
+        else out += '<span class="sp' + (s.field === 'state' ? ' st' : '') + (xi ? ' xi' : '') + (amb ? ' amb' : '') + '"' + attrs + ' title="' + esc(s.field) + ' span">' + w + '</span>';
       }
       pos = s.end;
     });
     out += esc(text.slice(pos));
+    if (chip) out += ' <span class="nreg">' + esc(t.commands.filter(function (k) { return k.tag_status === 'not_in_registry'; }).map(function (k) { return k.tag; }).join(', ')) + ' not in registry</span>';
     if (role === 'rb' && c.verdict && c.verdict.diffs) {
       c.verdict.diffs.forEach(function (d) {
         if (d.got == null && d.field !== 'command') out += ' <span class="miss" data-f="' + esc(d.field) + '" data-c="0" data-side="rb" data-x="1">no ' + esc(d.field) + ' read back</span>';
@@ -646,9 +671,10 @@
     opts = opts || {};
     var v = c.verdict, vk = vkey(c), spot = vk === 'VERIFIED' && isSpot(c.exchange_id);
     var word = vk ? VERDICT_WORD[vk] : 'NO CARD';
-    var h = '<article class="acard v-' + (vk || 'none') + (opts.enter ? ' enter' : '') + '" aria-live="polite">';
+    var h = '<article class="acard v-' + (vk || 'none') + (opts.enter ? ' enter' : '') + '">';
     h += '<header class="ac-h"><div class="vword">' + (vk === 'VERIFIED' ? TICK : '') + esc(spot ? 'SPOT-CHECK' : word) + '</div>' +
-      '<div class="ac-meta"><b>' + esc(c.exchange_id) + '</b> · ' + esc(S.meta.channel) + (c._at != null ? ' · T+' + clock(c._at) : '') + '</div></header>';
+      '<div class="ac-meta"><b>' + esc(c.exchange_id) + '</b> · ' + esc(S.meta.channel) + (c._at != null ? ' · T+' + clock(c._at) : '') +
+      (LANG[c.lang] ? ' · <span class="langc">' + esc(LANG[c.lang]) + '</span>' : '') + '</div></header>';
     if (opts.timing) h += opts.timing;
     // the one-line verdict
     if (v && v.diffs && v.diffs.length) {
@@ -692,7 +718,7 @@
       '<span class="bdg">radio <b>' + esc(c.provenance.radio) + '</b></span>' +
       (c.turns.some(function (t) { return t.receipt && t.receipt.on_amd; }) ? '<span class="bdg amd">extraction <b>' + esc(S.rung) + '</b> · AMD-hosted API</span>'
         : '<span class="bdg">extraction <b>' + esc(S.rung === 'regex' ? 'regex, no model' : S.rung + ', no successful call') + '</b></span>') +
-      '<span class="bdg">referee <b>local</b> · ' + esc(c.referee_ms != null ? c.referee_ms.toFixed(2) + ' ms ' + refWhere : '') + '</span>' +
+      '<span class="bdg">referee <b>local</b> · <b>' + esc(c.referee_ms != null ? c.referee_ms.toFixed(2) + ' ms' : '') + '</b></span>' +
       '</div>';
     // receipts
     var nCalls = {};
@@ -700,7 +726,8 @@
     var nc = Object.keys(nCalls).length, anyLive = c.turns.some(function (t) { return t.receipt && t.receipt.live; });
     h += '<details class="sec"><summary><span class="lab">Receipts · ' + (S.rung === 'regex' ? 'no model call (regex rung 0)' : nc + ' model call' + (nc === 1 ? '' : 's') +
       ' behind these turns') + '</span></summary><ul class="rcpt">' + c.turns.map(receiptLine).join('') + '</ul>' +
-      (nc && !anyLive ? '<p class="evalrow">Identical wording shares one stored call: the run extracted each distinct transcript once.</p>' : '') + '</details>';
+      (nc && !anyLive && !c.not_audited_turns ? '<p class="evalrow">Identical wording shares one stored call: the run extracted each distinct transcript once.</p>' : '') +
+      '<p class="evalrow">Referee time ' + esc(c.referee_ms != null ? c.referee_ms.toFixed(2) + ' ms' : 'n/a') + ', measured ' + esc(refWhere) + '.</p></details>';
     // the baseline
     if (c.baseline && c.baseline.verdict) {
       var b = c.baseline, exp = c.expected || '';
@@ -842,7 +869,7 @@
         var ex = S.meta.stages.extract;
         var exTxt = S.rung === 'regex' ? 'extraction: regex rung 0, no model call'
           : (live ? 'extraction called live on the ' : 'extraction replayed from its receipts, ') + esc(ex.where) + ': <b>' + esc(ext.join(' + ')) + '</b>' +
-            (ex.latency_s_p50 != null ? ' (this run’s p50 is ' + esc(ex.latency_s_p50.toFixed(2)) + ' s over ' + esc(ex.calls) + ' calls)' : '');
+            (ex.latency_s_p50 != null ? ' (p50 ' + esc(ex.latency_s_p50.toFixed(2)) + ' s over the ' + esc(ex.calls) + ' calls behind this run' + (ex.calls_reused ? ', ' + esc(ex.calls_reused) + ' of them reused from the first pass' : '') + ')' : '');
         var refTxt = 'referee <b>' + c.referee_ms.toFixed(2) + ' ms</b> ' + (j.replay ? 'when this replay was exported' : 'just now in the server') + ' (' + esc(j.measured_on || '') + ')' +
           (live ? ' · each live receipt below carries the time of its call (a turn already called this session is reused)' : '');
         var why = c.verdict && c.verdict.reason === 'unknown tag'

@@ -63,7 +63,7 @@
       <button type="button" data-speed="32" aria-pressed="false">32×</button>
     </div>
     <button id="skip" class="btn" type="button">Skip to end of shift</button>
-    <button id="chime" class="btn btn-q" type="button" aria-pressed="false" aria-label="Chime on new cards" title="One soft chime when a card arrives">
+    <button id="chime" class="btn btn-q" type="button" aria-pressed="false" aria-label="Chime off" title="One soft chime when a card arrives">
     <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 8h3l4-3.5v11L7 12H4z"/><path class="on" d="M14 7.2a4 4 0 0 1 0 5.6M15.9 5.3a6.6 6.6 0 0 1 0 9.4"/><path class="off" d="M14 7.5l4 5M18 7.5l-4 5"/></svg>
     <span class="t">Chime off</span>
   </button>
@@ -84,9 +84,9 @@
       <button role="tab" type="button" id="tab-all" aria-selected="false" aria-controls="rows">All exchanges <span class="n" id="n-all">0</span></button>
     </div>
     <div class="cols" aria-hidden="true"><span>T+</span><span>CH</span><span>Verdict</span><span>Field</span><span>From → to</span></div>
-    <ol id="rows" class="rows" aria-label="Exchanges"></ol>
+    <ol id="rows" class="rows" aria-label="Exchanges" role="tabpanel"></ol>
     <p id="rows-empty" class="empty">No card yet. Read-backs that match are logged, not queued.</p>
-    <div id="eos" class="eos" hidden></div>
+    <div id="eos" class="eos" hidden role="tabpanel" aria-label="End-of-shift list"></div>
   </section>
 
   <section class="cardpane" id="card" tabindex="-1" aria-label="Alert card">
@@ -105,6 +105,7 @@
   <p>A card leaves the live queue only when the supervisor confirms or dismisses it.</p>
 </footer>
 
+<p id="sr-live" class="sr" aria-live="polite"></p>
 <script src="app.js" defer></script>
 </body>
 </html>

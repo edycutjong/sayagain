@@ -297,7 +297,11 @@ def rung_stage(run: str, rung: str) -> dict:
         served = sorted({r.get("model_served") for r in recs if r.get("model_served")})
         on_amd = sorted({bool(r.get("on_amd")) for r in recs})
         lat = [float(r["latency_s"]) for r in recs if isinstance(r.get("latency_s"), int | float)]
-        own = sum(1 for r in recs if r.get("run") == run)
+        reaudit_of = _summary(run).get("reaudit_of")
+        # a first pass owns all its calls (older receipts carry no `run` field); a re-audit reuses the rest
+        reaudit_of = _summary(run).get("reaudit_of")
+        # a first pass owns all its calls (older receipts carry no `run` field); a re-audit reuses the rest
+        own = sum(1 for r in recs if r.get("run") == run) if reaudit_of else len(recs) if reaudit_of else len(recs)
         extract = {
             "name": rung,
             "model_served": served,
@@ -310,7 +314,7 @@ def rung_stage(run: str, rung: str) -> dict:
             # count only the run's own calls)
             "calls_own": own,
             "calls_reused": len(recs) - own,
-            "reused_from": _summary(run).get("reaudit_of"),
+            "reused_from": reaudit_of,
             "latency_s_p50": _pct(lat, 0.5),
             "latency_s_p95": _pct(lat, 0.95),
         }

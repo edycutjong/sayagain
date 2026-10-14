@@ -166,10 +166,11 @@ img,svg{display:block}
 .row[aria-current="true"]:hover{background:var(--desk)}
 .row[aria-current="true"]::after{content:"";position:absolute;right:0;top:0;bottom:0;width:2px;background:var(--ink)}
 .row .t,.row .c{color:var(--mid)}
-.row .f{color:var(--mid);overflow-wrap:anywhere}
+.row .f{color:var(--mid);overflow-wrap:break-word}
 .row .ft{color:var(--mid);overflow-wrap:break-word}
 .row .ft b{font-weight:600;color:var(--after-text);white-space:nowrap}
-.row .ft .ok{white-space:nowrap}
+.row .ft .ok{white-space:normal}
+.row .nw,.row .ft b{white-space:nowrap}
 .row .ft .ok{color:var(--ink)}
 .vw{font-weight:600;letter-spacing:.04em;white-space:nowrap}
 .v-MISMATCH .vw{color:var(--ink)}
@@ -244,7 +245,7 @@ mark.blk{background:var(--after-block);color:var(--ink);border-radius:3px;paddin
 .acard.enter mark.blk{animation:slam .62s var(--land) .2s both}
 .miss{display:inline-block;margin-left:.4em;padding:0 .3em;border:1.5px dashed var(--after);border-radius:3px;color:var(--after-text);font-size:.8em}
 .ret{text-decoration:line-through;text-decoration-color:var(--muted);color:var(--mid)}
-.sline.ab .w{background:var(--hatch-amber);background-size:auto;padding:0 4px;border-radius:2px;color:var(--ink)}
+.sline.ab .w{box-shadow:inset 3px 0 0 var(--abstain);padding-left:8px}
 .sline.na .w{background:var(--hatch-grey);padding:0 4px;border-radius:2px}
 .lane{grid-column:2;display:flex;align-items:center;gap:10px;height:16px;margin-top:4px}
 .lane::before{content:"";flex:1;border-top:1px dotted var(--rule)}
@@ -257,7 +258,12 @@ mark.blk{background:var(--after-block);color:var(--ink);border-radius:3px;paddin
 .strip.ab{background:linear-gradient(90deg,rgba(230,160,25,.07),transparent 70%);border-radius:4px}
 .strip.ab svg.links{display:none}
 .sp.amb{border-bottom:2px dashed var(--abstain)}
-.nreg{display:inline-block;margin-left:.45em;padding:2px 6px;border:1px solid var(--abstain);border-radius:2px;font:600 12px/1.2 var(--font-data);letter-spacing:.06em;
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.langc{color:var(--ink)}
+.v-CAUGHT .vw{color:var(--ink)}
+.v-CAUGHT::before{background:repeating-linear-gradient(180deg,var(--after) 0 4px,transparent 4px 8px)!important}
+.bdg b{white-space:nowrap}
+.nreg{display:inline-block;margin-left:.2em;padding:2px 6px;border:1px solid var(--abstain);border-radius:2px;font:600 12px/1.2 var(--font-data);letter-spacing:.06em;
   color:var(--abstain-text);vertical-align:3px;white-space:nowrap}
 .listen.na{color:var(--before);border-image:var(--hatch-grey) 1}
 .timing p{margin:0}
@@ -337,17 +343,24 @@ details.sec[open] > summary{margin-bottom:8px}
 
 /* ---------- desktop: both panes scroll inside the viewport ---------- */
 @media (min-width:1024px){
-  .stages summary{flex-wrap:nowrap}
+  .stages summary{flex-wrap:nowrap;min-height:38px;padding:5px 0}
   .stages summary .sum{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ch-sub{display:none}
+}
+@media (min-width:1280px) and (min-height:760px){
   body{height:100dvh;display:flex;flex-direction:column;overflow:hidden}
   .desk{flex:1;min-height:0;align-items:stretch}
   .log,.cardpane{overflow-y:auto;min-height:0;scrollbar-width:thin}
   .foot{display:none}
 }
+@media (min-width:1024px) and (max-width:1279px), (min-width:1024px) and (max-height:759px){
+  .cardpane{position:sticky;top:0;max-height:100dvh;overflow-y:auto;scrollbar-width:thin}
+}
 @media (max-width:1279px){
   .ch-ctl .btn{padding:8px 11px;font-size:14px}
   #chime .t{display:none}
-  .cols,.row{grid-template-columns:3.8rem 7.6rem minmax(3rem,.6fr) minmax(5rem,1.6fr)}
+  .cols,.row{grid-template-columns:3.8rem 7.2rem minmax(5.5rem,.7fr) minmax(5rem,1.5fr)}
+  .ch-line .txt{white-space:normal}
   .cols span:nth-child(2),.row .c{display:none}
   .stage-list{grid-template-columns:1fr}
   .stage{grid-template-columns:auto 1fr;padding:6px 10px}
@@ -383,7 +396,11 @@ details.sec[open] > summary{margin-bottom:8px}
   .ch-ctl .seg{justify-self:stretch;display:flex}
   .ch-ctl .seg button{flex:1}
   #skip{grid-column:1 / span 2}
-  #follow{display:none}
+  #chime{grid-row:1;grid-column:3}
+  #skip{grid-row:2}
+  #follow{grid-row:2;grid-column:3;font-size:0;gap:6px}
+  #follow::before{font-size:15px}
+  #follow::after{content:"Follow";font-size:14px}
   .btn-ref{grid-column:1 / -1}
   .ch-sub{display:none}
   .cols{display:none}
@@ -398,6 +415,8 @@ details.sec[open] > summary{margin-bottom:8px}
   body.card-open .cardpane{display:block}
   .back{display:inline-flex;position:sticky;top:0;z-index:3;box-shadow:0 6px 14px rgba(0,0,0,.4)}
   .stages summary .more{margin-left:0}
+  .stages summary .sum{font-size:0}
+  .stages summary .sum::after{content:attr(data-short);font-size:14px}
   .acard{padding:16px 14px}
   .bdg{white-space:normal}
   .tabs button{padding:0 9px;font-size:14px}
