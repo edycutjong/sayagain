@@ -1,0 +1,1321 @@
+{
+ "budget_usd": 0.15,
+ "canonical_prompt_sha256": "22f984e087c93f49c4c7e7fdcb808a4320b75fb66672de0ecc6e035b52e309fb",
+ "cards_sha256": "02766dc15ff4edb90933fbef2ee85b87de7c1fb7b8c3103598d6623416e0f724",
+ "finished_at": "2026-10-14T04:58:30+00:00",
+ "git_head": "787eace",
+ "headline_note": "the pre-registered headline is the 0 dB audio row (bench/PROTOCOL.md §5): not run",
+ "judge_prompt_sha256": "0b62697b10c61b979446141b1635c1ddc16f80aa9677d7548cf4e6da39d31927",
+ "ladder_order": [
+  "regex",
+  "MiniCPM5-2B",
+  "Qwen3.8-27B",
+  "Gemma-4-31B-IT",
+  "DeepSeek-V4-Flash",
+  "MiMo-V2.6-Flash"
+ ],
+ "n_cards": 40,
+ "provenance": "text·scripted",
+ "provenance_note": "turn transcripts are the card scripts (no audio, no ASR): the ASR-free ceiling per rung",
+ "rule": "smallest rung with 0 false-VERIFIED AND false-alarm load <= 5 % (held_out row, text·scripted)",
+ "run": "dev-r1",
+ "rungs": {
+  "DeepSeek-V4-Flash": {
+   "cache_hits": 85,
+   "calls": {
+    "calls": 83,
+    "calls_failed": 0,
+    "calls_ok": 83,
+    "completion_tokens": 5333,
+    "cost_usd": 0.0043,
+    "hosts": [
+     "developer.amd.com.cn"
+    ],
+    "latency_s_p50": 4.2881,
+    "latency_s_p95": 35.3602,
+    "model_served": [
+     "self-dploy/DeepSeek-V4-Flash"
+    ],
+    "on_amd": [
+     true
+    ],
+    "prompt_tokens": 20049,
+    "rate_limited_attempts": 0,
+    "reasoning_tokens_reported": 0,
+    "schema_invalid": 0
+   },
+   "cards": "bench/results/text/dev-r1/DeepSeek-V4-Flash.cards.jsonl",
+   "distinct_transcripts": 83,
+   "extractions": "bench/results/text/dev-r1/DeepSeek-V4-Flash.extractions.jsonl",
+   "meets_rule": {
+    "literal": false,
+    "strict": false
+   },
+   "mode": "spans",
+   "receipts": "bench/results/receipts/text-dev-r1-DeepSeek-V4-Flash.jsonl",
+   "rows": {
+    "chatter": {
+     "false_card_exchanges": [],
+     "false_cards": 0,
+     "n_cards": 0,
+     "n_turns": 0,
+     "per_channel_hour": "not measurable on text rows (no audio duration); measured on the audio rows"
+    },
+    "dev": {
+     "abstain_rate": {
+      "ci95": [
+       0.0044,
+       0.1288
+      ],
+      "k": 1,
+      "n": 40,
+      "rate": 0.025
+     },
+     "cards_per_shift_assumption": {
+      "2_errors_per_180": 9.42,
+      "5_errors_per_180": 12.29
+     },
+     "caught_on_channel_detected": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "errors_flagged": {
+      "ci95": [
+       0.8064,
+       1.0
+      ],
+      "k": 16,
+      "n": 16,
+      "rate": 1.0
+     },
+     "false_alarm_exchanges": [
+      "A2-018: ABSTAIN · grounding"
+     ],
+     "false_alarm_load": {
+      "ci95": [
+       0.0074,
+       0.2024
+      ],
+      "k": 1,
+      "n": 24,
+      "rate": 0.0417
+     },
+     "false_verified": {
+      "count": 0,
+      "exchanges": []
+     },
+     "label_exact": {
+      "ci95": [
+       0.8712,
+       0.9956
+      ],
+      "k": 39,
+      "n": 40,
+      "rate": 0.975
+     },
+     "label_misses": [
+      "A2-018: expected 'VERIFIED', got 'ABSTAIN · grounding'"
+     ],
+     "mismatch_only_recall": {
+      "ci95": [
+       0.7961,
+       1.0
+      ],
+      "k": 15,
+      "n": 15,
+      "rate": 1.0
+     },
+     "missed_no_card": {
+      "count": 0,
+      "exchanges": []
+     },
+     "n_cards": 40,
+     "n_correct": 24,
+     "n_seeded_errors": 16,
+     "not_audited": {
+      "ci95": [
+       0.0,
+       0.0876
+      ],
+      "k": 0,
+      "n": 40,
+      "rate": 0.0
+     },
+     "precision_at_1pct_prevalence": 0.1951,
+     "precision_at_corpus_prevalence": 0.9412,
+     "ungrounded_rate": {
+      "ci95": [
+       0.0022,
+       0.0675
+      ],
+      "k": 1,
+      "n": 80,
+      "rate": 0.0125
+     }
+    },
+    "held_out": {
+     "abstain_rate": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "caught_on_channel_detected": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "errors_flagged": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "false_alarm_exchanges": [],
+     "false_alarm_load": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "false_verified": {
+      "count": 0,
+      "exchanges": []
+     },
+     "label_exact": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "label_misses": [],
+     "mismatch_only_recall": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "missed_no_card": {
+      "count": 0,
+      "exchanges": []
+     },
+     "n_cards": 0,
+     "n_correct": 0,
+     "n_seeded_errors": 0,
+     "not_audited": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "ungrounded_rate": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     }
+    },
+    "refusal": []
+   },
+   "rung": {
+    "max_tokens": 512,
+    "model": "DeepSeek-V4-Flash",
+    "name": "DeepSeek-V4-Flash",
+    "params_b": null,
+    "reasoning_effort": "none",
+    "thinking": "off"
+   },
+   "wall_s": 1356.7
+  },
+  "Gemma-4-31B-IT": {
+   "cache_hits": 85,
+   "calls": {
+    "calls": 83,
+    "calls_failed": 0,
+    "calls_ok": 83,
+    "completion_tokens": 4628,
+    "cost_usd": 0.000389,
+    "hosts": [
+     "developer.amd.com.cn"
+    ],
+    "latency_s_p50": 2.5678,
+    "latency_s_p95": 11.936,
+    "model_served": [
+     "self-dploy/Gemma-4-31B-IT"
+    ],
+    "on_amd": [
+     true
+    ],
+    "prompt_tokens": 21717,
+    "rate_limited_attempts": 0,
+    "reasoning_tokens_reported": 0,
+    "schema_invalid": 0
+   },
+   "cards": "bench/results/text/dev-r1/Gemma-4-31B-IT.cards.jsonl",
+   "distinct_transcripts": 83,
+   "extractions": "bench/results/text/dev-r1/Gemma-4-31B-IT.extractions.jsonl",
+   "meets_rule": {
+    "literal": false,
+    "strict": false
+   },
+   "mode": "spans",
+   "receipts": "bench/results/receipts/text-dev-r1-Gemma-4-31B-IT.jsonl",
+   "rows": {
+    "chatter": {
+     "false_card_exchanges": [],
+     "false_cards": 0,
+     "n_cards": 0,
+     "n_turns": 0,
+     "per_channel_hour": "not measurable on text rows (no audio duration); measured on the audio rows"
+    },
+    "dev": {
+     "abstain_rate": {
+      "ci95": [
+       0.0044,
+       0.1288
+      ],
+      "k": 1,
+      "n": 40,
+      "rate": 0.025
+     },
+     "cards_per_shift_assumption": {
+      "2_errors_per_180": 9.42,
+      "5_errors_per_180": 12.29
+     },
+     "caught_on_channel_detected": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "errors_flagged": {
+      "ci95": [
+       0.8064,
+       1.0
+      ],
+      "k": 16,
+      "n": 16,
+      "rate": 1.0
+     },
+     "false_alarm_exchanges": [
+      "KT-06: ABSTAIN · coverage"
+     ],
+     "false_alarm_load": {
+      "ci95": [
+       0.0074,
+       0.2024
+      ],
+      "k": 1,
+      "n": 24,
+      "rate": 0.0417
+     },
+     "false_verified": {
+      "count": 0,
+      "exchanges": []
+     },
+     "label_exact": {
+      "ci95": [
+       0.8712,
+       0.9956
+      ],
+      "k": 39,
+      "n": 40,
+      "rate": 0.975
+     },
+     "label_misses": [
+      "KT-06: expected 'VERIFIED', got 'ABSTAIN · coverage'"
+     ],
+     "mismatch_only_recall": {
+      "ci95": [
+       0.7961,
+       1.0
+      ],
+      "k": 15,
+      "n": 15,
+      "rate": 1.0
+     },
+     "missed_no_card": {
+      "count": 0,
+      "exchanges": []
+     },
+     "n_cards": 40,
+     "n_correct": 24,
+     "n_seeded_errors": 16,
+     "not_audited": {
+      "ci95": [
+       0.0,
+       0.0876
+      ],
+      "k": 0,
+      "n": 40,
+      "rate": 0.0
+     },
+     "precision_at_1pct_prevalence": 0.1951,
+     "precision_at_corpus_prevalence": 0.9412,
+     "ungrounded_rate": {
+      "ci95": [
+       0.0,
+       0.0464
+      ],
+      "k": 0,
+      "n": 79,
+      "rate": 0.0
+     }
+    },
+    "held_out": {
+     "abstain_rate": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "caught_on_channel_detected": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "errors_flagged": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "false_alarm_exchanges": [],
+     "false_alarm_load": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "false_verified": {
+      "count": 0,
+      "exchanges": []
+     },
+     "label_exact": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "label_misses": [],
+     "mismatch_only_recall": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "missed_no_card": {
+      "count": 0,
+      "exchanges": []
+     },
+     "n_cards": 0,
+     "n_correct": 0,
+     "n_seeded_errors": 0,
+     "not_audited": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "ungrounded_rate": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     }
+    },
+    "refusal": []
+   },
+   "rung": {
+    "max_tokens": 512,
+    "model": "Gemma-4-31B-IT",
+    "name": "Gemma-4-31B-IT",
+    "params_b": 31.0,
+    "reasoning_effort": null,
+    "thinking": "off"
+   },
+   "wall_s": 1286.7
+  },
+  "MiMo-V2.6-Flash": {
+   "cache_hits": 85,
+   "calls": {
+    "calls": 83,
+    "calls_failed": 0,
+    "calls_ok": 83,
+    "completion_tokens": 4276,
+    "cost_usd": 0.001767,
+    "hosts": [
+     "developer.amd.com.cn"
+    ],
+    "latency_s_p50": 3.2884,
+    "latency_s_p95": 13.0083,
+    "model_served": [
+     "self-dploy/MiMo-V2.6-Flash"
+    ],
+    "on_amd": [
+     true
+    ],
+    "prompt_tokens": 19687,
+    "rate_limited_attempts": 0,
+    "reasoning_tokens_reported": 0,
+    "schema_invalid": 0
+   },
+   "cards": "bench/results/text/dev-r1/MiMo-V2.6-Flash.cards.jsonl",
+   "distinct_transcripts": 83,
+   "extractions": "bench/results/text/dev-r1/MiMo-V2.6-Flash.extractions.jsonl",
+   "meets_rule": {
+    "literal": false,
+    "strict": false
+   },
+   "mode": "spans",
+   "receipts": "bench/results/receipts/text-dev-r1-MiMo-V2.6-Flash.jsonl",
+   "rows": {
+    "chatter": {
+     "false_card_exchanges": [],
+     "false_cards": 0,
+     "n_cards": 0,
+     "n_turns": 0,
+     "per_channel_hour": "not measurable on text rows (no audio duration); measured on the audio rows"
+    },
+    "dev": {
+     "abstain_rate": {
+      "ci95": [
+       0.0706,
+       0.2907
+      ],
+      "k": 6,
+      "n": 40,
+      "rate": 0.15
+     },
+     "cards_per_shift_assumption": {
+      "2_errors_per_180": 24.25,
+      "5_errors_per_180": 26.88
+     },
+     "caught_on_channel_detected": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "errors_flagged": {
+      "ci95": [
+       0.8064,
+       1.0
+      ],
+      "k": 16,
+      "n": 16,
+      "rate": 1.0
+     },
+     "false_alarm_exchanges": [
+      "A2-009: ABSTAIN · coverage",
+      "A2-010: ABSTAIN · grounding",
+      "A2-018: ABSTAIN · grounding"
+     ],
+     "false_alarm_load": {
+      "ci95": [
+       0.0434,
+       0.31
+      ],
+      "k": 3,
+      "n": 24,
+      "rate": 0.125
+     },
+     "false_verified": {
+      "count": 0,
+      "exchanges": []
+     },
+     "label_exact": {
+      "ci95": [
+       0.7093,
+       0.9294
+      ],
+      "k": 34,
+      "n": 40,
+      "rate": 0.85
+     },
+     "label_misses": [
+      "A2-008: expected 'MISMATCH · line: missing (expected A)', got 'ABSTAIN · grounding'",
+      "A2-009: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "A2-010: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-018: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "KT-03: expected 'MISMATCH · tag: XV-203 ≠ XV-208', got 'ABSTAIN · coverage'",
+      "KT-18: expected 'MISMATCH · tag: XV-203 ≠ XV-208', got 'ABSTAIN · grounding'"
+     ],
+     "mismatch_only_recall": {
+      "ci95": [
+       0.5481,
+       0.9295
+      ],
+      "k": 12,
+      "n": 15,
+      "rate": 0.8
+     },
+     "missed_no_card": {
+      "count": 0,
+      "exchanges": []
+     },
+     "n_cards": 40,
+     "n_correct": 24,
+     "n_seeded_errors": 16,
+     "not_audited": {
+      "ci95": [
+       0.0,
+       0.0876
+      ],
+      "k": 0,
+      "n": 40,
+      "rate": 0.0
+     },
+     "precision_at_1pct_prevalence": 0.0748,
+     "precision_at_corpus_prevalence": 0.8421,
+     "ungrounded_rate": {
+      "ci95": [
+       0.0196,
+       0.1216
+      ],
+      "k": 4,
+      "n": 80,
+      "rate": 0.05
+     }
+    },
+    "held_out": {
+     "abstain_rate": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "caught_on_channel_detected": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "errors_flagged": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "false_alarm_exchanges": [],
+     "false_alarm_load": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "false_verified": {
+      "count": 0,
+      "exchanges": []
+     },
+     "label_exact": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "label_misses": [],
+     "mismatch_only_recall": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "missed_no_card": {
+      "count": 0,
+      "exchanges": []
+     },
+     "n_cards": 0,
+     "n_correct": 0,
+     "n_seeded_errors": 0,
+     "not_audited": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "ungrounded_rate": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     }
+    },
+    "refusal": []
+   },
+   "rung": {
+    "max_tokens": 512,
+    "model": "MiMo-V2.6-Flash",
+    "name": "MiMo-V2.6-Flash",
+    "params_b": null,
+    "reasoning_effort": "none",
+    "thinking": "off"
+   },
+   "wall_s": 1281.1
+  },
+  "MiniCPM5-2B": {
+   "cache_hits": 85,
+   "calls": {
+    "calls": 83,
+    "calls_failed": 0,
+    "calls_ok": 83,
+    "completion_tokens": 4983,
+    "cost_usd": 0.000439,
+    "hosts": [
+     "developer.amd.com.cn"
+    ],
+    "latency_s_p50": 1.4188,
+    "latency_s_p95": 2.2821,
+    "model_served": [
+     "self-dploy/MiniCPM5-2B"
+    ],
+    "on_amd": [
+     true
+    ],
+    "prompt_tokens": 21414,
+    "rate_limited_attempts": 0,
+    "reasoning_tokens_reported": 0,
+    "schema_invalid": 44
+   },
+   "cards": "bench/results/text/dev-r1/MiniCPM5-2B.cards.jsonl",
+   "distinct_transcripts": 83,
+   "extractions": "bench/results/text/dev-r1/MiniCPM5-2B.extractions.jsonl",
+   "meets_rule": {
+    "literal": false,
+    "strict": false
+   },
+   "mode": "spans",
+   "receipts": "bench/results/receipts/text-dev-r1-MiniCPM5-2B.jsonl",
+   "rows": {
+    "chatter": {
+     "false_card_exchanges": [],
+     "false_cards": 0,
+     "n_cards": 0,
+     "n_turns": 0,
+     "per_channel_hour": "not measurable on text rows (no audio duration); measured on the audio rows"
+    },
+    "dev": {
+     "abstain_rate": {
+      "ci95": [
+       0.9124,
+       1.0
+      ],
+      "k": 40,
+      "n": 40,
+      "rate": 1.0
+     },
+     "cards_per_shift_assumption": {
+      "2_errors_per_180": 180.0,
+      "5_errors_per_180": 180.0
+     },
+     "caught_on_channel_detected": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "errors_flagged": {
+      "ci95": [
+       0.8064,
+       1.0
+      ],
+      "k": 16,
+      "n": 16,
+      "rate": 1.0
+     },
+     "false_alarm_exchanges": [
+      "A2-001: ABSTAIN · coverage",
+      "A2-004: ABSTAIN · coverage",
+      "A2-006: ABSTAIN · grounding",
+      "A2-009: ABSTAIN · grounding",
+      "A2-010: ABSTAIN · grounding",
+      "A2-012: ABSTAIN · coverage",
+      "A2-016: ABSTAIN · coverage",
+      "A2-018: ABSTAIN · grounding",
+      "A2-019: ABSTAIN · grounding",
+      "KT-01: ABSTAIN · coverage",
+      "KT-02: ABSTAIN · grounding",
+      "KT-04: ABSTAIN · grounding",
+      "KT-05: ABSTAIN · coverage",
+      "KT-06: ABSTAIN · grounding",
+      "KT-07: ABSTAIN · coverage",
+      "KT-09: ABSTAIN · grounding",
+      "KT-10: ABSTAIN · grounding",
+      "KT-11: ABSTAIN · grounding",
+      "KT-12: ABSTAIN · coverage",
+      "KT-14: ABSTAIN · grounding",
+      "KT-15: ABSTAIN · grounding",
+      "KT-17: ABSTAIN · coverage",
+      "KT-19: ABSTAIN · coverage",
+      "KT-20: ABSTAIN · coverage"
+     ],
+     "false_alarm_load": {
+      "ci95": [
+       0.862,
+       1.0
+      ],
+      "k": 24,
+      "n": 24,
+      "rate": 1.0
+     },
+     "false_verified": {
+      "count": 0,
+      "exchanges": []
+     },
+     "label_exact": {
+      "ci95": [
+       0.0,
+       0.0876
+      ],
+      "k": 0,
+      "n": 40,
+      "rate": 0.0
+     },
+     "label_misses": [
+      "A2-001: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "A2-002: expected 'MISMATCH · action: OPEN ≠ CLOSE', got 'ABSTAIN · grounding'",
+      "A2-003: expected 'MISMATCH · tag: P-114 ≠ P-140', got 'ABSTAIN · coverage'",
+      "A2-004: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "A2-005: expected 'NO-READBACK', got 'ABSTAIN · coverage'",
+      "A2-006: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-007: expected 'MISMATCH · line: B ≠ D', got 'ABSTAIN · coverage'",
+      "A2-008: expected 'MISMATCH · line: missing (expected A)', got 'ABSTAIN · grounding'",
+      "A2-009: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-010: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-011: expected 'MISMATCH · line: C ≠ A', got 'ABSTAIN · coverage'",
+      "A2-012: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "A2-013: expected 'MISMATCH · tag: P-114 ≠ P-140', got 'ABSTAIN · coverage'",
+      "A2-014: expected 'MISMATCH · tag: P-114 ≠ P-140', got 'ABSTAIN · grounding'",
+      "A2-015: expected 'MISMATCH · action: START ≠ STOP', got 'ABSTAIN · grounding'",
+      "A2-016: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "A2-017: expected 'MISMATCH · tag: MOV-31H ≠ MOV-31A', got 'ABSTAIN · coverage'",
+      "A2-018: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-019: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "A2-020: expected 'MISMATCH · tag: P-140 ≠ P-114', got 'ABSTAIN · coverage'",
+      "KT-01: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "KT-02: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "KT-03: expected 'MISMATCH · tag: XV-203 ≠ XV-208', got 'ABSTAIN · coverage'",
+      "KT-04: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "KT-05: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "KT-06: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "KT-07: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "KT-08: expected 'MISMATCH · tag: MOV-31A ≠ MOV-31H', got 'ABSTAIN · grounding'",
+      "KT-09: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "KT-10: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "KT-11: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "KT-12: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "KT-13: expected 'MISMATCH · tag: P-114 ≠ P-140', got 'ABSTAIN · coverage'",
+      "KT-14: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "KT-15: expected 'VERIFIED', got 'ABSTAIN · grounding'",
+      "KT-16: expected 'MISMATCH · line: C ≠ B', got 'ABSTAIN · grounding'",
+      "KT-17: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "KT-18: expected 'MISMATCH · tag: XV-203 ≠ XV-208', got 'ABSTAIN · grounding'",
+      "KT-19: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "KT-20: expected 'VERIFIED', got 'ABSTAIN · coverage'"
+     ],
+     "mismatch_only_recall": {
+      "ci95": [
+       0.0,
+       0.2039
+      ],
+      "k": 0,
+      "n": 15,
+      "rate": 0.0
+     },
+     "missed_no_card": {
+      "count": 0,
+      "exchanges": []
+     },
+     "n_cards": 40,
+     "n_correct": 24,
+     "n_seeded_errors": 16,
+     "not_audited": {
+      "ci95": [
+       0.0,
+       0.0876
+      ],
+      "k": 0,
+      "n": 40,
+      "rate": 0.0
+     },
+     "precision_at_1pct_prevalence": 0.01,
+     "precision_at_corpus_prevalence": 0.4,
+     "ungrounded_rate": {
+      "ci95": [
+       0.6379,
+       0.8314
+      ],
+      "k": 56,
+      "n": 75,
+      "rate": 0.7467
+     }
+    },
+    "held_out": {
+     "abstain_rate": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "caught_on_channel_detected": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "errors_flagged": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "false_alarm_exchanges": [],
+     "false_alarm_load": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "false_verified": {
+      "count": 0,
+      "exchanges": []
+     },
+     "label_exact": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "label_misses": [],
+     "mismatch_only_recall": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "missed_no_card": {
+      "count": 0,
+      "exchanges": []
+     },
+     "n_cards": 0,
+     "n_correct": 0,
+     "n_seeded_errors": 0,
+     "not_audited": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "ungrounded_rate": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     }
+    },
+    "refusal": []
+   },
+   "rung": {
+    "max_tokens": 512,
+    "model": "MiniCPM5-2B",
+    "name": "MiniCPM5-2B",
+    "params_b": 2.0,
+    "reasoning_effort": null,
+    "thinking": "none"
+   },
+   "wall_s": 1165.9
+  },
+  "Qwen3.8-27B": {
+   "cache_hits": 85,
+   "calls": {
+    "calls": 83,
+    "calls_failed": 0,
+    "calls_ok": 83,
+    "completion_tokens": 21272,
+    "cost_usd": 0.002963,
+    "hosts": [
+     "developer.amd.com.cn"
+    ],
+    "latency_s_p50": 14.858,
+    "latency_s_p95": 31.2326,
+    "model_served": [
+     "self-dploy/Qwen3.8-27B"
+    ],
+    "on_amd": [
+     true
+    ],
+    "prompt_tokens": 22216,
+    "rate_limited_attempts": 0,
+    "reasoning_tokens_reported": 17909,
+    "schema_invalid": 0
+   },
+   "cards": "bench/results/text/dev-r1/Qwen3.8-27B.cards.jsonl",
+   "distinct_transcripts": 83,
+   "extractions": "bench/results/text/dev-r1/Qwen3.8-27B.extractions.jsonl",
+   "meets_rule": {
+    "literal": false,
+    "strict": false
+   },
+   "mode": "spans",
+   "receipts": "bench/results/receipts/text-dev-r1-Qwen3.8-27B.jsonl",
+   "rows": {
+    "chatter": {
+     "false_card_exchanges": [],
+     "false_cards": 0,
+     "n_cards": 0,
+     "n_turns": 0,
+     "per_channel_hour": "not measurable on text rows (no audio duration); measured on the audio rows"
+    },
+    "dev": {
+     "abstain_rate": {
+      "ci95": [
+       0.0,
+       0.0876
+      ],
+      "k": 0,
+      "n": 40,
+      "rate": 0.0
+     },
+     "cards_per_shift_assumption": {
+      "2_errors_per_180": 2.0,
+      "5_errors_per_180": 5.0
+     },
+     "caught_on_channel_detected": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "errors_flagged": {
+      "ci95": [
+       0.8064,
+       1.0
+      ],
+      "k": 16,
+      "n": 16,
+      "rate": 1.0
+     },
+     "false_alarm_exchanges": [],
+     "false_alarm_load": {
+      "ci95": [
+       0.0,
+       0.138
+      ],
+      "k": 0,
+      "n": 24,
+      "rate": 0.0
+     },
+     "false_verified": {
+      "count": 0,
+      "exchanges": []
+     },
+     "label_exact": {
+      "ci95": [
+       0.9124,
+       1.0
+      ],
+      "k": 40,
+      "n": 40,
+      "rate": 1.0
+     },
+     "label_misses": [],
+     "mismatch_only_recall": {
+      "ci95": [
+       0.7961,
+       1.0
+      ],
+      "k": 15,
+      "n": 15,
+      "rate": 1.0
+     },
+     "missed_no_card": {
+      "count": 0,
+      "exchanges": []
+     },
+     "n_cards": 40,
+     "n_correct": 24,
+     "n_seeded_errors": 16,
+     "not_audited": {
+      "ci95": [
+       0.0,
+       0.0876
+      ],
+      "k": 0,
+      "n": 40,
+      "rate": 0.0
+     },
+     "precision_at_1pct_prevalence": 1.0,
+     "precision_at_corpus_prevalence": 1.0,
+     "ungrounded_rate": {
+      "ci95": [
+       0.0,
+       0.0458
+      ],
+      "k": 0,
+      "n": 80,
+      "rate": 0.0
+     }
+    },
+    "held_out": {
+     "abstain_rate": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "caught_on_channel_detected": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "errors_flagged": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "false_alarm_exchanges": [],
+     "false_alarm_load": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "false_verified": {
+      "count": 0,
+      "exchanges": []
+     },
+     "label_exact": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "label_misses": [],
+     "mismatch_only_recall": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "missed_no_card": {
+      "count": 0,
+      "exchanges": []
+     },
+     "n_cards": 0,
+     "n_correct": 0,
+     "n_seeded_errors": 0,
+     "not_audited": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "ungrounded_rate": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     }
+    },
+    "refusal": []
+   },
+   "rung": {
+    "max_tokens": 6144,
+    "model": "Qwen3.8-27B",
+    "name": "Qwen3.8-27B",
+    "params_b": 27.0,
+    "reasoning_effort": "low",
+    "thinking": "on"
+   },
+   "wall_s": 750.7
+  },
+  "regex": {
+   "cache_hits": 2,
+   "calls": null,
+   "cards": "bench/results/text/dev-r1/regex.cards.jsonl",
+   "distinct_transcripts": 83,
+   "extractions": "bench/results/text/dev-r1/regex.extractions.jsonl",
+   "meets_rule": {
+    "literal": false,
+    "strict": false
+   },
+   "mode": "spans",
+   "receipts": null,
+   "rows": {
+    "chatter": {
+     "false_card_exchanges": [],
+     "false_cards": 0,
+     "n_cards": 0,
+     "n_turns": 0,
+     "per_channel_hour": "not measurable on text rows (no audio duration); measured on the audio rows"
+    },
+    "dev": {
+     "abstain_rate": {
+      "ci95": [
+       0.0,
+       0.0876
+      ],
+      "k": 0,
+      "n": 40,
+      "rate": 0.0
+     },
+     "cards_per_shift_assumption": {
+      "2_errors_per_180": 2.0,
+      "5_errors_per_180": 5.0
+     },
+     "caught_on_channel_detected": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "errors_flagged": {
+      "ci95": [
+       0.8064,
+       1.0
+      ],
+      "k": 16,
+      "n": 16,
+      "rate": 1.0
+     },
+     "false_alarm_exchanges": [],
+     "false_alarm_load": {
+      "ci95": [
+       0.0,
+       0.138
+      ],
+      "k": 0,
+      "n": 24,
+      "rate": 0.0
+     },
+     "false_verified": {
+      "count": 0,
+      "exchanges": []
+     },
+     "label_exact": {
+      "ci95": [
+       0.9124,
+       1.0
+      ],
+      "k": 40,
+      "n": 40,
+      "rate": 1.0
+     },
+     "label_misses": [],
+     "mismatch_only_recall": {
+      "ci95": [
+       0.7961,
+       1.0
+      ],
+      "k": 15,
+      "n": 15,
+      "rate": 1.0
+     },
+     "missed_no_card": {
+      "count": 0,
+      "exchanges": []
+     },
+     "n_cards": 40,
+     "n_correct": 24,
+     "n_seeded_errors": 16,
+     "not_audited": {
+      "ci95": [
+       0.0,
+       0.0876
+      ],
+      "k": 0,
+      "n": 40,
+      "rate": 0.0
+     },
+     "precision_at_1pct_prevalence": 1.0,
+     "precision_at_corpus_prevalence": 1.0
+    },
+    "held_out": {
+     "abstain_rate": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "caught_on_channel_detected": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "errors_flagged": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "false_alarm_exchanges": [],
+     "false_alarm_load": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "false_verified": {
+      "count": 0,
+      "exchanges": []
+     },
+     "label_exact": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "label_misses": [],
+     "mismatch_only_recall": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "missed_no_card": {
+      "count": 0,
+      "exchanges": []
+     },
+     "n_cards": 0,
+     "n_correct": 0,
+     "n_seeded_errors": 0,
+     "not_audited": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     }
+    },
+    "refusal": []
+   },
+   "rung": {
+    "max_tokens": 512,
+    "model": null,
+    "name": "regex",
+    "params_b": 0.0,
+    "reasoning_effort": null,
+    "thinking": "none"
+   },
+   "wall_s": 0.1
+  }
+ },
+ "shift_assumption": "180 exchanges per shift, 2-5 real errors",
+ "smallest_rung_meeting_rule": null,
+ "span_prompt_sha256": "b79578f3acc9d4301958637513f2ead0848bf9c2a286a4a1947bc75aa0016d97",
+ "spent_usd": 0.009858,
+ "started_at": "2026-10-14T04:35:54+00:00",
+ "subset": "dev",
+ "usage_before": {
+  "daily_cost_limit_usd": 1,
+  "daily_cost_used_usd": 0.0019048110116273165,
+  "daily_reset_at": "2026-10-14T16:00:00.000Z",
+  "rpm_limit": 20
+ }
+}
