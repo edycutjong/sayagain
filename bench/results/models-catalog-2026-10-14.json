@@ -1,0 +1,368 @@
+{
+ "endpoint": "/models",
+ "fetched_at": "2026-10-14T08:26:36.307+00:00",
+ "host": "developer.amd.com.cn",
+ "models": [
+  {
+   "architecture": {
+    "input_modalities": [
+     "text",
+     "image"
+    ],
+    "output_modalities": [
+     "text"
+    ],
+    "tokenizer": "GPT"
+   },
+   "context_length": 1048576,
+   "description": "Dynamic sglang-router service managed by Model Ops",
+   "id": "DeepSeek-V4.1-Flash",
+   "json_output": true,
+   "pricing": {
+    "completion": "5.6e-7",
+    "input_cache_read": "5.6e-9",
+    "prompt": "2.8e-7"
+   },
+   "structured_outputs": false,
+   "supported_parameters": [
+    "temperature",
+    "max_tokens",
+    "top_p",
+    "stream",
+    "response_format",
+    "tools",
+    "tool_choice"
+   ]
+  },
+  {
+   "architecture": {
+    "input_modalities": [
+     "text"
+    ],
+    "output_modalities": [
+     "text"
+    ],
+    "tokenizer": "GPT"
+   },
+   "context_length": 1048576,
+   "description": "Dynamic sglang-router service managed by Model Ops",
+   "id": "DeepSeek-V4-Flash",
+   "json_output": true,
+   "pricing": {
+    "completion": "2.8e-7",
+    "input_cache_read": "2.8e-9",
+    "prompt": "1.4e-7"
+   },
+   "structured_outputs": false,
+   "supported_parameters": [
+    "temperature",
+    "max_tokens",
+    "top_p",
+    "stream",
+    "response_format",
+    "tools",
+    "tool_choice"
+   ]
+  },
+  {
+   "architecture": {
+    "input_modalities": [
+     "text",
+     "image"
+    ],
+    "output_modalities": [
+     "text"
+    ],
+    "tokenizer": "GPT"
+   },
+   "context_length": 1048576,
+   "description": "Dynamic sglang-router service managed by Model Ops",
+   "id": "DeepSeek-V4-Flash-Vision-Exp",
+   "json_output": true,
+   "pricing": {
+    "completion": "2.8e-7",
+    "input_cache_read": "2.8e-9",
+    "prompt": "1.4e-7"
+   },
+   "structured_outputs": false,
+   "supported_parameters": [
+    "temperature",
+    "max_tokens",
+    "top_p",
+    "stream",
+    "response_format",
+    "tools",
+    "tool_choice"
+   ]
+  },
+  {
+   "architecture": {
+    "input_modalities": [
+     "text",
+     "image"
+    ],
+    "output_modalities": [
+     "text"
+    ],
+    "tokenizer": "GPT"
+   },
+   "context_length": 262144,
+   "description": "Dynamic sglang-router service managed by Model Ops",
+   "id": "Gemma-4-31B-IT",
+   "json_output": true,
+   "pricing": {
+    "completion": "7e-8",
+    "input_cache_read": "7e-10",
+    "prompt": "3.5e-8"
+   },
+   "structured_outputs": false,
+   "supported_parameters": [
+    "temperature",
+    "max_tokens",
+    "top_p",
+    "stream",
+    "response_format",
+    "tools",
+    "tool_choice"
+   ]
+  },
+  {
+   "architecture": {
+    "input_modalities": [
+     "text"
+    ],
+    "output_modalities": [
+     "text"
+    ],
+    "tokenizer": "GPT"
+   },
+   "context_length": 262144,
+   "description": "Dynamic vllm-router service managed by Model Ops",
+   "id": "GLM-5.3-Flash",
+   "json_output": true,
+   "pricing": {
+    "completion": "5.6e-7",
+    "input_cache_read": "5.6e-9",
+    "prompt": "2.8e-7"
+   },
+   "structured_outputs": false,
+   "supported_parameters": [
+    "temperature",
+    "max_tokens",
+    "top_p",
+    "stream",
+    "response_format",
+    "tools",
+    "tool_choice"
+   ]
+  },
+  {
+   "architecture": {
+    "input_modalities": [
+     "text",
+     "image"
+    ],
+    "output_modalities": [
+     "text"
+    ],
+    "tokenizer": "GPT"
+   },
+   "context_length": 1048576,
+   "description": "Dynamic sglang-router service managed by Model Ops",
+   "id": "MiMo-V2.6-Flash",
+   "json_output": true,
+   "pricing": {
+    "completion": "2.8e-7",
+    "input_cache_read": "2.8e-9",
+    "prompt": "1.4e-7"
+   },
+   "structured_outputs": false,
+   "supported_parameters": [
+    "temperature",
+    "max_tokens",
+    "top_p",
+    "stream",
+    "response_format",
+    "tools",
+    "tool_choice"
+   ]
+  },
+  {
+   "architecture": {
+    "input_modalities": [
+     "text"
+    ],
+    "output_modalities": [
+     "ocr"
+    ],
+    "tokenizer": "GPT"
+   },
+   "context_length": 0,
+   "description": "Dynamic vllm-router service managed by Model Ops",
+   "id": "MinerU2.5-Pro",
+   "json_output": false,
+   "pricing": {
+    "completion": "0",
+    "prompt": "0"
+   },
+   "structured_outputs": false,
+   "supported_parameters": []
+  },
+  {
+   "architecture": {
+    "input_modalities": [
+     "text"
+    ],
+    "output_modalities": [
+     "text"
+    ],
+    "tokenizer": "GPT"
+   },
+   "context_length": 131072,
+   "description": "Dynamic vllm-router service managed by Model Ops",
+   "id": "MiniCPM5-2B",
+   "json_output": true,
+   "pricing": {
+    "completion": "7e-8",
+    "input_cache_read": "7e-10",
+    "prompt": "3.5e-8"
+   },
+   "structured_outputs": false,
+   "supported_parameters": [
+    "temperature",
+    "max_tokens",
+    "top_p",
+    "stream",
+    "response_format",
+    "tools",
+    "tool_choice"
+   ]
+  },
+  {
+   "architecture": {
+    "input_modalities": [
+     "text",
+     "image"
+    ],
+    "output_modalities": [
+     "text"
+    ],
+    "tokenizer": "GPT"
+   },
+   "context_length": 262144,
+   "description": "Dynamic sglang-router service managed by Model Ops",
+   "id": "MiniCPM-V-4.7-1B",
+   "json_output": true,
+   "pricing": {
+    "completion": "7e-8",
+    "input_cache_read": "7e-10",
+    "prompt": "3.5e-8"
+   },
+   "structured_outputs": false,
+   "supported_parameters": [
+    "temperature",
+    "max_tokens",
+    "top_p",
+    "stream",
+    "response_format",
+    "tools",
+    "tool_choice"
+   ]
+  },
+  {
+   "architecture": {
+    "input_modalities": [
+     "text",
+     "image"
+    ],
+    "output_modalities": [
+     "text"
+    ],
+    "tokenizer": "GPT"
+   },
+   "context_length": 262144,
+   "description": "Dynamic sglang-router service managed by Model Ops",
+   "id": "MiniCPM-V-4.7-35B-A3B",
+   "json_output": true,
+   "pricing": {
+    "completion": "7e-8",
+    "input_cache_read": "7e-10",
+    "prompt": "3.5e-8"
+   },
+   "structured_outputs": false,
+   "supported_parameters": [
+    "temperature",
+    "max_tokens",
+    "top_p",
+    "stream",
+    "response_format",
+    "tools",
+    "tool_choice"
+   ]
+  },
+  {
+   "architecture": {
+    "input_modalities": [
+     "text",
+     "image"
+    ],
+    "output_modalities": [
+     "text"
+    ],
+    "tokenizer": "GPT"
+   },
+   "context_length": 262144,
+   "description": "Dynamic sglang-router service managed by Model Ops",
+   "id": "Qwen3.8-27B",
+   "json_output": true,
+   "pricing": {
+    "completion": "7e-8",
+    "input_cache_read": "7e-10",
+    "prompt": "3.5e-8"
+   },
+   "structured_outputs": false,
+   "supported_parameters": [
+    "temperature",
+    "max_tokens",
+    "top_p",
+    "stream",
+    "response_format",
+    "tools",
+    "tool_choice"
+   ]
+  },
+  {
+   "architecture": {
+    "input_modalities": [
+     "text",
+     "image"
+    ],
+    "output_modalities": [
+     "text"
+    ],
+    "tokenizer": "GPT"
+   },
+   "context_length": 262144,
+   "description": "Dynamic sglang-router service managed by Model Ops",
+   "id": "Qwen3.8-Flash-Next",
+   "json_output": true,
+   "pricing": {
+    "completion": "2.8e-7",
+    "input_cache_read": "2.8e-9",
+    "prompt": "1.4e-7"
+   },
+   "structured_outputs": false,
+   "supported_parameters": [
+    "temperature",
+    "max_tokens",
+    "top_p",
+    "stream",
+    "response_format",
+    "tools",
+    "tool_choice"
+   ]
+  }
+ ],
+ "on_amd": true,
+ "request_id": null
+}

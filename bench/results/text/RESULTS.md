@@ -35,6 +35,8 @@ Re-audit of bench/results/text/ablate-grounding-r1.json: only the transcripts th
 | with_grounding | off | 0 | 0 | 0 | 41/41 (100 %) [91.43 % – 100 %] | 38/38 (100 %) | 2/48 (4.17 %) [1.15 % – 13.98 %] | 87/89 (97.75 %) | 0/194 (0 %) | ABSTAIN · unknown tag | 0 | 3.5638 / 14.9693 | bench/results/text/ablate-grounding-r1-reaudit.json |
 | without_grounding | off | 0 | 0 | 1 | 41/41 (100 %) [91.43 % – 100 %] | 38/38 (100 %) | 6/48 (12.5 %) [5.86 % – 24.7 %] | 75/89 (84.27 %) | 0/193 (0 %) | ABSTAIN · unknown tag | 0 | 3.7864 / 19.9265 | bench/results/text/ablate-grounding-r1-reaudit.json |
 
+Cards in the *Not audited* column had a failed call (server error, time-out). They stay in the denominators but are never counted as flagged errors or as false alarms — conservative for errors flagged, optimistic for false-alarm load — and they keep the row from meeting the rule; a re-audit result, where one exists, is listed above.
+
 ### llm-judge-r1-reaudit — `text·scripted`, row `held_out`, 145 cards run, this run spent $0.00787 (bench/results/text/llm-judge-r1-reaudit.json)
 
 Re-audit of bench/results/text/llm-judge-r1.json: only the transcripts that pass could not audit were requested again; latency and cost columns cover those calls only.
@@ -42,6 +44,8 @@ Re-audit of bench/results/text/llm-judge-r1.json: only the transcripts that pass
 | Rung | Thinking | False-VERIFIED | No card | Not audited | Errors flagged [Wilson CI] | MISMATCH-only recall | False-alarm load [Wilson CI] | Label exact | Ungrounded | Refusal R-01 | Chatter false cards | Median / 95th-pct latency, s | Source |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | llm_judge | default | 2 | 0 | 5 | 35/41 (85.37 %) [71.56 % – 93.12 %] | 33/38 (86.84 %) | 1/48 (2.08 %) [0.37 % – 10.9 %] | 81/89 (91.01 %) | — | VERIFIED | 1 | 3.8606 / 68.7281 | bench/results/text/llm-judge-r1-reaudit.json |
+
+Cards in the *Not audited* column had a failed call (server error, time-out). They stay in the denominators but are never counted as flagged errors or as false alarms — conservative for errors flagged, optimistic for false-alarm load — and they keep the row from meeting the rule; a re-audit result, where one exists, is listed above.
 
 ### dev-r1 — `text·scripted`, row `dev`, 40 cards run, this run spent $0.009858 (bench/results/text/dev-r1.json)
 

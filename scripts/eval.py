@@ -890,7 +890,7 @@ def report_lines(path: Path) -> list[str]:
             f"{_r(h.get('ungrounded_rate')) if h.get('ungrounded_rate') else '—'} | {ref} | "
             f"{rows['chatter']['false_cards']} | {lat} | {rel} |"
         )
-    if any(g["rows"][row]["not_audited"]["k"] for g in groups.values()) and not doc.get("reaudit_of"):
+    if any(g["rows"][row]["not_audited"]["k"] for g in groups.values()):
         out.append("")
         out.append(
             "Cards in the *Not audited* column had a failed call (server error, time-out). They stay in the "
