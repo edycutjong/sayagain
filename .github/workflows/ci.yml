@@ -7,21 +7,39 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  test:
+  quality:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
         with:
           python-version: "3.11"
+          enable-cache: true
       - name: Install (CPU only, no kill-test extra)
         run: uv sync --locked
       - name: Lint
         run: |
-          uv run ruff check .
+          uv run ruff check --output-format=github .
           uv run ruff format --check .
-      - name: Tests
-        run: uv run pytest -q
+      - name: Tests and coverage
+        run: uv run pytest -q --cov=referee --cov=sayagain --cov=scripts --cov-report=term-missing
       - name: Readiness (build stage)
         run: uv run python scripts/check_submission_readiness.py --stage build
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.11"
+          enable-cache: true
+      - name: Install
+        run: uv sync --locked
+      - name: Dependency audit (pip-audit)
+        run: uv run pip-audit
