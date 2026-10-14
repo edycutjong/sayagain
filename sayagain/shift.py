@@ -119,6 +119,18 @@ def receipts_by_request(rung: str) -> dict[str, dict]:
     return out
 
 
+@lru_cache(maxsize=16)
+def failed_receipts_by_client(rung: str) -> dict[str, dict]:
+    """Every failed call of this rung (HTTP 5xx, time-out, 429 after the back-off) by its client call id: a failed call
+    has no request id, and its receipt is what a NOT_AUDITED turn can show instead of nothing."""
+    out: dict[str, dict] = {}
+    for p in sorted(RECEIPTS.glob(f"text-*-{rung}.jsonl")):
+        for r in read_jsonl(p):
+            if r.get("client_id") and r.get("ok") is False:
+                out[r["client_id"]] = r
+    return out
+
+
 def stored_extractor(run: str, rung: str) -> Callable[[str], Extraction]:
     rows = read_jsonl(ROOT / _rung_info(run, rung)["extractions"])
     by_text = {r["text"]: r for r in rows}
@@ -128,7 +140,10 @@ def stored_extractor(run: str, rung: str) -> Callable[[str], Extraction]:
         if r is None:  # a transcript this run never saw: not audited, never a verdict
             return Extraction(text, None, "not in this run", None, 0)
         keep = {k: r.get(k) for k in ("request_id", "latency_s", "cost_usd", "attempts")}
-        return Extraction(text, r["obj"], r["not_audited"], keep if r.get("request_id") else None, r.get("attempts", 0))
+        if r.get("request_id") is None and r.get("not_audited") and r.get("client_id"):
+            keep["client_id"] = r["client_id"]  # a failed call: its receipt is found by the client call id
+        has = r.get("request_id") or keep.get("client_id")
+        return Extraction(text, r["obj"], r["not_audited"], keep if has else None, r.get("attempts", 0))
 
     return call
 
@@ -164,7 +179,9 @@ def _receipt_view(ext: Extraction, rung: str) -> dict | None:
         return None
     rid = ext.receipt.get("request_id")
     full = receipts_by_request(rung).get(rid) if rid else None
-    src = full or ext.receipt
+    cid = ext.receipt.get("client_id")
+    failed = failed_receipts_by_client(rung).get(cid) if full is None and cid and ext.not_audited else None
+    src = full or failed or ext.receipt
     view = {
         "request_id": rid,
         "model_served": src.get("model_served"),
@@ -174,8 +191,12 @@ def _receipt_view(ext: Extraction, rung: str) -> dict | None:
         "cost_usd": src.get("cost_usd"),
         "started_at": src.get("started_at"),
         "run": src.get("run"),
-        "receipt_found": full is not None,
+        "receipt_found": full is not None or failed is not None,
     }
+    if ext.not_audited is not None and src.get("ok") is False:  # a failed call: what failed, not only that it did
+        view.update(
+            ok=False, http_status=src.get("http_status"), error=src.get("error"), client_id=src.get("client_id")
+        )
     if "live" in ext.receipt:
         view["live"] = True
     return view

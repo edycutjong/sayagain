@@ -671,10 +671,15 @@
     return '<div class="' + cls + '"><span class="who">' + who + '<small>' + esc(t.id) + '</small>' + noRec + '</span><span class="w">' + lineHTML(c, t, role) + '</span>' + laneHTML(t) + '</div>';
   }
 
+  function failedBits(r) {  // the failed call's own receipt: what the host answered, after how long
+    return (r.http_status ? ' · HTTP ' + esc(r.http_status) : '') + ' · ' + esc(r.host || '') + (r.on_amd ? ' (AMD-hosted API)' : '') +
+      (typeof r.latency_s === 'number' ? ' · <b>' + esc(secs(r.latency_s) || '') + '</b>' : '') +
+      (r.client_id ? ' · call <span class="data">' + esc(r.client_id) + '</span>' : '');
+  }
   function receiptLine(t) {
     var who = t.role === 'operator' ? 'Operator' : 'Field tech';
     var r = t.receipt, bits;
-    if (t.not_audited) bits = '<b>not audited</b> · ' + esc(t.not_audited);
+    if (t.not_audited) bits = '<b>not audited</b> · ' + esc(t.not_audited) + (r && r.ok === false ? failedBits(r) : '');
     else if (!r) bits = S.rung === 'regex' ? 'regex rung 0 · no model, no call' : 'no receipt';
     else {
       bits = (r.live ? '<b>live call</b>' + (r.started_at ? ' at ' + esc(String(r.started_at).slice(11, 19)) + ' UTC' : '') + ' · ' : '') + '<b>' + esc(r.model_served || S.rung) + '</b> · ' + esc(r.host || '') +
@@ -741,7 +746,7 @@
       '</div>';
     // receipts
     var nCalls = {};
-    c.turns.forEach(function (t) { if (t.receipt && t.receipt.request_id) nCalls[t.receipt.request_id] = 1; });
+    c.turns.forEach(function (t) { var k = t.receipt && (t.receipt.request_id || t.receipt.client_id); if (k) nCalls[k] = 1; });
     var nc = Object.keys(nCalls).length, anyLive = c.turns.some(function (t) { return t.receipt && t.receipt.live; });
     h += '<details class="sec"><summary><span class="lab">Receipts · ' + (S.rung === 'regex' ? 'no model call (regex rung 0)' : nc + ' model call' + (nc === 1 ? '' : 's') +
       ' behind these turns') + '</span></summary><ul class="rcpt">' + c.turns.map(receiptLine).join('') + '</ul>' +
@@ -887,7 +892,7 @@
           return;
         }
         $('ch-line').classList.remove('tx');
-        var ext = c.turns.map(function (t) { return t.receipt && typeof t.receipt.latency_s === 'number' ? t.receipt.latency_s.toFixed(2) + ' s' : null; }).filter(Boolean);
+        var ext = c.turns.map(function (t) { return t.receipt && t.receipt.ok !== false && typeof t.receipt.latency_s === 'number' ? t.receipt.latency_s.toFixed(2) + ' s' : null; }).filter(Boolean);
         var live = c.turns.some(function (t) { return t.receipt && t.receipt.live; });
         var ex = S.meta.stages.extract;
         var exTxt = S.rung === 'regex' ? 'extraction: regex rung 0, no model call'

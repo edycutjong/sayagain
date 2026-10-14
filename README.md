@@ -157,7 +157,7 @@ transcription will run elsewhere, and every stage will be labelled with where it
 
 ## 📊 Engineering Rigor
 
-516 tests (`uv run pytest`; one runs only with local Whisper weights), ruff lint and format, `pip-audit` and gitleaks over the
+517 tests (`uv run pytest`; one runs only with local Whisper weights), ruff lint and format, `pip-audit` and gitleaks over the
 full history (`make ci`, `make secrets`), CI workflows for the same checks plus CodeQL (none has executed yet, see Testing & CI), and a readiness gate (`scripts/check_submission_readiness.py`) that fails the build on an unfilled
 placeholder, a hardware or serving-stack name no receipt backs, or a number its cited file does not contain.
 
@@ -247,7 +247,7 @@ docs/           landing page, pitch deck + PDF (docs/pitch), static replay (docs
 evidence/       recorded terminal sessions, live-call receipts, the external sources the pages quote
 bench/          pre-registered protocol and every stored result and receipt
 data/           fictional plant registry and the 145 recording cards
-tests/          516 tests, with regression tests from five review rounds (`test_review_round*.py`)
+tests/          517 tests, with regression tests from five review rounds (`test_review_round*.py`)
 ```
 
 ## 🗺️ Roadmap

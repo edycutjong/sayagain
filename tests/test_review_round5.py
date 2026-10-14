@@ -267,3 +267,20 @@ def test_a_cross_site_page_cannot_dismiss_a_card(tmp_path) -> None:
 def test_a_cross_site_page_cannot_start_paid_live_calls(tmp_path) -> None:
     r = _client(tmp_path).get("/api/stream", params={"extract": "live"}, headers={"sec-fetch-site": "cross-site"})
     assert r.status_code == 403 and "cross-site" in r.text
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# A NOT_AUDITED turn shows the receipt of the call that failed (found by its client call id), not just the word.
+
+
+def test_a_not_audited_turn_shows_the_receipt_of_the_call_that_failed() -> None:
+    from sayagain import shift
+
+    ext = shift.stored_extractor("ladder-r1", "Gemma-4-31B-IT")  # the as-run first pass, with its gateway failures
+    rows = shift.read_jsonl(shift.ROOT / "bench/results/text/ladder-r1/Gemma-4-31B-IT.extractions.jsonl")
+    failed = [r for r in rows if r["not_audited"]]
+    views = [shift._receipt_view(ext(r["text"]), "Gemma-4-31B-IT") for r in failed]
+    assert failed and all(v and v["ok"] is False and v["receipt_found"] and v["client_id"] for v in views)
+    assert {(v["http_status"], v["error"]) for v in views} <= {(500, "server error"), (None, "timeout")}
+    ok = next(r for r in rows if r["request_id"])
+    assert "ok" not in shift._receipt_view(ext(ok["text"]), "Gemma-4-31B-IT")  # answered calls render as before
