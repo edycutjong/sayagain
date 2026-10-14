@@ -181,3 +181,34 @@ def test_a_crash_while_pairing_is_not_audited(monkeypatch) -> None:
     rec = _hero_card()
     assert rec["verdict"]["verdict"] == "NOT_AUDITED"
     assert "referee error (pairing)" in rec["trace"][0]
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# An unreadable second read-back is judged (ABSTAIN), never swallowed as the acknowledgement after a good first one.
+
+
+def test_an_unreadable_second_readback_is_judged_not_taken_as_the_ack() -> None:
+    from referee.regex_extractor import extract as regex_extract
+    from referee.turns import analyze
+
+    texts = (
+        "Close valve two-oh-three, line Bravo.",
+        "Copy, closing valve two-oh-three, line Bravo.",
+        "Copy, closing valve two-oh-eight, line Bravo.",
+    )
+    turns = [Turn(f"t{k}", "CH-01", 3.5 * k, 3.5 * k + 2.5, x, regex_extract(x)) for k, x in enumerate(texts)]
+    turns[2].extraction = {"_invalid": "not JSON"}  # the model failed on the last turn
+    a = analyze(turns[2], REG)
+    assert a.status == "abstain" and a.readback_shaped
+    assert audit(turns[:2], REG, spot_checks=0).judged[0].verdict.verdict == "VERIFIED"
+    # before the fix the unreadable turn closed the exchange as an "ack" and it stood VERIFIED
+    assert audit(turns, REG, spot_checks=0).judged[0].verdict.verdict == "ABSTAIN"
+
+
+def test_a_status_report_after_the_readback_still_closes_the_exchange() -> None:
+    from referee.regex_extractor import extract as regex_extract
+
+    texts = ("Close valve two-oh-three, line Bravo.", "Copy, closing valve two-oh-three, line Bravo.", "Correct.")
+    turns = [Turn(f"t{k}", "CH-01", 3.5 * k, 3.5 * k + 2.5, x, regex_extract(x)) for k, x in enumerate(texts)]
+    turns[2].extraction = {"_invalid": "not JSON"}  # unreadable, but not read-back shaped: an acknowledgement
+    assert audit(turns, REG, spot_checks=0).judged[0].verdict.verdict == "VERIFIED"

@@ -17,7 +17,8 @@ written down and tested:
     repeat is awaited is ignored; after "Negative." an order for different tags starts a new exchange;
   * an unreadable (NOT_AUDITED) instruction's window closes when a new instruction-shaped turn arrives;
   * while a read-back is awaited, a cue-less order for OTHER tags starts a new exchange; the same order with a query
-    ("…, do you copy?") is the operator repeating; a second read-back after the first is kept and judged;
+    ("…, do you copy?") is the operator repeating; a second read-back after the first is kept and judged, also
+    when the referee cannot read it (it abstains);
   * no read-back inside the window -> NO_READBACK. Radio is half-duplex: no overlap model.
 """
 
@@ -186,6 +187,15 @@ def _pair_channel(turns: list[TurnAnalysis], window_s: float, out: Paired) -> No
                 ex.more_readbacks.append(t)  # a second read-back: judged too, never dropped as an "ack"
                 ex.turn_ids.append(t.id)
                 ex.events.append("second read-back")
+                deadline = t.turn.t_end + window_s
+            elif (
+                t.status == "abstain" and (t.readback_shaped or t.verb_first) and not t.opens_window and not t.say_again
+            ):
+                # the same shape as above, but the referee could not read it: judged (it abstains), never taken as
+                # the acknowledgement that closes the exchange on the first read-back
+                ex.more_readbacks.append(t)
+                ex.turn_ids.append(t.id)
+                ex.events.append("unreadable second read-back")
                 deadline = t.turn.t_end + window_s
             elif t.status != "not_audited" and not t.opens_window and not t.say_again:
                 ex.turn_ids.append(t.id)  # "Correct." / "Valve 203 is now closed." — acknowledgement or status
