@@ -68,3 +68,82 @@ def test_a_backwards_retraction_cannot_verify_a_wrong_self_correction() -> None:
     turns = [Turn("i", "CH-01", 0.0, 2.5, instr, ins), Turn("r", "CH-01", 3.5, 6.0, rb_text, rb)]
     rep = audit(turns, REG, spot_checks=0)
     assert [j.verdict.label for j in rep.judged] == ["ABSTAIN · retraction cue missing"]
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Property: a technician's self-corrections, read by an extractor that groups and retracts the turn's real safety words
+# at random. The final reading is computable: a different value replaces the earlier one only when a cue was spoken
+# after the earlier mention; with no cue in between, that field is ambiguous until a cue-led value settles it.
+# The referee may abstain or flag at will, but it must never VERIFY a read-back whose final reading is wrong or open.
+
+_VALUES = {
+    "action_span": [("closing", "CLOSE"), ("opening", "OPEN")],
+    "tag_span": [("two-oh-three", "XV-203"), ("two-oh-eight", "XV-208"), ("valve two-oh-three", "XV-203")],
+    "line_span": [("line Bravo", "B"), ("line Alpha", "A")],
+}
+_FIELD = {"action": "action_span", "tag": "tag_span", "line": "line_span"}
+
+
+def _self_corrected_readback(rng) -> tuple[str, dict, bool]:
+    words, final, cue_since, open_field = [], {}, {}, {}
+    fields = list(_VALUES)
+
+    def say(f: str) -> None:
+        w, v = rng.choice(_VALUES[f])
+        if f in final and v != final[f]:
+            open_field[f] = not cue_since[f]
+        elif f in final and cue_since[f]:
+            open_field[f] = False
+        final[f], cue_since[f] = v, False
+        words.append(w)
+
+    for f in fields:
+        say(f)
+    for _ in range(rng.choice((1, 1, 2))):
+        if rng.random() < 0.8:
+            words.append(rng.choice(("correction", "no", "koreksi")))
+            cue_since = dict.fromkeys(cue_since, True)
+        say(rng.choice(fields))
+    return "Copy, " + ", ".join(words) + ".", final, any(open_field.values())
+
+
+def _random_extraction(text: str, rng) -> dict:
+    from referee import aliases as al
+
+    cmds, cur, retracted = [], {}, []
+    for m in al.all_mentions(text):
+        f = _FIELD.get(m.field)
+        if f is None:
+            continue
+        if rng.random() < 0.35:
+            retracted.append(text[m.start : m.end])
+            continue
+        if f in cur or rng.random() < 0.1:
+            cmds.append(cur)
+            cur = {}
+        cur[f] = text[m.start : m.end]
+    cmds.append(cur)
+    keys = ("action_span", "tag_span", "state_span", "line_span")
+    return {
+        "kind": "readback",
+        "commands": [{k: c.get(k) for k in keys} for c in cmds if c],
+        "retracted_spans": retracted,
+    }
+
+
+def test_no_extraction_of_a_self_corrected_readback_verifies_a_wrong_final_reading() -> None:
+    import random
+
+    rng = random.Random(1018)
+    instr = "Close valve two-oh-three, line Bravo."
+    ins = ex(("Close", "valve two-oh-three", None, "line Bravo"))
+    right = {"action_span": "CLOSE", "tag_span": "XV-203", "line_span": "B"}
+    wrong = []
+    for _ in range(3000):
+        text, final, still_open = _self_corrected_readback(rng)
+        rb = _random_extraction(text, rng)
+        turns = [Turn("i", "CH-01", 0.0, 2.5, instr, ins), Turn("r", "CH-01", 3.5, 6.0, text, rb)]
+        v = audit(turns, REG, spot_checks=0).judged[0].verdict.verdict
+        if v == "VERIFIED" and (still_open or final != right):
+            wrong.append((text, rb))
+    assert wrong == []
