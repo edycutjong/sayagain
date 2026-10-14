@@ -93,7 +93,7 @@ flowchart LR
 | AMD Token Factory client with a receipt per call; access probe | `sayagain/amd_client.py`, `scripts/access_gate.py` | probe run, see below |
 | Span extraction on the AMD Token Factory: JSON mode + local schema check, 429 back-off, fail closed to `NOT_AUDITED`, a receipt per call | `sayagain/extract.py` | done, run on text rows |
 | Model ladder, grounding ablation, LLM-judge baseline, offline re-scoring of every stored model output | `scripts/eval.py` | run on the card scripts (`text·scripted`), see below |
-| Speech path: one WAV per card → VAD turns → speech-to-text (local Whisper, labelled off-AMD; AMD notebook backend switched off until a notebook GPU is confirmed) → disagreement gate | `sayagain/ingest.py`, `sayagain/asr.py` | code + tests done, waiting for recordings |
+| Speech path: one WAV per card → VAD turns → speech-to-text (local Whisper, labelled off-AMD; AMD notebook backend switched off until a notebook GPU is confirmed) → disagreement gate | `sayagain/ingest.py`, `sayagain/asr.py` | unit tests done; Whisper has not yet run on a recording |
 | Local kill test (Whisper-large-v3 on a laptop, off-AMD) | `scripts/kill_test_local.py` | harness ready, waiting for recordings |
 | Supervisor queue: read-back strip card, confirm / dismiss (reason required), "Try the refused one", end-of-shift list (spot-checks, caught on channel, not audited), receipts per model call | `sayagain/server.py`, `sayagain/shift.py`, `web/` | done, over the stored text runs |
 | Static replay of stored runs (same page, GitHub Pages-ready, not published) | `scripts/export_run.py` → `docs/replay/` | done |
@@ -102,8 +102,14 @@ flowchart LR
 ## 🏆 AMD Token Factory Integration
 
 Span extraction is the one model job in the pipeline, and it runs on the AMD Token Factory: `sayagain/amd_client.py` is the
-client (paced, 429 back-off, a receipt per call with request id, model served, host, latency and cost),
-`sayagain/extract.py` the extraction stage (JSON mode, schema checked in code, fail closed).
+client (a receipt per call with request id, model served, host, latency and cost; a 429 is reported as not audited),
+`sayagain/extract.py` the extraction stage (JSON mode, 429 back-off, schema checked in code, fail closed).
+
+How to read the rows below: a **rung** is one extractor tried in turn, from the plain regex (rung 0, no model) to the larger
+models; the **ladder rule** (pre-registered in `bench/PROTOCOL.md`) picks the smallest rung that lets **0 wrong read-backs
+through as VERIFIED** (*false-VERIFIED*) while bothering the supervisor on no more than a pre-registered threshold of the correct ones (*false-alarm
+load*); `text·scripted` marks rows run on the cards' written words, with no audio; a Wilson interval is the range a
+rate could plausibly have, given so few cards.
 
 ### First measurements: the card scripts, no audio yet (2026-10-14)
 
@@ -135,8 +141,9 @@ dev slice (the first 20 A2 cards and the 20 kill-test cards). Full tables with W
   still not audited after the re-audit.
 
 Every call above has a receipt in bench/results/receipts/, and `uv run python scripts/eval.py --rescore` re-judges
-every stored model output offline and re-derives every table in the result files (it reports OK for every result file). A second live run of
-DeepSeek-V4-Flash on the dev slice gave the same verdict on 40/40 cards (bench/results/text/repro-dev-DeepSeek-V4-Flash.json);
+every stored model output offline and re-derives every table in the result files (it reports OK for every ladder, ablation, LLM-judge and dev-slice result file). A second live run of
+DeepSeek-V4-Flash on the dev slice gave the same verdict on 40/40 cards (bench/results/text/repro-dev-DeepSeek-V4-Flash.json),
+with every extraction identical but one turn's `kind` (same file) and one re-audit of 3 transcripts (bench/results/text/dev-r2-repro-reaudit.json);
 temperature 0 gives no determinism guarantee at this gateway, so this is measured, not guaranteed.
 
 The access probe (bench/results/access-gate.json) listed 11 instruct models on the AMD Token Factory; 8 of them returned a span
@@ -148,7 +155,7 @@ transcription will run elsewhere, and every stage will be labelled with where it
 ## 📊 Engineering Rigor
 
 501 tests (`uv run pytest`; one runs only with local Whisper weights), ruff lint and format, `pip-audit` and gitleaks over the
-full history (`make ci`, `make secrets`), CI workflows for the same checks plus CodeQL (see the CI badge for their state), and a readiness gate (`scripts/check_submission_readiness.py`) that fails the build on an unfilled
+full history (`make ci`, `make secrets`), CI workflows for the same checks plus CodeQL (none has executed yet, see Testing & CI), and a readiness gate (`scripts/check_submission_readiness.py`) that fails the build on an unfilled
 placeholder, a hardware or serving-stack name no receipt backs, or a number its cited file does not contain.
 
 ### Attacks defeated
@@ -175,8 +182,8 @@ placeholder, a hardware or serving-stack name no receipt backs, or a number its 
 4. The plant, its 120 tags and every exchange are fictional; the error mix is seeded, not sampled from a real site.
 5. The first Gemma-4-31B-IT pass left 45 cards not audited; the headline row is a re-audit of those, and the as-run pass is kept next to it (bench/results/text/ladder-r1.json).
 6. Temperature 0 does not make the gateway deterministic; the repeat run agreed on 40/40 cards (bench/results/text/repro-dev-DeepSeek-V4-Flash.json), which is evidence and not a guarantee.
-7. The Token Factory is a hosted API: receipts name the model and host, never a GPU, so no page here claims one.
-8. The gateway ignores `logprobs`, so the audio confidence floor cannot use model probabilities; the disagreement gate between two transcription passes stands in.
+7. The Token Factory is a hosted API: receipts name the model and host, never a GPU, so no page here claims one (`on_amd` in a receipt means only that the endpoint host is an amd.com domain).
+8. The gateway ignores `logprobs` for the extraction models. Speech-to-text is planned on local Whisper, whose token probabilities can feed the confidence floor, with the disagreement gate between two transcription passes as the fallback; neither has run on audio.
 9. The static replay shows stored verdicts. The live queue calls the API only when `SAYAGAIN_LIVE_EXTRACT=1`, paced and capped per process.
 
 ## 🚀 Getting Started
@@ -211,13 +218,15 @@ recorded, and every card shows the receipt of each model call (request id, model
 ## 🧪 Testing & CI
 
 ```bash
-make ci            # ruff, pytest with coverage, pip-audit, readiness: what the CI workflow runs
+make ci            # ruff, pytest with coverage, pip-audit, readiness: the checks the CI workflow runs
 make secrets       # gitleaks over the whole git history
 uv run python scripts/eval.py --rescore   # re-judge every stored model output offline
 ```
 
 Workflows in `.github/workflows/`: `ci` (quality + security jobs), `gitleaks` (full history), `codeql` (Python and
-JavaScript), `release` (semantic version tag from conventional commits). Dependabot is grouped, monthly, with no major bumps.
+JavaScript), `release` (semantic version tag from conventional commits). Dependabot is grouped and monthly; major bumps are ignored for
+Python dependencies. **None of these workflows has executed yet:** every run since the first push failed to start because of a GitHub
+account billing block, not a test failure. The same checks pass locally with `make ci` and `make secrets`.
 
 ## 📁 Project Structure
 
