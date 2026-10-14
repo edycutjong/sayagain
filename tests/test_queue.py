@@ -234,3 +234,29 @@ def test_stage_percentile_matches_the_result_file_for_a_first_pass():
     assert (
         re["calls_own"] + re["calls_reused"] == re["calls"] and re["reused_from"] == "bench/results/text/ladder-r1.json"
     )
+
+
+def test_first_pass_owns_its_calls():
+    ex = shift.run_meta("dev-r1", RUNG)["stages"]["extract"]
+    assert ex["calls_reused"] == 0 and ex["reused_from"] is None and ex["calls_own"] == ex["calls"]
+
+
+def test_live_reserve_released_on_exception_and_charged_without_cost(tmp_path):
+    from sayagain.extract import Extraction
+
+    live = server.LiveExtract(tmp_path, budget_usd=0.05)
+
+    def boom(text):
+        raise RuntimeError("network")
+
+    with pytest.raises(RuntimeError):
+        live._guarded(boom)("x")
+    assert live.spent == 0.0
+    live._guarded(lambda text: Extraction(text, {}, None, {"request_id": "r"}, 1))("y")  # answered, no cost reported
+    assert live.spent == pytest.approx(live.RESERVE_USD)
+
+
+def test_unknown_tag_card_carries_the_registry_line(events):
+    c = judged(events)["R-01"]
+    ins = next(t for t in c["turns"] if t["id"] == c["strip"]["instruction"])
+    assert ins["commands"][0]["tag_status"] == "not_in_registry" and "registry_line" in ins["commands"][0]

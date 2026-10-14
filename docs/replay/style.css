@@ -171,6 +171,10 @@ img,svg{display:block}
 .row .ft b{font-weight:600;color:var(--after-text);white-space:nowrap}
 .row .ft .ok{white-space:normal}
 .row .nw,.row .ft b{white-space:nowrap}
+.row.nof .f{display:none}
+.row.nof .ft{grid-column:span 2}
+.eos-note{margin-top:14px}
+.bdg .nw{white-space:nowrap}
 .row .ft .ok{color:var(--ink)}
 .vw{font-weight:600;letter-spacing:.04em;white-space:nowrap}
 .v-MISMATCH .vw{color:var(--ink)}
@@ -268,7 +272,9 @@ mark.blk{background:var(--after-block);color:var(--ink);border-radius:3px;paddin
 .listen.na{color:var(--before);border-image:var(--hatch-grey) 1}
 .timing p{margin:0}
 .timing details{margin-top:6px}
-.timing summary{cursor:pointer;color:var(--mid);font-weight:600;min-height:28px;display:inline-flex;align-items:center;transition:color .15s}
+.timing summary{cursor:pointer;color:var(--mid);font-weight:600;min-height:28px;display:inline-flex;align-items:center;gap:6px;transition:color .15s}
+.timing summary::after{content:"▸"}
+.timing details[open] summary::after{content:"▾"}
 .timing summary:hover{color:var(--ink)}
 
 .chan{list-style:none;margin:0 0 14px;padding:0;border-top:1px solid var(--line)}
@@ -345,7 +351,6 @@ details.sec[open] > summary{margin-bottom:8px}
 @media (min-width:1024px){
   .stages summary{flex-wrap:nowrap;min-height:38px;padding:5px 0}
   .stages summary .sum{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .ch-sub{display:none}
 }
 @media (min-width:1280px) and (min-height:760px){
   body{height:100dvh;display:flex;flex-direction:column;overflow:hidden}
@@ -361,6 +366,10 @@ details.sec[open] > summary{margin-bottom:8px}
   #chime .t{display:none}
   .cols,.row{grid-template-columns:3.8rem 7.2rem minmax(5.5rem,.7fr) minmax(5rem,1.5fr)}
   .ch-line .txt{white-space:normal}
+  .ch-sub{display:none}
+  .strip svg.links{display:none}
+  .stages summary .sum{font-size:0}
+  .stages summary .sum::after{content:attr(data-short);font-size:14px}
   .cols span:nth-child(2),.row .c{display:none}
   .stage-list{grid-template-columns:1fr}
   .stage{grid-template-columns:auto 1fr;padding:6px 10px}

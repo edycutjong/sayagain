@@ -198,7 +198,14 @@ def _turn_view(a: TurnAnalysis, role: str, at: float, ext: Extraction, rung: str
         "spans": spans,
         "retracted": [list(s) for s in a.retracted],
         "commands": [
-            {"action": c.action, "tag": c.tag, "line": c.line, "state": c.state, "tag_status": c.tag_status}
+            {
+                "action": c.action,
+                "tag": c.tag,
+                "line": c.line,
+                "state": c.state,
+                "tag_status": c.tag_status,
+                "registry_line": c.registry_line,
+            }
             for c in a.commands
         ],
         "extraction": ext.obj,
@@ -299,9 +306,7 @@ def rung_stage(run: str, rung: str) -> dict:
         lat = [float(r["latency_s"]) for r in recs if isinstance(r.get("latency_s"), int | float)]
         reaudit_of = _summary(run).get("reaudit_of")
         # a first pass owns all its calls (older receipts carry no `run` field); a re-audit reuses the rest
-        reaudit_of = _summary(run).get("reaudit_of")
-        # a first pass owns all its calls (older receipts carry no `run` field); a re-audit reuses the rest
-        own = sum(1 for r in recs if r.get("run") == run) if reaudit_of else len(recs) if reaudit_of else len(recs)
+        own = sum(1 for r in recs if r.get("run") == run) if reaudit_of else len(recs)
         extract = {
             "name": rung,
             "model_served": served,

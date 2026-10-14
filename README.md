@@ -78,7 +78,7 @@ The access probe (bench/results/access-gate.json) found 8 instruct models on the
 of the hero read-back the referee reads as `CLOSE · XV-208 · line B`. The model list has no speech-to-text model, so
 transcription will run elsewhere, and every stage will be labelled with where it ran.
 
-498 tests (`uv run pytest`; one runs only with local Whisper weights), lint with ruff, a CI workflow for every push. Friction log:
+501 tests (`uv run pytest`; one runs only with local Whisper weights), lint with ruff, a CI workflow for every push. Friction log:
 [docs/DX-REPORT.md](docs/DX-REPORT.md).
 
 ## Run it

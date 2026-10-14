@@ -138,13 +138,15 @@ class LiveExtract:
                 if self.spent + self.RESERVE_USD > self.budget_usd:
                     return Extraction(text, None, "live budget spent", None, 0)
                 self.spent += self.RESERVE_USD
-            cost = None
+            charge = 0.0  # if the call raises, the reserve is released and nothing is charged
             try:
                 out = ext(text)
                 cost = (out.receipt or {}).get("cost_usd")
-            finally:  # the reserve is always released; a call with no reported cost is charged nothing extra
+                # an answer without a reported cost keeps the reserve as its charge, so the cap still binds
+                charge = float(cost) if isinstance(cost, int | float) else self.RESERVE_USD
+            finally:
                 with self._lock:
-                    self.spent += (float(cost) if isinstance(cost, int | float) else 0.0) - self.RESERVE_USD
+                    self.spent += charge - self.RESERVE_USD
             if out.receipt is not None:
                 out.receipt = {**out.receipt, "live": True}
             return out
