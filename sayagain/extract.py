@@ -54,6 +54,20 @@ class Rung:
 
 REGEX = Rung("regex", None, thinking="none", params_b=0.0)
 
+# The ladder (bench/PROTOCOL.md §5: at most 4 model rungs, smallest first). Parameter counts are not exposed by the
+# API; they come from the model names, and a model whose name states none is placed last.
+RUNGS: dict[str, Rung] = {
+    "regex": REGEX,
+    "MiniCPM5-2B": Rung("MiniCPM5-2B", "MiniCPM5-2B", None, "none", 2.0),
+    "Qwen3.8-27B": Rung("Qwen3.8-27B", "Qwen3.8-27B", "low", "on", 27.0, max_tokens=6144),
+    "Gemma-4-31B-IT": Rung("Gemma-4-31B-IT", "Gemma-4-31B-IT", None, "off", 31.0),
+    "DeepSeek-V4-Flash": Rung("DeepSeek-V4-Flash", "DeepSeek-V4-Flash", "none", "off", None),
+    "MiMo-V2.6-Flash": Rung("MiMo-V2.6-Flash", "MiMo-V2.6-Flash", "none", "off", None),
+    # the LLM-judge baseline: the newest, highest-priced general model in the catalog, served as-is (no
+    # reasoning parameter sent) — the baseline gets its best shot
+    "DeepSeek-V4.1-Flash": Rung("DeepSeek-V4.1-Flash", "DeepSeek-V4.1-Flash", None, "default", None, max_tokens=2048),
+}
+
 
 @dataclass
 class Extraction:

@@ -51,7 +51,7 @@ from sayagain.amd_client import (  # noqa: E402
     load_config,
 )
 from sayagain.extract import (  # noqa: E402
-    REGEX,
+    RUNGS,
     Cache,
     Extraction,
     Pacer,
@@ -70,19 +70,7 @@ PACE_S = 3.2  # 20 requests per minute per account -> one call start every 3.2 s
 SHIFT_EXCHANGES = 180  # site assumption (bench/PROTOCOL.md §4): 6 channels x 30 instructions per shift
 SHIFT_ERRORS = (2, 5)  # assumption: ~2-5 real errors per 180 exchanges
 
-# The ladder (bench/PROTOCOL.md §5: at most 4 model rungs, smallest first). Parameter counts are not exposed by the
-# API; they come from the model names, and a model whose name states none is placed last.
-CANDIDATES: dict[str, Rung] = {
-    "regex": REGEX,
-    "MiniCPM5-2B": Rung("MiniCPM5-2B", "MiniCPM5-2B", None, "none", 2.0),
-    "Qwen3.8-27B": Rung("Qwen3.8-27B", "Qwen3.8-27B", "low", "on", 27.0, max_tokens=6144),
-    "Gemma-4-31B-IT": Rung("Gemma-4-31B-IT", "Gemma-4-31B-IT", None, "off", 31.0),
-    "DeepSeek-V4-Flash": Rung("DeepSeek-V4-Flash", "DeepSeek-V4-Flash", "none", "off", None),
-    "MiMo-V2.6-Flash": Rung("MiMo-V2.6-Flash", "MiMo-V2.6-Flash", "none", "off", None),
-    # the LLM-judge baseline: the newest, highest-priced general model in the catalog, served as-is (no
-    # reasoning parameter sent) — the baseline gets its best shot
-    "DeepSeek-V4.1-Flash": Rung("DeepSeek-V4.1-Flash", "DeepSeek-V4.1-Flash", None, "default", None, max_tokens=2048),
-}
+CANDIDATES = RUNGS  # the ladder candidates live in sayagain/extract.py (the queue UI uses them too)
 DEFAULT_LADDER = ("regex", "MiniCPM5-2B", "Qwen3.8-27B", "Gemma-4-31B-IT", "DeepSeek-V4-Flash")
 
 JUDGE_PROMPT = (
