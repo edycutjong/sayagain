@@ -133,8 +133,8 @@ exchange, errors caught / missed, seconds from card shown to decision. n = 1 aud
 ## 6. Reporting rules
 
 * Every published number greps to a file in `bench/results/` or `evidence/` produced by a receipted run.
-* Hardware, serving-stack and model names on any judged page render from receipts; a sentence that says a stage ran on AMD must
-  map to a receipt stage with `*_on_amd = 1` (`scripts/check_submission_readiness.py` enforces it).
+* Hardware, serving-stack and model names on any judged page render from receipts; a sentence placing a pipeline stage at
+  AMD needs a receipt for that stage with `on_amd = true` (`scripts/check_submission_readiness.py` enforces it).
 * Text-to-speech audio may appear only in unit-test fixtures, labelled `tts·fixture`, never in an eval row.
 * Rows that were not run are printed as "not run", never dropped.
 
@@ -143,6 +143,7 @@ exchange, errors caught / missed, seconds from card shown to decision. n = 1 aud
 | Date | Change | Why |
 |---|---|---|
 | 2026-10-14 | Editorial only: internal planning labels removed from two headings and the rung-0 rule reworded; no threshold, formula or rule changed | the labels referred to private planning notes |
+| 2026-10-14 | Referee hardening, round 3 of code review, before any recording existed: "no" / "bukan" count as retraction cues only when punctuated; "no" / "nomor" before a number is a tag filler; number runs stop at punctuation and never end on a homophone ("for", "to"); clock times are H:MM / H.MM only; an action after "when / confirm / report / setelah …" is a report-back, not a command; an operator's query repeat, back-to-back orders and second read-backs are paired explicitly; editorial: one reporting rule reworded | each change closes a path to a false VERIFIED or a dropped read-back |
 | 2026-10-14 | Model ladder output mode: JSON mode (`json_object`) with the schema in the system prompt instead of server-enforced JSON schema; the schema is still checked locally | the access gate found no Token Factory model that accepts `json_schema` |
 | 2026-10-14 | Referee hardening, round 2 of code review, before any recording existed: wider negation lexicon; a span may hold words of its own field only; an order needs a bare imperative (or a Bahasa passive) to open a window; explicit audio-gate mode, missing input abstains; "stand by" extends the window; kill-test thresholds are also checked per language (pivot rule) | each change closes a path to a false VERIFIED, a phantom card or a silently skipped check |
 | 2026-10-14 | Referee hardening from code review, before any recording existed: the coverage scan also counts negators ("not", "jangan", "unable", "can't" …) and NATO letters without "line"; command spans must keep the order of their tags; with a floor set, missing token probabilities abstain; a bare unknown number in suffix format opens a window; read-back-shaped orphan turns and unreadable turns no longer create phantom live cards. The regex extractor's output is unchanged | each change closes a path that could mark a real error VERIFIED or create a false card; they apply to every rung alike |

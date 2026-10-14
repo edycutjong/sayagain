@@ -29,10 +29,15 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
-PLACEHOLDER = re.compile(r"⟨[^⟩]*⟩|\bTODO\b|\bTBD\b|\bFIXME\b|\bXXX\b|\{\{.*?\}\}|lorem ipsum", re.IGNORECASE)
+PLACEHOLDER = re.compile(
+    r"⟨[^⟩]*⟩|<(?:measured|placeholder|tbd|todo|fill[^>]*)>|\bTODO\b|\bTBD\b|\bTBA\b|\bFIXME\b|\bXXX\b|"
+    r"\bxx\s?%|\?\?\?|\{\{.*?\}\}|lorem ipsum|coming soon",
+    re.IGNORECASE,
+)
 # hardware / serving-stack names: backed only by a receipt field that names hardware or the stack
 HARDWARE = re.compile(
-    r"\bMI\d{3}[A-Z]?\b|\bRadeon\b|\bInstinct\b|\bROCm\b|\bvLLM\b|AMD Developer Cloud|co-resident|channels per GPU",
+    r"\bMI[- ]?\d{3}[A-Z]?\b|\bRadeon\b|\bInstinct\b|\bROCm\b|\bvLLM\b|\bRyzen\b|\bStrix\b|\bgfx\d+\b|\bHIP\b|"
+    r"\bEPYC\b|AMD Developer Cloud|co-resident|channels per GPU",
     re.IGNORECASE,
 )
 HW_KEYS = {"gpu", "hardware", "device", "rocm", "vllm", "serving_stack", "stack"}
@@ -50,16 +55,24 @@ AMD_HW = re.compile(r"\bAMD(?:'s)?\s+(?:\w+\s+)?(?:GPU|hardware|accelerator|sili
 ASR_WORDS = re.compile(
     r"\b(?:ASR|STT|Whisper|transcri\w*|speech[- ]to[- ]text|speech recognition|voice|audio)\b", re.IGNORECASE
 )
-LLM_WORDS = re.compile(r"\b(?:extract\w*|LLM|language model|Qwen|model ladder|span)\b", re.IGNORECASE)
+LLM_WORDS = re.compile(
+    r"\b(?:extract\w*|LLM|language model|instruct models?|Qwen|model ladder|rungs?|span)\b", re.IGNORECASE
+)
 NUMBER_CLAIM = re.compile(
-    r"(\d+(?:\.\d+)?)\s?(?:%|percent\b)|\b(0\.\d+)\b|(\d+(?:\.\d+)?)\s?(?:ms|s|sec|seconds)\b|\bp(?:50|95|99)\b|"
-    r"(\d+(?:\.\d+)?)\s?(?:x|×)\s+(?:faster|slower|cheaper|more|less)",
+    r"(\d+(?:\.\d+)?)\s?(?:%|percent\b|per cent\b)|\b(0\.\d+)\b|"
+    r"(\d+(?:\.\d+)?)\s?(?:ms|milliseconds?|s|sec|secs|seconds?)\b|\bp(?:50|90|95|99)\b|"
+    r"(\d+(?:\.\d+)?)\s?(?:x|×|times)\s+(?:faster|slower|cheaper|more|less|lower|higher)|(\d+)[- ]fold\b|"
+    r"\b(\d+)\s+(?:of|out of)\s+\d+\b|\b(\d+)/\d+\b|(\d+(?:\.\d+)?)\s?(?:/s|/sec|per second)\b|"
+    r"\bsub-second\b|\breal[- ]time\b",
     re.IGNORECASE,
 )
-NUMBER_OK = re.compile(r"\btarget|\bthreshold|assum|≥|≤|\bpre-registered|\bat most\b|\bat least\b", re.IGNORECASE)
+# a target / threshold / assumption word right before the number (same clause) marks it as not a result
+NUMBER_OK = re.compile(
+    r"(?:\btarget|\bthreshold|assum\w*|≥|≤|\bpre-registered|\bat most|\bat least|\bbudget)[^.;,|]{0,25}$", re.IGNORECASE
+)
 NUMBER_EXEMPT = {"bench/PROTOCOL.md"}  # pre-registered thresholds and formulas, by definition not results
 CITATION = re.compile(r"(?<![\w/])((?:bench|evidence|scripts|referee|sayagain|data|docs|tests)/[\w./-]+)")
-TESTS_STATED = re.compile(r"\b(\d+)\s+(?:[a-z-]+\s+){0,2}tests\b", re.IGNORECASE)
+TESTS_STATED = re.compile(r"\b(\d+)\s+(?:[a-z-]+\s+){0,2}tests?(?:\s+cases)?\b|\btests?:\s*(\d+)", re.IGNORECASE)
 SKIP_DIRS = {".git", ".venv", "node_modules", "tests", ".github", "graphify-out", ".ruff_cache", ".pytest_cache"}
 
 
@@ -79,7 +92,12 @@ def judged_files(root: Path) -> list[Path]:
     out = []
     for p in sorted(root.rglob("*")):
         rel = p.relative_to(root)
-        if p.is_file() and p.suffix in (".md", ".html", ".htm") and not (set(rel.parts[:-1]) & SKIP_DIRS):
+        if (
+            p.is_file()
+            and p.suffix.lower() in (".md", ".mdx", ".markdown", ".html", ".htm", ".txt", ".rst")
+            and not (set(rel.parts[:-1]) & SKIP_DIRS)
+            and rel.parts[0] != "LICENSE"
+        ):
             out.append(p)
     return out
 
@@ -101,8 +119,11 @@ def load_receipts(root: Path) -> list[dict]:
 
 
 def _hw_values(obj, under_hw: bool = False) -> list[str]:
-    """String values found under hardware / stack keys only (a URL path that happens to say 'radeon' backs nothing)."""
+    """String values found under hardware / stack keys only (a URL path that happens to say 'radeon' backs nothing),
+    and only from receipts that did not fail."""
     if isinstance(obj, dict):
+        if obj.get("ok") is False:
+            return []
         return [v for k, x in obj.items() for v in _hw_values(x, under_hw or str(k).lower() in HW_KEYS)]
     if isinstance(obj, list):
         return [v for x in obj for v in _hw_values(x, under_hw)]
@@ -144,14 +165,15 @@ def check_files(root: Path, stage: str, collected_tests: int | None = None) -> l
     hw_text = "\n".join(_hw_values(receipts)).lower()
     stage_amd = {
         "asr": any(
-            isinstance(r, dict) and r.get("stage") == "asr" and r.get("on_amd") and r.get("ok") for r in receipts
+            isinstance(r, dict) and r.get("stage") == "asr" and r.get("on_amd") is True and r.get("ok") is True
+            for r in receipts
         ),
         "extract": any(
-            isinstance(r, dict) and r.get("stage") == "extract" and r.get("on_amd") and r.get("ok") for r in receipts
+            isinstance(r, dict) and r.get("stage") == "extract" and r.get("on_amd") is True and r.get("ok") is True
+            for r in receipts
         ),
         "gpu": bool(hw_text.strip()),
     }
-    any_amd = stage_amd["asr"] or stage_amd["extract"]
     stated_counts: list[tuple[str, int, int]] = []
 
     for f in judged_files(root):
@@ -174,7 +196,7 @@ def check_files(root: Path, stage: str, collected_tests: int | None = None) -> l
                         Finding("hardware", rel, n, f"'{m.group(0)}' with no hardware/stack receipt naming it")
                     )
             for m in TESTS_STATED.finditer(line):
-                stated_counts.append((rel, n, int(m.group(1))))
+                stated_counts.append((rel, n, int(m.group(1) or m.group(2))))
             if in_code or rel in NUMBER_EXEMPT:
                 continue
             prose = _strip_code(line)
@@ -184,27 +206,37 @@ def check_files(root: Path, stage: str, collected_tests: int | None = None) -> l
             cited_texts = [
                 (root / c).read_text(encoding="utf-8", errors="ignore") for c in cites if (root / c).is_file()
             ]
+            uncited = CITATION.sub("", prose)
             for m in claims:
                 value = next((g for g in m.groups() if g), None)
+                is_pct = "%" in m.group(0) or "cent" in m.group(0).lower()
+                if NUMBER_OK.search(uncited[: m.start()]):
+                    continue  # "target ≥ 90 %": a threshold, not a result
                 if cited_texts and value is not None:
-                    if not _number_backed(value, "%" in m.group(0) or "percent" in m.group(0).lower(), cited_texts):
+                    if not _number_backed(value, is_pct, cited_texts):
                         findings.append(Finding("number", rel, n, f"{m.group(0).strip()} not found in the cited file"))
-                elif not NUMBER_OK.search(prose):
+                else:
                     findings.append(
                         Finding("number", rel, n, f"{m.group(0).strip()} — cite the result file: {prose.strip()[:80]}")
                     )
         for n, s in _sentences(text):
-            if not re.search(r"\bAMD\b", s) or OFF_AMD.search(s) or not AMD_CLAIM.search(s):
+            if not re.search(r"\bAMD\b", s):
                 continue
-            if AMD_HW.search(s) and not stage_amd["gpu"]:
+            # judge each clause on its own: "lists no Whisper but extraction runs on AMD" is a claim
+            clauses = re.split(r"[,;:]|\bbut\b|\band\b|\bwhile\b|—", s)
+            claims = [c for c in clauses if re.search(r"\bAMD\b", c) and AMD_CLAIM.search(c) and not OFF_AMD.search(c)]
+            if not claims:
+                continue
+            if any(AMD_HW.search(c) for c in claims) and not stage_amd["gpu"]:
                 findings.append(Finding("amd-stage", rel, n, "claims AMD hardware; no receipt names a GPU"))
             elif ASR_WORDS.search(s) and not stage_amd["asr"]:
                 findings.append(Finding("amd-stage", rel, n, "speech-to-text on AMD with no AMD ASR receipt"))
-            elif LLM_WORDS.search(s) and not stage_amd["extract"]:
-                findings.append(Finding("amd-stage", rel, n, "extraction on AMD with no AMD extraction receipt"))
-            elif not any_amd:
+            elif LLM_WORDS.search(s):
+                if not stage_amd["extract"]:
+                    findings.append(Finding("amd-stage", rel, n, "extraction on AMD with no AMD extraction receipt"))
+            elif not ASR_WORDS.search(s):
                 findings.append(
-                    Finding("amd-stage", rel, n, "says something runs on AMD; no receipt has on_amd = true")
+                    Finding("amd-stage", rel, n, "says something runs on AMD without naming a receipted stage")
                 )
         for k, para in enumerate(re.split(r"\n\s*\n", text)):
             if "hero" in para.lower() and ("B ≠ A" in para or "line: B" in para or "two-oh-three, line Alpha" in para):
