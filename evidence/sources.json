@@ -1,0 +1,86 @@
+{
+  "about": "External figures and labelled assumptions quoted on docs/index.html and docs/pitch/. Each external figure lists its source and the date it was read; an assumption is marked as one and is never a measurement.",
+  "external": [
+    {
+      "id": "atc-detection",
+      "figure": "63 % / 50 %",
+      "claim": "Tower controllers detect 63 % of pilots' read-back errors and radar approach controllers 50 %, as cited from the literature.",
+      "domain": "aviation, not plant radio",
+      "source": "Helmke et al., Readback Error Detection by Automatic Speech Recognition to Increase ATM Safety, ATM Seminar 2021",
+      "url": "https://fit.vut.cz/research/group/speech/public/publi/2021/helmke_ATM_Seminar_2021_paper_7.pdf",
+      "read": "2026-10-09"
+    },
+    {
+      "id": "haawaii",
+      "figure": "80 % detection at 11 % false alarms",
+      "claim": "Automatic read-back error detection (ASR + understanding) in controller trials of the HAAWAII project.",
+      "domain": "aviation research",
+      "source": "Helmke et al., Readback Error Detection by ASRU, Results of HAAWAII Project for Isavia's Enroute Airspace, SESAR Innovation Days 2022",
+      "url": "https://publications.idiap.ch/publications/show/4942",
+      "read": "2026-10-09"
+    },
+    {
+      "id": "goodyear",
+      "figure": "1 killed, 6 injured",
+      "claim": "Goodyear, Houston, 2008: an isolation valve on the relief path was left closed after maintenance and the remaining relief path was then blocked.",
+      "source": "US Chemical Safety Board, Goodyear case study, section 4.2",
+      "url": "https://www.csb.gov/assets/1/20/case_study.pdf",
+      "read": "2026-10-09"
+    },
+    {
+      "id": "mills",
+      "figure": "1,318",
+      "claim": "Palm-oil mills in operation in Indonesia in 2022.",
+      "source": "Trase, SEI-PCS Indonesia palm oil methodology v1.2.2 (Sept 2024)",
+      "url": "https://resources.trase.earth/documents/data_methods/Indonesia_palm_1.2.2_.pdf",
+      "read": "2026-10-09"
+    },
+    {
+      "id": "smk3",
+      "figure": "100 workers",
+      "claim": "PP 50/2012 Article 5: every company with at least 100 workers or a high hazard potential must implement SMK3, which is audited.",
+      "source": "PP 50/2012 on SMK3",
+      "url": "https://peraturan.go.id/files/pp50-2012bt.pdf",
+      "read": "2026-10-09"
+    },
+    {
+      "id": "pdp",
+      "figure": "UU 27/2022",
+      "claim": "Indonesia's personal data protection law (UU PDP), enacted 17 October 2022; voice that identifies a person is personal data.",
+      "source": "JDIH Kemenko Infrastruktur, UU No. 27/2022",
+      "url": "https://jdih.kemenkoinfra.go.id/en/uu-no-272022-pelindungan-data-pribadi",
+      "read": "2026-10-09"
+    },
+    {
+      "id": "three-way",
+      "figure": null,
+      "claim": "The read-back check is the human-performance tool called three-way communication.",
+      "source": "US DOE, DOE-HDBK-1028-2009 Human Performance Improvement Handbook, Vol. 2",
+      "url": null,
+      "read": "2026-10-09",
+      "note": "named in the project spec; no URL recorded here"
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "addressable",
+      "figure": "30 %",
+      "assumption": "30 % of the operating mills are addressable: group-owned and dispatching isolation work by radio."
+    },
+    {
+      "id": "channels",
+      "figure": "6",
+      "assumption": "6 radio channels per palm-oil mill: control room, boiler and power house, press, maintenance, loading, security."
+    },
+    {
+      "id": "price",
+      "figure": "USD 2,400",
+      "assumption": "USD 2,400 per monitored channel per year (USD 200 a month), an on-prem licence."
+    },
+    {
+      "id": "floor",
+      "figure": "USD 5.7 M",
+      "assumption": "1,318 x 30 % x 6 channels x USD 2,400 = about USD 5.7 M a year: the mills line only, the floor of the Indonesian beachhead."
+    }
+  ]
+}

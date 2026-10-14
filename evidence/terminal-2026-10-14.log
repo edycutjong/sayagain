@@ -1,0 +1,38 @@
+# recorded 2026-10-14T17:42:54+07:00 in build/ at c57de6a (macOS arm64); stdout kept verbatim
+$ uv run python scripts/eval.py --rescore
+OK   ablate-grounding-r1-reaudit.json :: without_grounding (rows, calls, meets_rule)
+OK   ablate-grounding-r1.json :: without_grounding (rows, calls, meets_rule)
+OK   dev-r1.json :: DeepSeek-V4-Flash (rows, calls, meets_rule)
+OK   dev-r1.json :: Gemma-4-31B-IT (rows, calls, meets_rule)
+OK   dev-r1.json :: MiMo-V2.6-Flash (rows, calls, meets_rule)
+OK   dev-r1.json :: MiniCPM5-2B (rows, calls, meets_rule)
+OK   dev-r1.json :: Qwen3.8-27B (rows, calls, meets_rule)
+OK   dev-r1.json :: regex (rows, calls, meets_rule)
+OK   dev-r2-repro-reaudit.json :: DeepSeek-V4-Flash (rows, calls, meets_rule)
+OK   dev-r2-repro-reaudit.json :: regex (rows, calls, meets_rule)
+OK   dev-r2-repro.json :: DeepSeek-V4-Flash (rows, calls, meets_rule)
+OK   dev-r2-repro.json :: regex (rows, calls, meets_rule)
+OK   ladder-r1-reaudit.json :: DeepSeek-V4-Flash (rows, calls, meets_rule)
+OK   ladder-r1-reaudit.json :: Gemma-4-31B-IT (rows, calls, meets_rule)
+OK   ladder-r1-reaudit.json :: MiniCPM5-2B (rows, calls, meets_rule)
+OK   ladder-r1-reaudit.json :: Qwen3.8-27B (rows, calls, meets_rule)
+OK   ladder-r1-reaudit.json :: regex (rows, calls, meets_rule)
+OK   ladder-r1.json :: DeepSeek-V4-Flash (rows, calls, meets_rule)
+OK   ladder-r1.json :: Gemma-4-31B-IT (rows, calls, meets_rule)
+OK   ladder-r1.json :: MiniCPM5-2B (rows, calls, meets_rule)
+OK   ladder-r1.json :: Qwen3.8-27B (rows, calls, meets_rule)
+OK   ladder-r1.json :: regex (rows, calls, meets_rule)
+OK   llm-judge-r1-reaudit.json :: llm_judge (rows, calls, meets_rule)
+OK   llm-judge-r1.json :: llm_judge (rows, calls, meets_rule)
+# exit 0 · wall 3.0 s
+$ jq -r '.events[] | select(.type=="judged" and .card.exchange_id=="H-01") | .card.verdict.trace[]' docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json
+instruction: grounded + covered (1 command(s))
+read-back: grounded + covered (1 command(s))
+audio: no gate (no token probabilities, no unprompted pass)
+instruction: XV-203 line B (registry ok)
+compare: tag: XV-203 ≠ XV-208
+# exit 0 · wall 0.0 s
+$ jq -c '.events[] | select(.type=="judged" and .card.exchange_id=="H-01") | .card.turns[].receipt | {request_id, model_served, host, latency_s}' docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json
+{"request_id":"980edf5c577d429b906b24cfae299218","model_served":"self-dploy/Gemma-4-31B-IT","host":"developer.amd.com.cn","latency_s":10.7585}
+{"request_id":"c9647a04cfcc4eeaadbfa965a4d74c6d","model_served":"self-dploy/Gemma-4-31B-IT","host":"developer.amd.com.cn","latency_s":35.4972}
+# exit 0 · wall 0.0 s
