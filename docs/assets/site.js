@@ -8,6 +8,7 @@
   var STILL = /(^|[?&])still\b/.test(location.search);
   var MOTION = !RM && !STILL;
   if (STILL) root.classList.add('settled');
+  if (!MOTION) root.classList.add('no-motion');
   function $(s, r) { return (r || doc).querySelector(s); }
   function $$(s, r) { return Array.prototype.slice.call((r || doc).querySelectorAll(s)); }
   function later(fn, ms) { return setTimeout(fn, ms); }
@@ -86,13 +87,13 @@
     $$('.w', card).forEach(function (w) { w.classList.remove('on'); });
     void card.offsetWidth;
     card.classList.add('armed');
-    var t0 = quick ? 0 : 150;
+    var t0 = quick ? 0 : 100;
     turns.forEach(function (turn, i) {
-      var ws = $$('.w', turn), step = quick ? 0 : Math.min(55, 420 / Math.max(ws.length, 1));
+      var ws = $$('.w', turn), step = quick ? 0 : Math.min(36, 260 / Math.max(ws.length, 1));
       ws.forEach(function (w, j) { T.push(later(function () { w.classList.add('on'); }, t0 + j * step)); });
-      t0 += quick ? 0 : ws.length * step + (i === 0 ? 260 : 200);
+      t0 += quick ? 0 : ws.length * step + (i === 0 ? 150 : 110);
     });
-    var g = quick ? [60, 160, 320, 520, 1000] : [0, 300, 600, 950, 1900];
+    var g = quick ? [60, 160, 320, 520, 1000] : [0, 180, 340, 600, 1500];
     T.push(later(function () { card.classList.add('p-point'); }, t0 + g[0]));
     T.push(later(function () { drawLinks(card); card.classList.add('p-link'); }, t0 + g[1]));
     T.push(later(function () { card.classList.add('p-slam'); }, t0 + g[2]));
@@ -142,6 +143,10 @@
     if (card) { drawLinks(card); if (MOTION) play(card, true, true); }
     if (focusRow) { var r = $('.row[data-pick="' + id + '"]', list); if (r) r.focus(); }
     if (det && window.innerWidth < 1024) det.scrollIntoView({ behavior: MOTION ? 'smooth' : 'auto', block: 'start' });
+    else if (det) {
+      var r = det.getBoundingClientRect();
+      if (r.top < 80 || r.top > window.innerHeight * 0.6) det.scrollIntoView({ behavior: MOTION ? 'smooth' : 'auto', block: 'start' });
+    }
   }
   if (list) {
     list.addEventListener('click', function (e) { var r = e.target.closest('.row'); if (r) pick(r.getAttribute('data-pick')); });
