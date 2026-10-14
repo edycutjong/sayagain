@@ -211,6 +211,39 @@ SAY_AGAIN_PHRASES: tuple[tuple[str, ...], ...] = (
 # the operator's own repeat starts with these; they are not a say-again request
 REPEAT_OPENERS: tuple[tuple[str, ...], ...] = (("i", "say", "again"), ("saya", "ulangi"), ("i", "repeat"))
 
+# negators: a negated command ("do not open", "jangan tutup", "unable to close") is never read as the command
+NEGATORS: frozenset[str] = frozenset(
+    {
+        "not",
+        "never",
+        "unable",
+        "cannot",
+        "dont",
+        "wont",
+        "cant",
+        "didnt",
+        "jangan",
+        "tidak",
+        "tak",
+        "belum",
+        "nggak",
+        "gak",
+        "enggak",
+        "ndak",
+    }
+)
+NEGATOR_PAIRS: frozenset[tuple[str, str]] = frozenset(
+    {
+        ("don", "t"),
+        ("won", "t"),
+        ("can", "t"),
+        ("didn", "t"),
+        ("isn", "t"),
+        ("doesn", "t"),
+        ("shouldn", "t"),
+    }
+)
+
 # units after a number mean "a quantity", never a tag ("150 psi", "10 minutes")
 UNIT_WORDS: frozenset[str] = frozenset(
     {
@@ -616,10 +649,33 @@ def state_mentions(tokens: list[Token]) -> list[Mention]:
     return [Mention("state", t.start, t.end, STATES[t.norm]) for t in tokens if t.norm in STATES]
 
 
+def bare_letter_mentions(tokens: list[Token]) -> list[Mention]:
+    """NATO letters not right after a line word ("…two-oh-three, Alpha."). Only the coverage scan uses these: a stray
+    letter in an exchange turn must be accounted for, or the referee abstains."""
+    out = []
+    for i, t in enumerate(tokens):
+        if t.norm in NATO and t.norm != "lima" and not (i > 0 and tokens[i - 1].norm in LINE_WORDS):
+            out.append(Mention("line", t.start, t.end, NATO[t.norm]))
+    return out
+
+
+def negation_mentions(tokens: list[Token]) -> list[Mention]:
+    """Negators, except an operator-correction cue opening the turn ("Tidak, close valve …")."""
+    out = []
+    for i, t in enumerate(tokens):
+        if i == 0 and t.norm in OPERATOR_CORRECTION_CUES:
+            continue
+        if t.norm in NEGATORS:
+            out.append(Mention("negation", t.start, t.end, t.norm))
+        elif i + 1 < len(tokens) and (t.norm, tokens[i + 1].norm) in NEGATOR_PAIRS:
+            out.append(Mention("negation", t.start, tokens[i + 1].end, t.norm + "'t"))
+    return out
+
+
 def all_mentions(text: str) -> list[Mention]:
     """Every safety-relevant mention in a transcript, sorted by position (the coverage scan)."""
     toks = tokenize(text)
-    ms = action_mentions(toks) + tag_mentions(toks) + line_mentions(toks)
+    ms = action_mentions(toks) + tag_mentions(toks) + line_mentions(toks) + bare_letter_mentions(toks)
     return sorted(ms, key=lambda m: (m.start, m.end))
 
 

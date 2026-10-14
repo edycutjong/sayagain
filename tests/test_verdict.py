@@ -122,11 +122,26 @@ def test_no_readback(registry) -> None:
 def test_audio_floor_abstains(registry) -> None:
     ins = analyze(make_turn(HERO_I, tokens=[(0, 99, -0.01)]), registry)
     rb = analyze(
-        make_turn("Copy, closing two-oh-three, line Bravo.", t=3, tokens=[(0, 13, -0.01), (14, 26, -2.0)]), registry
+        make_turn(
+            "Copy, closing two-oh-three, line Bravo.", t=3, tokens=[(0, 13, -0.01), (14, 26, -2.0), (27, 39, -0.01)]
+        ),
+        registry,
     )
     v = judge(Exchange("CH-07", ins, rb), floor=0.5)
     assert v.verdict == "ABSTAIN" and v.reason == "audio"
     assert judge(Exchange("CH-07", ins, rb), floor=0.1).verdict == "VERIFIED"
+
+
+def test_audio_gate_fails_closed_on_partial_token_data(registry) -> None:
+    """With a floor set, a turn without token probabilities, or a span no token covers, abstains — never passes."""
+    rb_text = "Copy, closing two-oh-three, line Bravo."
+    ins = analyze(make_turn(HERO_I, tokens=[(0, 99, -0.01)]), registry)
+    for tokens in (None, [], [(0, 13, -0.01)]):  # none · empty · the tag and line spans uncovered
+        rb = analyze(make_turn(rb_text, t=3, tokens=tokens), registry)
+        v = judge(Exchange("CH-07", ins, rb), floor=0.1)
+        assert v.verdict == "ABSTAIN" and v.reason == "audio", tokens
+    rb = analyze(make_turn(rb_text, t=3), registry)
+    assert judge(Exchange("CH-07", ins, rb)).verdict == "VERIFIED"  # no floor configured: no audio gate
 
 
 def test_disagreement_gate_abstains(registry) -> None:

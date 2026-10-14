@@ -4,7 +4,8 @@ Grounding catches invented words; coverage catches the model pointing at the *wr
 transcript with the alias tables (`aliases.all_mentions`: actions, tags, line letters after a line word) and every
 mention must overlap a command span or a retraction that code accepted. A retraction is accepted only if a cue from the
 closed list ("correction", "koreksi", "ralat", "bukan", "no") sits between the retracted words and the operative words
-that replace them.
+that replace them. A turn with an action and a negator ("do not open", "jangan tutup", "unable to close") is never
+read as the command: the referee abstains.
 """
 
 from __future__ import annotations
@@ -51,6 +52,12 @@ def check(transcript: str, g: Grounded) -> None:
                 "retraction cue missing",
                 f"no correction word between {transcript[r[0] : r[1]]!r} and "
                 f"{transcript[operative[0] : operative[1]]!r}",
+            )
+
+    if al.action_mentions(toks):
+        for m in al.negation_mentions(toks):
+            raise CoverageError(
+                "coverage", f"negated command: {transcript[m.start : m.end]!r} — never read as the command"
             )
 
     accounted = [sp for _, sp in command_spans] + list(g.retracted)

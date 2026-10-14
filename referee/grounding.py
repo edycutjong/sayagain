@@ -51,10 +51,17 @@ def _overlaps(a: Span, b: Span) -> bool:
 
 
 def ground(transcript: str, extraction: dict) -> Grounded:
-    commands = extraction["commands"]
-    # candidate occurrences per (command, field)
+    # retracted words first, each at its earliest occurrence: a retraction always precedes the words that replace it
+    # ("line Bravo, correction, line Bravo" must not hand the operative mention to the retraction)
+    retracted: list[Span] = []
+    for s in extraction.get("retracted_spans", []):
+        occ = [sp for sp in occurrences(transcript, s) if not any(_overlaps(sp, t) for t in retracted)]
+        if not occ:
+            raise GroundingError(f"retracted span {s!r} is not in the transcript")
+        retracted.append(occ[0])
+
     cands: list[list[tuple[str, list[Span]]]] = []
-    for c in commands:
+    for c in extraction["commands"]:
         fields = []
         for f in FIELDS:
             s = c.get(f)
@@ -68,7 +75,8 @@ def ground(transcript: str, extraction: dict) -> Grounded:
             raise GroundingError("a command with no spans")
         cands.append(fields)
 
-    used: list[tuple[str, Span]] = []
+    used: list[tuple[str, Span]] = [("retracted", r) for r in retracted]
+    placed: list[dict[str, Span]] = []
 
     def free(f: str, sp: Span) -> bool:
         for uf, u in used:
@@ -76,23 +84,36 @@ def ground(transcript: str, extraction: dict) -> Grounded:
                 return False
         return True
 
-    def assign_command(k: int, after: int) -> list[dict[str, Span | None]] | None:
+    def in_order(chosen: dict[str, Span]) -> bool:
+        """Every field keeps the order of the commands: command k's verb / line / state come after command k-1's
+        (or are the same shared words). A model cannot swap two commands' verbs or lines and still ground."""
+        if not placed:
+            return True
+        prev = placed[-1]
+        key = chosen["tag_span"][0] if "tag_span" in chosen else min(sp[0] for sp in chosen.values())
+        prev_key = prev["tag_span"][0] if "tag_span" in prev else min(sp[0] for sp in prev.values())
+        if key <= prev_key:
+            return False
+        for f, sp in chosen.items():
+            p = prev.get(f)
+            if p is not None and not (sp[0] > p[0] or (sp == p and f in SHAREABLE)):
+                return False
+        return True
+
+    def assign(k: int) -> bool:
         if k == len(cands):
-            return []
+            return True
         fields = cands[k]
 
-        def rec(j: int, chosen: dict[str, Span]) -> list[dict[str, Span | None]] | None:
+        def rec(j: int, chosen: dict[str, Span]) -> bool:
             if j == len(fields):
-                # commands are ordered by their tag (else their first span)
-                first = chosen["tag_span"][0] if "tag_span" in chosen else min(sp[0] for sp in chosen.values())
-                if first <= after and k > 0:
-                    return None
-                rest = assign_command(k + 1, first)
-                if rest is None:
-                    return None
-                full: dict[str, Span | None] = {f: None for f in FIELDS}
-                full.update(chosen)
-                return [full, *rest]
+                if not in_order(chosen):
+                    return False
+                placed.append(dict(chosen))
+                if assign(k + 1):
+                    return True
+                placed.pop()
+                return False
             f, occ = fields[j]
             # fresh words first; pointing at words another command already uses is the fallback
             for sp in sorted(occ, key=lambda o: (any(o == u for _, u in used), o[0])):
@@ -100,25 +121,20 @@ def ground(transcript: str, extraction: dict) -> Grounded:
                     continue
                 used.append((f, sp))
                 chosen[f] = sp
-                out = rec(j + 1, chosen)
+                ok = rec(j + 1, chosen)
                 used.pop()
                 del chosen[f]
-                if out is not None:
-                    return out
-            return None
+                if ok:
+                    return True
+            return False
 
-        # keep this command's spans in `used` while later commands are placed
         return rec(0, {})
 
-    result = assign_command(0, -1)
-    if result is None:
+    if not assign(0):
         raise GroundingError("no ordered, non-overlapping alignment of the command spans")
-
-    taken = [sp for cmd in result for sp in cmd.values() if sp is not None]
-    retracted: list[Span] = []
-    for s in extraction.get("retracted_spans", []):
-        occ = [sp for sp in occurrences(transcript, s) if not any(_overlaps(sp, t) for t in taken + retracted)]
-        if not occ:
-            raise GroundingError(f"retracted span {s!r} is not in the transcript")
-        retracted.append(occ[0])
-    return Grounded(commands=result, retracted=retracted)
+    commands: list[dict[str, Span | None]] = []
+    for chosen in placed:
+        full: dict[str, Span | None] = {f: None for f in FIELDS}
+        full.update(chosen)
+        commands.append(full)
+    return Grounded(commands=commands, retracted=retracted)
