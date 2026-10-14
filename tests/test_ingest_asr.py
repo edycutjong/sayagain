@@ -155,3 +155,11 @@ def test_local_whisper_on_a_tts_fixture(registry) -> None:
     assert res.receipt["asr_on_amd"] == 0 and res.receipt["badge"] == "asr·off-AMD"
     assert res.tokens and all(0 <= s < e <= len(res.text) and lp <= 0 for s, e, lp in res.tokens)
     assert "eight" in res.text.lower() or "208" in res.text
+    # the whole path on the fixture: scripted instruction + Whisper read-back -> regex rung -> referee, floor gate
+    from referee.turns import Turn
+
+    ins_text = "Close valve two-oh-three, line Bravo."
+    ins = Turn("H-0", "H", 0.0, 2.5, ins_text, extract(ins_text), tokens=[(0, len(ins_text), -0.01)])
+    rb = Turn("H-1", "H", 3.5, 6.0, res.text, extract(res.text), tokens=res.tokens)
+    v = audit([ins, rb], registry, floor=0.01, audio_gate="floor").judged[0].verdict
+    assert v.label == "MISMATCH · tag: XV-203 ≠ XV-208"

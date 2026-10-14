@@ -32,7 +32,6 @@ VOCAB_PROMPT = (
 )
 NOTEBOOK_ENV = "SAYAGAIN_NOTEBOOK_ASR_URL"
 _AMD_GPU = re.compile(r"\b(?:AMD|Instinct|Radeon|MI\d{3}[A-Z]?)\b", re.IGNORECASE)
-_LANG_TOKEN = re.compile(r"<\|startoftranscript\|><\|(\w{2,3})\|>")
 
 
 class ASRUnavailable(Exception):
@@ -114,7 +113,7 @@ class LocalWhisper:
         self.device = self.device or ("mps" if torch.backends.mps.is_available() else "cpu")
         dtype = torch.float16 if self.device == "mps" else torch.float32
         self._proc = WhisperProcessor.from_pretrained(self.model_id)
-        self._model = WhisperForConditionalGeneration.from_pretrained(self.model_id, torch_dtype=dtype).to(self.device)
+        self._model = WhisperForConditionalGeneration.from_pretrained(self.model_id, dtype=dtype).to(self.device)
         self._model.eval()
 
     def transcribe(self, samples: np.ndarray, *, language: str | None = None, prompt: str | None = None) -> ASRResult:
@@ -134,20 +133,32 @@ class LocalWhisper:
 
             proc, model = self._proc, self._model
             feats = proc(samples, sampling_rate=SR, return_tensors="pt").input_features.to(self.device, model.dtype)
-            kw: dict = {"task": "transcribe", "return_dict_in_generate": True, "output_scores": True}
+            kw: dict = {"task": "transcribe"}
             if language:
                 kw["language"] = language
+            prompt_ids = None
             if prompt:
-                kw["prompt_ids"] = torch.tensor(proc.get_prompt_ids(prompt), device=self.device)
+                prompt_ids = torch.tensor(proc.get_prompt_ids(prompt), device=self.device)
+                kw["prompt_ids"] = prompt_ids
             with torch.no_grad():
-                out = model.generate(feats, **kw)
-            scores = model.compute_transition_scores(out.sequences, out.scores, normalize_logits=True)[0]
-            gen = out.sequences[0, -scores.shape[0] :].tolist()
-            tok = proc.tokenizer
-            skip = set(tok.all_special_ids) | {i for i in set(gen) if i >= tok.convert_tokens_to_ids("<|0.00|>")}
-            text, tokens = align_tokens(gen, scores.float().cpu().tolist(), lambda ids: tok.decode(ids), skip)
-            m = _LANG_TOKEN.search(tok.decode(out.sequences[0].tolist(), skip_special_tokens=False))
-            detected = m.group(1) if m else language
+                gen = [int(i) for i in model.generate(feats, **kw)[0].tolist()]
+                # token log-probs by one teacher-forced pass over the decoder context + the generated tokens
+                # (transformers 5.x crashes on `return_dict_in_generate` for Whisper; the forward pass gives the same
+                # normalised scores). `generate` returns the text tokens only, so the forced prefix is rebuilt here.
+                tok = proc.tokenizer
+                ids = tok.convert_tokens_to_ids
+                lang_id = ids(f"<|{language}|>") if language else int(model.detect_language(feats)[0])
+                prefix = [ids("<|startoftranscript|>"), lang_id, ids("<|transcribe|>"), ids("<|notimestamps|>")]
+                if prompt_ids is not None:
+                    prefix = [int(i) for i in prompt_ids.tolist()] + prefix
+                full = torch.tensor([prefix + gen], device=self.device)
+                logits = model(input_features=feats, decoder_input_ids=full[:, :-1]).logits[0].float()
+                lp = torch.log_softmax(logits, dim=-1).gather(1, full[0, 1:, None])[:, 0]
+            scores = lp[len(prefix) - 1 :].cpu().tolist()
+            first_ts = ids("<|0.00|>")
+            skip = set(tok.all_special_ids) | {i for i in set(gen) if i >= first_ts}
+            text, tokens = align_tokens(gen, scores, lambda t: tok.decode(t), skip)
+            detected = tok.convert_ids_to_tokens(lang_id).strip("<|>")
         except ASRUnavailable:
             raise
         except Exception as e:  # noqa: BLE001 — fail closed: a crashed ASR is NOT_AUDITED, never an empty transcript
