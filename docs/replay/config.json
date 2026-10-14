@@ -1,0 +1,31 @@
+{
+ "mode": "replay",
+ "runs": [
+  {
+   "run": "ladder-r1-reaudit",
+   "rungs": [
+    "Gemma-4-31B-IT",
+    "regex",
+    "DeepSeek-V4-Flash",
+    "Qwen3.8-27B",
+    "MiniCPM5-2B"
+   ],
+   "n_cards": 145
+  },
+  {
+   "run": "ladder-r1",
+   "rungs": [
+    "Gemma-4-31B-IT"
+   ],
+   "n_cards": 145
+  }
+ ],
+ "default": {
+  "run": "ladder-r1-reaudit",
+  "rung": "Gemma-4-31B-IT"
+ },
+ "live_extract": false,
+ "refused": "R-01",
+ "exported_at": "2026-10-14T08:41:43+00:00",
+ "git_head": "ee1ee07"
+}

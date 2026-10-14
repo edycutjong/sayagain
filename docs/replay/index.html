@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SayAgain · supervisor queue</title>
+<meta name="description" content="The shift supervisor's queue: every radio read-back that does not match its instruction, with the word that differs, the verdict trace and the receipts.">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#272A2B">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/SairaStencilOne-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#card">Skip to the alert card</a>
+
+<header class="top">
+  <a class="brand" href="./" aria-label="SayAgain supervisor queue, reload">
+    <img src="favicon.svg" alt="" width="30" height="30">
+    <span class="wordmark">Say<span>Again</span></span>
+  </a>
+  <span class="lab top-lab">Supervisor queue</span>
+  <div class="runbox">
+    <label class="lab" for="rung">Extraction rung</label>
+    <select id="rung" class="sel"></select>
+    <label class="lab" for="extract" id="extract-lab" hidden>Model calls</label>
+    <select id="extract" class="sel" hidden>
+      <option value="stored">replayed from receipts</option>
+      <option value="live">live on the API</option>
+    </select>
+  </div>
+  <span id="mode" class="mode"></span>
+  <div class="counter">
+    <span class="lab">Cards<br>this shift</span>
+    <output id="count" class="num" aria-live="polite">0</output>
+  </div>
+  <button id="chime" class="btn btn-q" type="button" aria-pressed="false" title="One soft chime when a card arrives">
+    <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 8h3l4-3.5v11L7 12H4z"/><path class="on" d="M14 7.2a4 4 0 0 1 0 5.6M15.9 5.3a6.6 6.6 0 0 1 0 9.4"/><path class="off" d="M14 7.5l4 5M18 7.5l-4 5"/></svg>
+    <span class="t">Chime off</span>
+  </button>
+</header>
+
+<section class="stages" id="stages" aria-label="Where each stage of this run ran">
+  <p class="banner" id="banner"></p>
+  <ol class="stage-list" id="stage-list"></ol>
+</section>
+
+<section class="channel" aria-label="Radio channel, replayed">
+  <div class="ch-id"><span class="lab">Channel</span><span class="ch-name" id="ch-name">CH-01</span></div>
+  <div class="ch-line" id="ch-line">
+    <span class="who" id="ch-who">·</span>
+    <span class="txt" id="ch-txt">Waiting for the first transmission.</span>
+  </div>
+  <div class="ch-clock"><span class="lab">Replay T+</span><span id="clock" class="num">00:00</span></div>
+  <div class="ch-ctl">
+    <button id="play" class="btn" type="button" aria-pressed="false">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><path class="i-pause" d="M6 4h3v12H6zM11 4h3v12h-3z"/><path class="i-play" d="M6 4l10 6-10 6z"/></svg>
+      <span class="t">Pause</span>
+    </button>
+    <div class="seg" role="group" aria-label="Replay speed">
+      <button type="button" data-speed="1" aria-pressed="false">1×</button>
+      <button type="button" data-speed="8" aria-pressed="true">8×</button>
+      <button type="button" data-speed="32" aria-pressed="false">32×</button>
+    </div>
+    <button id="skip" class="btn" type="button">Skip to end of shift</button>
+    <button id="follow" class="btn btn-q" type="button" aria-pressed="true" title="Open each new card as it arrives">Follow new cards</button>
+    <button id="refused" class="btn btn-ref" type="button">
+      <span>Try the refused one</span><span class="data">XV-205</span>
+    </button>
+  </div>
+  <div class="prog" aria-hidden="true"><i id="progbar"></i></div>
+  <p class="ch-sub" id="ch-sub"></p>
+</section>
+
+<main class="desk">
+  <section class="log" aria-label="Queue">
+    <div class="tabs" role="tablist" aria-label="Queue views">
+      <button role="tab" type="button" id="tab-live" aria-selected="true" aria-controls="rows">Live queue <span class="n" id="n-live">0</span></button>
+      <button role="tab" type="button" id="tab-eos" aria-selected="false" aria-controls="eos">End of shift <span class="n" id="n-eos">·</span></button>
+      <button role="tab" type="button" id="tab-all" aria-selected="false" aria-controls="rows">All exchanges <span class="n" id="n-all">0</span></button>
+    </div>
+    <div class="cols" aria-hidden="true"><span>T+</span><span>CH</span><span>Verdict</span><span>Field</span><span>From → to</span></div>
+    <ol id="rows" class="rows" aria-label="Exchanges"></ol>
+    <p id="rows-empty" class="empty">No card yet. Read-backs that match are logged, not queued.</p>
+    <div id="eos" class="eos" hidden></div>
+  </section>
+
+  <section class="cardpane" id="card" tabindex="-1" aria-label="Alert card">
+    <button id="back" class="btn back" type="button">← Queue</button>
+    <div id="card-body" class="card-body">
+      <div class="placeholder">
+        <p class="lab">Alert card</p>
+        <p>The first card opens here when the referee flags a read-back.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <p id="foot-run"></p>
+  <p>Exchanges are fictional plant radio traffic from <span class="data">data/cards.jsonl</span>. A card leaves the live queue only when the supervisor confirms or dismisses it.</p>
+</footer>
+
+<script src="app.js" defer></script>
+</body>
+</html>
