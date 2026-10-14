@@ -852,7 +852,7 @@
 <p class="lede">Span extraction, the model’s one job, runs on the AMD Token Factory: it copies out the words that carry the order. Each call leaves a receipt with the gateway host, the model served, the request id and the cost, and every card prints where each stage ran.</p>
 </div>
 <ol class="stages">
-<li class="pending"><p class="st">Speech-to-text</p><p class="where">not measured yet</p><p class="what">Local Whisper is planned and badged with where it ran. The Token Factory lists no transcription model.</p><p class="slot">audio eval scheduled Oct 16</p></li>
+<li class="pending"><p class="st">Speech-to-text</p><p class="where">not measured yet</p><p class="what">Local Whisper is planned and badged with where it ran. The Token Factory lists no transcription model.</p><p class="slot">no audio evaluation in this submission</p></li>
 <li class="on"><p class="st">Span extraction</p><p class="where">AMD Token Factory · developer.amd.com.cn</p><p class="what">Gemma-4-31B-IT, DeepSeek-V4-Flash, Qwen3.8-27B and MiniCPM5-2B served the ladder; every call has a receipt in <code>bench/results/receipts/</code>.</p></li>
 <li><p class="st">Referee</p><p class="where">local · plain Python</p><p class="what" data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">0.77 ms for card H-01, from the stored run.</p></li>
 <li><p class="st">Supervisor queue</p><p class="where">local · FastAPI</p><p class="what">Server-sent events to the queue page; reviews in SQLite.</p></li>
@@ -904,7 +904,7 @@
 <blockquote class="ab"><p class="ab-h">ABSTAIN · honest limit 4</p><p class="ab-q">The plant, its 120 tags and every exchange are fictional; the error mix is seeded, not sampled from a real site.</p><cite>build/README.md</cite></blockquote>
 </div>
 <div class="pending-wrap">
-<p class="lab">Not in this build · audio eval scheduled Oct 16</p>
+<p class="lab">No audio evaluation in this submission</p>
 <ul class="slots">
 <li><b>Audio row</b><span>errors flagged, false-alarm load and false-VERIFIED on recorded speech at 0 dB</span></li>
 <li><b>Failure case</b><span>−6 dB look-alike pairs: <span class="nw">XV-203</span> vs <span class="nw">XV-208</span>, <span class="nw">P-114</span> vs <span class="nw">P-140</span>, <span class="nw">MOV-31A</span> vs <span class="nw">MOV-31H</span></span></li>
@@ -928,7 +928,7 @@
 <details><summary>A regex already meets the rule. Why a model at all?</summary>
 <p>On clean written words it does: that is our own result, and the page says so. Real speech is not clean: recognition errors, code-switched Bahasa, other people’s phrasing. The audio rows decide whether a model earns its place; if they say it does not, the report will say that.</p></details>
 <details><summary>What happens when the radio is too noisy to hear?</summary>
-<p>On the written-word rows, a failed model call is NOT_AUDITED and an exchange the referee cannot clear reaches a human as ABSTAIN, in amber: listen yourself. How it behaves on noisy audio is not measured in this build; the −6 dB look-alike failure case needs the human recordings (audio eval scheduled Oct 16).</p></details>
+<p>On the written-word rows, a failed model call is NOT_AUDITED and an exchange the referee cannot clear reaches a human as ABSTAIN, in amber: listen yourself. How it behaves on noisy audio is not measured in this build; the −6 dB look-alike failure case needs the human recordings (no audio evaluation in this submission).</p></details>
 <details><summary>Does SayAgain control anything in the plant?</summary>
 <p>No. It has no write path to the plant. A card leaves the queue only when a supervisor confirms it or dismisses it with a reason.</p></details>
 <details><summary>Isn’t this a way to watch workers?</summary>
