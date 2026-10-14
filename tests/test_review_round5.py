@@ -212,3 +212,24 @@ def test_a_status_report_after_the_readback_still_closes_the_exchange() -> None:
     turns = [Turn(f"t{k}", "CH-01", 3.5 * k, 3.5 * k + 2.5, x, regex_extract(x)) for k, x in enumerate(texts)]
     turns[2].extraction = {"_invalid": "not JSON"}  # unreadable, but not read-back shaped: an acknowledgement
     assert audit(turns, REG, spot_checks=0).judged[0].verdict.verdict == "VERIFIED"
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# The referee routes an orphan read-back (no order heard) to the end-of-shift list; the queue must carry it there.
+
+
+def test_an_orphan_readback_reaches_the_end_of_shift_list() -> None:
+    from sayagain import shift
+    from sayagain.extract import regex_extraction
+
+    card = {
+        "exchange_id": "T-ORPHAN",
+        "set": "C",
+        "dev_slice": False,
+        "lang": "en",
+        "error_type": None,
+        "turns": [{"role": "tech", "text": "Copy, closing valve two-oh-three, line Bravo."}],
+    }
+    events = list(shift.shift_events(cards=[card], extract=regex_extraction, check_stored=False))
+    assert events[-2]["card"]["verdict"] is None and events[-2]["card"]["orphans"]  # no card, but not nothing
+    assert events[-1]["orphan_readbacks"] == ["T-ORPHAN"]  # before the fix the queue dropped it

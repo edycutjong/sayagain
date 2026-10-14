@@ -392,7 +392,7 @@ def shift_events(
     extract = extract or stored_extractor(run, rung)
     stored = stored_labels(run, rung) if check_stored else {}
     baseline = judge_baseline()
-    clock, verified, caught_ids, not_audited, records = 0.0, [], [], [], {}
+    clock, verified, caught_ids, not_audited, orphan_ids, records = 0.0, [], [], [], [], {}
     for idx, card in enumerate(cards):
         rec = judge_card(card, extract, registry, rung)
         rec["at"] = round(clock, 2)
@@ -413,6 +413,8 @@ def shift_events(
             not_audited.append(rec["exchange_id"])
         if rec["caught"]:
             caught_ids.append(rec["exchange_id"])
+        if rec["orphans"]:
+            orphan_ids.append(rec["exchange_id"])  # a read-back with no order heard (referee/pairing.py): end of shift
         clock += last + TURN_STEP_S + CARD_GAP_S
     spot = random.Random(SEED).sample(verified, min(SPOT_CHECKS, len(verified)))
     yield {
@@ -421,6 +423,7 @@ def shift_events(
         "spot_checks": sorted(spot, key=list(records).index),
         "caught_on_channel": caught_ids,
         "not_audited": not_audited,
+        "orphan_readbacks": orphan_ids,
         "cards": len(records),
         "live_cards": sum(r["live"] for r in records.values()),
     }

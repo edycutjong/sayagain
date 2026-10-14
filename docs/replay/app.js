@@ -450,6 +450,7 @@
   }
   function rowFields(c) {
     var v = c.verdict;
+    if (!v && c.orphans && c.orphans.length) return { f: 'read-back', ft: '<span>no order heard · end of shift</span>' };
     if (!v) return { f: 'no instruction', ft: '<span>chatter · no card</span>' };
     if (v.diffs && v.diffs.length) {
       var d = v.diffs[0], more = v.diffs.length > 1 ? ' +' + (v.diffs.length - 1) : '';
@@ -501,8 +502,9 @@
   function eosIds() {
     if (!S.eos) return [];
     var seen = {};
-    return S.eos.spot_checks.concat(S.eos.caught_on_channel, S.eos.not_audited).filter(function (id) { return !seen[id] && (seen[id] = 1); });
+    return S.eos.spot_checks.concat(S.eos.caught_on_channel, S.eos.not_audited, orphansOf(S.eos)).filter(function (id) { return !seen[id] && (seen[id] = 1); });
   }
+  function orphansOf(e) { return (e && e.orphan_readbacks) || []; }  // replays exported before the list existed have none
   function renderEos() {
     var box = $('eos');
     if (S.tab !== 'eos') { renderSub(); return; }
@@ -514,11 +516,12 @@
       return;
     }
     var e = S.eos;
-    var all = e.spot_checks.length + e.caught_on_channel.length + e.not_audited.length, dup = all - eosIds().length;
+    var orph = orphansOf(e), all = e.spot_checks.length + e.caught_on_channel.length + e.not_audited.length + orph.length, dup = all - eosIds().length;
     box.innerHTML = (dup > 0 ? '<p class="why eos-note">' + esc(eosIds().length) + ' exchanges; ' + esc(dup) + (dup === 1 ? ' appears' : ' appear') + ' in two lists.</p>' : '') +
       section('Spot-checks', e.spot_checks, 'Random VERIFIED exchanges a human re-checks at the end of the shift: how the plant learns whether the referee lets errors through.', 'No VERIFIED exchange to sample this shift.') +
       caughtSection(e.caught_on_channel) +
-      section('Not audited', e.not_audited, 'Each of these has at least one turn whose model call failed, so part of it was never judged. They are listed, never passed.', 'Every exchange was judged.');
+      section('Not audited', e.not_audited, 'Each of these has at least one turn whose model call failed, so part of it was never judged. They are listed, never passed.', 'Every exchange was judged.') +
+      (orph.length ? section('Read-backs with no order heard', orph, 'A field read-back with no instruction heard before it on the channel: work nobody was heard ordering. Listed for a human, never passed.', '') : '');
     bindRows(box);
   }
   function caughtSection(ids) {
