@@ -27,6 +27,7 @@ from referee.schema import CANON_PROMPT, SYSTEM_PROMPT, validate_canonical, vali
 from sayagain.amd_client import _FENCE, SCHEMA_IN_PROMPT, NotAuditing, Receipt, TokenFactory
 
 BACKOFF_S = (5.0, 15.0, 30.0)
+MAX_RETRY_AFTER_S = 60.0  # the documented Retry-After is 60 s; never block a worker longer
 
 
 @dataclass(frozen=True)
@@ -85,25 +86,15 @@ def _retry_after(rec: Receipt | None) -> float | None:
         return None
     v = (rec.rate_limit or {}).get("retry-after")
     try:
-        return max(0.0, float(v)) if v is not None else None
+        return min(MAX_RETRY_AFTER_S, max(0.0, float(v))) if v is not None else None
     except ValueError:
         return None
 
 
 def complete_receipt(rec: Receipt, rung: Rung, attempts: int) -> dict:
-    d = rec.to_dict()
-    usage = rec.usage or {}
-    cost = usage.get("cost")
-    details = usage.get("completion_tokens_details") or {}
-    d.update(
-        rung=rung.name,
-        llm_on_amd=1 if rec.on_amd else 0,
-        cost_usd=float(cost) if isinstance(cost, int | float) else None,
-        reasoning_tokens=usage.get("reasoning_tokens", details.get("reasoning_tokens")),
-        stage_timings={"extract_s": rec.latency_s},
-        attempts=attempts,
-    )
-    return d
+    """The receipt as written to disk (cost, timings, llm_on_amd are derived in `Receipt.to_dict`) + rung/attempt."""
+    rec.context.update(rung=rung.name, attempt=attempts)
+    return rec.to_dict()
 
 
 class TokenFactoryExtractor:
@@ -147,11 +138,14 @@ class TokenFactoryExtractor:
             obj = json.loads(content)
         except json.JSONDecodeError:
             obj = {"_invalid": "not JSON", "_content": content[:200]}
+        if not isinstance(obj, dict):  # "null", a list, a string: an answer, but not an extraction -> ABSTAIN
+            obj = {"_invalid": "not an object", "_content": content[:200]}
         problem = validate_extraction(obj) if self.mode == "spans" else validate_canonical(obj)
         rec.params["schema_valid"] = problem is None
         rec.params["mode"] = self.mode
         if problem:
             rec.error = f"schema: {problem}"
+        rec.context.update(rung=self.rung.name)
         self.client._record(rec)
         return obj, rec
 

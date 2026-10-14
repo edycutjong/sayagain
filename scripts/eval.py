@@ -65,6 +65,7 @@ CARDS_PATH = ROOT / "data" / "cards.jsonl"
 OUT = ROOT / "bench" / "results" / "text"
 RECEIPTS = ROOT / "bench" / "results" / "receipts"
 DAILY_CAP_GUARD = 0.80  # never let the account's daily spend pass this (the cap is $1/day)
+UNKNOWN_COST_USD = 0.001  # charged to the run budget for a call whose cost the API did not report
 PACE_S = 3.2  # 20 requests per minute per account -> one call start every 3.2 s across all threads
 SHIFT_EXCHANGES = 180  # site assumption (bench/PROTOCOL.md §4): 6 channels x 30 instructions per shift
 SHIFT_ERRORS = (2, 5)  # assumption: ~2-5 real errors per 180 exchanges
@@ -159,7 +160,9 @@ def judge_card(card: dict, extract: Callable[[str], Extraction], registry: Regis
                 "status": a.status,
                 "reason": a.reason,
                 "commands": len(a.commands),
-                "had_commands": bool(e.obj and isinstance(e.obj.get("commands"), list) and e.obj["commands"]),
+                "had_commands": isinstance(e.obj, dict)
+                and isinstance(e.obj.get("commands"), list)
+                and bool(e.obj["commands"]),
             }
             for a, e in zip(analyses, exts, strict=True)
         ],
@@ -207,7 +210,11 @@ def row_metrics(cards: list[dict], *, model_rung: bool) -> dict:
         "n_correct": len(correct),
         "errors_flagged": wilson(len(flagged), len(errors)),
         "mismatch_only_recall": wilson(sum(c["verdict"] == MISMATCH for c in mismatch_errors), len(mismatch_errors)),
-        "false_verified": {"count": len(false_verified), "exchanges": false_verified},
+        "false_verified": {
+            "count": len(false_verified),
+            "exchanges": false_verified,
+            **wilson(len(false_verified), len(errors)),
+        },
         "missed_no_card": {"count": len(missed_no_card), "exchanges": missed_no_card},
         "false_alarm_load": wilson(len(false_alarms), len(correct)),
         "false_alarm_exchanges": [f"{c['exchange_id']}: {c['label']}" for c in false_alarms],
@@ -288,11 +295,13 @@ def summarise(records: list[dict], receipts: list[dict], *, model_rung: bool) ->
 
 def meets_rule(summary: dict) -> dict:
     """The pre-registered ladder rule (PROTOCOL §5), applied here to the text·scripted held-out row: 0 false-VERIFIED
-    AND false-alarm load <= 5 %. `strict` also requires no seeded error that formed no card at all."""
+    AND false-alarm load <= 5 %. Only a fully audited row can meet it: a NOT_AUDITED card (rate limit, timeout, budget
+    stop) is unmeasured, not safe. `strict` also requires no seeded error that formed no card at all."""
     h = summary["rows"]["held_out"]
     fa = h["false_alarm_load"]["rate"]
-    literal = h["false_verified"]["count"] == 0 and fa is not None and fa <= 0.05
-    return {"literal": literal, "strict": literal and h["missed_no_card"]["count"] == 0}
+    audited = h["not_audited"]["n"] > 0 and h["not_audited"]["k"] == 0
+    literal = audited and h["false_verified"]["count"] == 0 and fa is not None and fa <= 0.05
+    return {"literal": literal, "strict": literal and h["missed_no_card"]["count"] == 0, "fully_audited": audited}
 
 
 # --------------------------------------------------------------------------------------------------- plumbing
@@ -316,7 +325,8 @@ def guarded(fn: Callable[[str], Extraction], budget: Budget) -> Callable[[str], 
         if budget.exceeded:
             return Extraction(text, None, "budget guard")
         e = fn(text)
-        budget.add((e.receipt or {}).get("cost_usd"))
+        cost = (e.receipt or {}).get("cost_usd")
+        budget.add(cost if cost is not None else UNKNOWN_COST_USD)  # no cost reported: count a pessimistic one
         return e
 
     return call
@@ -327,10 +337,18 @@ def sha256(s: str | bytes) -> str:
 
 
 def git_head() -> str | None:
+    """Short HEAD, with "+dirty" when tracked files differ from it (the run's code is then not that commit)."""
     try:
-        return subprocess.run(
+        head = subprocess.run(
             ["git", "-C", str(ROOT), "rev-parse", "--short", "HEAD"], capture_output=True, text=True, check=True
         ).stdout.strip()
+        dirty = subprocess.run(
+            ["git", "-C", str(ROOT), "status", "--porcelain", "--untracked-files=no"],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout.strip()
+        return head + ("+dirty" if dirty else "")
     except (OSError, subprocess.CalledProcessError):
         return None
 
@@ -351,8 +369,10 @@ def write_json(p: Path, obj: dict) -> None:
     p.write_text(json.dumps(obj, ensure_ascii=False, indent=1, sort_keys=True) + "\n", encoding="utf-8")
 
 
-def open_client(receipts_path: Path) -> TokenFactory:
-    return TokenFactory(load_config(), timeout=90.0, receipts_path=receipts_path, thinking_off=None)
+def open_client(receipts_path: Path, **context) -> TokenFactory:
+    c = TokenFactory(load_config(), timeout=90.0, receipts_path=receipts_path, thinking_off=None)
+    c.context = dict(context)
+    return c
 
 
 def check_daily(budget_usd: float) -> tuple[float, dict]:
@@ -362,8 +382,10 @@ def check_daily(budget_usd: float) -> tuple[float, dict]:
         u, _ = c.usage()
     finally:
         c.close()
-    used = float(u.get("daily_cost_used_usd") or 0.0)
-    allowed = min(budget_usd, DAILY_CAP_GUARD - used)
+    used = u.get("daily_cost_used_usd")
+    if not isinstance(used, int | float):  # unknown spend today: the guard cannot work, so nothing is spent
+        return 0.0, {"daily_cost_used_usd": None, "error": "usage endpoint returned no daily spend"}
+    allowed = min(budget_usd, DAILY_CAP_GUARD - float(used))
     snap = {k: u.get(k) for k in ("daily_cost_used_usd", "daily_cost_limit_usd", "rpm_limit", "daily_reset_at")}
     return allowed, snap
 
@@ -391,7 +413,9 @@ def run_extraction_rung(
     if rung.model is None:
         fn: Callable[[str], Extraction] = regex_extraction
     else:
-        client = open_client(rpath)
+        if rpath.exists():
+            raise SystemExit(f"{rpath.relative_to(ROOT)} exists: pick a new --run name (receipts never mix runs)")
+        client = open_client(rpath, rung=tag, run=run)
         fn = guarded(TokenFactoryExtractor(client, rung, pacer=pacer, mode=mode), budget)
     cache = Cache(fn)
     t0 = time.time()
@@ -423,9 +447,8 @@ def run_extraction_rung(
     ]
     write_jsonl(OUT / run / f"{tag}.extractions.jsonl", exts)
     write_jsonl(OUT / run / f"{tag}.cards.jsonl", records)
-    # one complete receipt per distinct transcript (the last attempt), from the extractor itself
-    final_receipts = [e.receipt for e in cache.store.values() if e.receipt is not None]
-    summary = summarise(records, final_receipts, model_rung=rung.model is not None)
+    # call metrics from every attempt on disk (429s included), so --rescore can recompute them
+    summary = summarise(records, read_jsonl(rpath), model_rung=rung.model is not None)
     summary.update(
         rung=rung.describe(),
         mode=mode,
@@ -458,7 +481,9 @@ def parse_judge(obj: object) -> tuple[str | None, str | None]:
 
 def run_llm_judge(run: str, rung: Rung, cards: list[dict], pacer: Pacer, budget: Budget) -> dict:
     rpath = RECEIPTS / f"text-{run}-{rung.name}.judge.jsonl"
-    client = open_client(rpath)
+    if rpath.exists():
+        raise SystemExit(f"{rpath.relative_to(ROOT)} exists: pick a new --run name (receipts never mix runs)")
+    client = open_client(rpath, rung=rung.name, run=run)
     records, receipts = [], []
     t0 = time.time()
     try:
@@ -494,10 +519,9 @@ def run_llm_judge(run: str, rung: Rung, cards: list[dict], pacer: Pacer, budget:
                             continue
                         na = e.reason
                         break
-            cost = ((rec or {}).get("usage") or {}).get("cost")
-            budget.add(cost if isinstance(cost, int | float) else None)
             if rec is not None:
-                rec.update(llm_on_amd=1 if rec.get("on_amd") else 0, cost_usd=cost)
+                cost = rec.get("cost_usd")
+                budget.add(cost if cost is not None else UNKNOWN_COST_USD)
                 receipts.append(rec)
             if na is not None:
                 verdict, problem = NOT_AUDITED, na
@@ -530,7 +554,7 @@ def run_llm_judge(run: str, rung: Rung, cards: list[dict], pacer: Pacer, budget:
     for r in records:
         r["expected"] = r["expected_verdict"]
     summary = summarise(records, receipts, model_rung=False)
-    summary["calls"] = receipt_metrics(receipts)
+    summary["calls"] = receipt_metrics(read_jsonl(rpath))
     summary.update(
         rung=rung.describe(),
         mode="llm-judge (per-field yes/no; speaker roles given; no registry)",
@@ -629,11 +653,12 @@ def cmd_single(args, kind: str) -> int:
     meta = metadata(run, cards, {"subset": args.subset, "budget_usd": round(allowed, 4), "usage_before": snap})
     if kind == "ablate-grounding":
         if args.reuse:  # "with grounding" = that model's rung in a ladder run on the same cards (no second call)
-            ladder = json.loads(Path(args.reuse).read_text(encoding="utf-8"))
+            reuse = Path(args.reuse).resolve()
+            ladder = json.loads(reuse.read_text(encoding="utf-8"))
             if ladder["cards_sha256"] != meta["cards_sha256"] or ladder["subset"] != args.subset:
                 print("--reuse: the ladder run used other cards", file=sys.stderr)
                 return 2
-            with_g = {**ladder["rungs"][rung.name], "reused_from": str(Path(args.reuse).relative_to(ROOT))}
+            with_g = {**ladder["rungs"][rung.name], "reused_from": str(reuse.relative_to(ROOT))}
         else:
             with_g = run_extraction_rung(run, rung, cards, registry, pacer, budget, "spans")
         res = {
@@ -658,7 +683,7 @@ def cmd_single(args, kind: str) -> int:
 
 # ---------------------------------------------------------------------------------------------------- rescore
 
-VOLATILE = {"wall_s", "started_at", "finished_at", "git_head", "usage_before", "budget_usd", "spent_usd", "calls"}
+VOLATILE = {"wall_s", "started_at", "finished_at", "git_head", "usage_before", "budget_usd", "spent_usd"}
 
 
 def _strip(o):
@@ -680,6 +705,7 @@ def rescore_summary(summary: dict, cards: list[dict], registry: Registry) -> dic
     records = [judge_card(c, fn, registry, analyzer) for c in subset]
     receipts = read_jsonl(ROOT / summary["receipts"]) if summary.get("receipts") else []
     new = summarise(records, receipts, model_rung=summary["rung"]["model"] is not None)
+    new["meets_rule"] = meets_rule(new)
     return new
 
 
@@ -692,7 +718,10 @@ def rescore_judge(summary: dict) -> dict:
         r["label"], r["labels"], r["live_cards"] = r["verdict"], [r["verdict"]] if r["verdict"] else [], 0
         r["live_cards"] = int(r["verdict"] in LIVE)
         r["expected"] = r["expected_verdict"]
-    return summarise(records, [], model_rung=False)
+    new = summarise(records, [], model_rung=False)
+    new["calls"] = receipt_metrics(read_jsonl(ROOT / summary["receipts"]))
+    new["meets_rule"] = meets_rule(new)
+    return new
 
 
 def cmd_rescore(args) -> int:
@@ -702,16 +731,27 @@ def cmd_rescore(args) -> int:
     for p in paths:
         doc = json.loads(p.read_text(encoding="utf-8"))
         groups = doc.get("rungs") or doc.get("results") or {}
+        changed = False
         for name, summary in groups.items():
+            if summary.get("reused_from"):
+                continue  # a copy of a ladder rung: checked where it was produced
             new = rescore_judge(summary) if name == "llm_judge" else rescore_summary(summary, cards, registry)
-            same = _strip(new["rows"]) == _strip(summary["rows"])
-            bad += not same
-            print(f"{'OK  ' if same else 'DIFF'} {p.name} :: {name}")
-            if not same:
-                for row in new["rows"]:
-                    if _strip(new["rows"][row]) != _strip(summary["rows"][row]):
-                        print(f"     row {row} differs")
-    return 1 if bad else 0
+            keys = [k for k in ("rows", "calls", "meets_rule") if k in new]
+            diff = [k for k in keys if _strip(new[k]) != _strip(summary.get(k))]
+            bad += bool(diff)
+            tail = f" differs: {diff}" if diff else ""
+            print(f"{'DIFF' if diff else 'OK  '} {p.name} :: {name} ({', '.join(keys)}){tail}")
+            if diff and args.write:  # offline re-derivation from the stored model outputs: no call is repeated
+                summary.update({k: new[k] for k in keys})
+                summary["rescored"] = {"at": datetime.now(UTC).isoformat(timespec="seconds"), "git_head": git_head()}
+                changed = True
+        if changed:
+            if doc.get("rungs"):
+                order = [n for n in doc.get("ladder_order", []) if n in groups]
+                doc["smallest_rung_meeting_rule"] = next((n for n in order if groups[n]["meets_rule"]["literal"]), None)
+            write_json(p, doc)
+            print(f"     rewrote {p.name} from its stored extractions")
+    return 1 if bad and not args.write else 0
 
 
 # ----------------------------------------------------------------------------------------------------- report
@@ -798,6 +838,7 @@ def main(argv: list[str] | None = None) -> int:
         "--budget", type=float, default=0.50, help="USD this run may spend (also capped by the daily guard)"
     )
     ap.add_argument("--run", help="run name (default: subset + UTC time)")
+    ap.add_argument("--write", action="store_true", help="--rescore: rewrite results that differ (offline)")
     ap.add_argument("--reuse", help="--ablate: take the with-grounding side from this ladder result file")
     ap.add_argument("files", nargs="*", help="--rescore: result files (default: all of bench/results/text/*.json)")
     args = ap.parse_args(argv)

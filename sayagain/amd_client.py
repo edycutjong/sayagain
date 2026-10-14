@@ -26,6 +26,7 @@ from referee.schema import SPAN_SCHEMA, SYSTEM_PROMPT, validate_extraction
 ENV_PATH = Path.home() / ".config" / "amd-tokenfactory" / "env"
 AMD_DOMAINS = ("amd.com", "amd.com.cn")
 RESPONSE_MODES = ("json_schema", "json_object", "prompt")
+LLM_STAGES = ("extract", "extract-canonical", "judge", "chat")
 _THINK = re.compile(r"^\s*<think>.*?</think>\s*", re.DOTALL)
 _FENCE = re.compile(r"^```(?:json)?\s*|\s*```$")
 SCHEMA_IN_PROMPT = (
@@ -119,8 +120,24 @@ class Receipt:
     model_served: str | None = None  # the model id the API echoes back (e.g. "self-dploy/Qwen3.8-27B")
     client_id: str = field(default_factory=lambda: uuid.uuid4().hex[:12])
 
+    context: dict = field(default_factory=dict)  # run labels set by the caller (e.g. the ladder rung)
+
     def to_dict(self) -> dict:
-        return asdict(self)
+        d = asdict(self)
+        ctx = d.pop("context") or {}
+        usage = self.usage if isinstance(self.usage, dict) else {}
+        cost = usage.get("cost")
+        details = usage.get("completion_tokens_details")
+        details = details if isinstance(details, dict) else {}
+        d.update(
+            cost_usd=float(cost) if isinstance(cost, int | float) and not isinstance(cost, bool) else None,
+            reasoning_tokens=usage.get("reasoning_tokens", details.get("reasoning_tokens")),
+            stage_timings={f"{self.stage}_s": self.latency_s},
+            # the call went to an AMD-operated endpoint (never a GPU claim); set on language-model stages only
+            llm_on_amd=(1 if self.on_amd else 0) if self.stage in LLM_STAGES else None,
+        )
+        d.update(ctx)
+        return d
 
 
 class TokenFactory:
@@ -140,6 +157,7 @@ class TokenFactory:
         self.receipts_path = receipts_path
         self.thinking_off = thinking_off
         self.receipts: list[Receipt] = []
+        self.context: dict = {}  # merged into every receipt this client writes (e.g. {"rung": "Gemma-4-31B-IT"})
         self.min_interval_s = min_interval_s
         self._last_call = 0.0
         self._http = httpx.Client(
@@ -155,6 +173,7 @@ class TokenFactory:
     # ------------------------------------------------------------------------------------------ plumbing
 
     def _record(self, r: Receipt) -> Receipt:
+        r.context = {**self.context, **r.context}
         self.receipts.append(r)
         if self.receipts_path is not None:
             self.receipts_path.parent.mkdir(parents=True, exist_ok=True)

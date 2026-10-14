@@ -27,7 +27,7 @@
     "calls_failed": 0,
     "calls_ok": 83,
     "completion_tokens": 5333,
-    "cost_usd": 0.0043,
+    "cost_usd": 0.0,
     "hosts": [
      "developer.amd.com.cn"
     ],
@@ -41,18 +41,23 @@
     ],
     "prompt_tokens": 20049,
     "rate_limited_attempts": 0,
-    "reasoning_tokens_reported": 0,
+    "reasoning_tokens_reported": null,
     "schema_invalid": 0
    },
    "cards": "bench/results/text/dev-r1/DeepSeek-V4-Flash.cards.jsonl",
    "distinct_transcripts": 83,
    "extractions": "bench/results/text/dev-r1/DeepSeek-V4-Flash.extractions.jsonl",
    "meets_rule": {
+    "fully_audited": false,
     "literal": false,
     "strict": false
    },
    "mode": "spans",
    "receipts": "bench/results/receipts/text-dev-r1-DeepSeek-V4-Flash.jsonl",
+   "rescored": {
+    "at": "2026-10-14T05:10:12+00:00",
+    "git_head": "e34d86c+dirty"
+   },
    "rows": {
     "chatter": {
      "false_card_exchanges": [],
@@ -103,8 +108,15 @@
       "rate": 0.0417
      },
      "false_verified": {
+      "ci95": [
+       0.0,
+       0.1936
+      ],
       "count": 0,
-      "exchanges": []
+      "exchanges": [],
+      "k": 0,
+      "n": 16,
+      "rate": 0.0
      },
      "label_exact": {
       "ci95": [
@@ -182,8 +194,12 @@
       "rate": null
      },
      "false_verified": {
+      "ci95": null,
       "count": 0,
-      "exchanges": []
+      "exchanges": [],
+      "k": 0,
+      "n": 0,
+      "rate": null
      },
      "label_exact": {
       "ci95": null,
@@ -237,7 +253,7 @@
     "calls_failed": 0,
     "calls_ok": 83,
     "completion_tokens": 4628,
-    "cost_usd": 0.000389,
+    "cost_usd": 0.0,
     "hosts": [
      "developer.amd.com.cn"
     ],
@@ -251,18 +267,23 @@
     ],
     "prompt_tokens": 21717,
     "rate_limited_attempts": 0,
-    "reasoning_tokens_reported": 0,
+    "reasoning_tokens_reported": null,
     "schema_invalid": 0
    },
    "cards": "bench/results/text/dev-r1/Gemma-4-31B-IT.cards.jsonl",
    "distinct_transcripts": 83,
    "extractions": "bench/results/text/dev-r1/Gemma-4-31B-IT.extractions.jsonl",
    "meets_rule": {
+    "fully_audited": false,
     "literal": false,
     "strict": false
    },
    "mode": "spans",
    "receipts": "bench/results/receipts/text-dev-r1-Gemma-4-31B-IT.jsonl",
+   "rescored": {
+    "at": "2026-10-14T05:10:12+00:00",
+    "git_head": "e34d86c+dirty"
+   },
    "rows": {
     "chatter": {
      "false_card_exchanges": [],
@@ -313,8 +334,15 @@
       "rate": 0.0417
      },
      "false_verified": {
+      "ci95": [
+       0.0,
+       0.1936
+      ],
       "count": 0,
-      "exchanges": []
+      "exchanges": [],
+      "k": 0,
+      "n": 16,
+      "rate": 0.0
      },
      "label_exact": {
       "ci95": [
@@ -392,8 +420,12 @@
       "rate": null
      },
      "false_verified": {
+      "ci95": null,
       "count": 0,
-      "exchanges": []
+      "exchanges": [],
+      "k": 0,
+      "n": 0,
+      "rate": null
      },
      "label_exact": {
       "ci95": null,
@@ -443,11 +475,11 @@
   "MiMo-V2.6-Flash": {
    "cache_hits": 85,
    "calls": {
-    "calls": 83,
-    "calls_failed": 0,
+    "calls": 84,
+    "calls_failed": 1,
     "calls_ok": 83,
     "completion_tokens": 4276,
-    "cost_usd": 0.001767,
+    "cost_usd": 0.0,
     "hosts": [
      "developer.amd.com.cn"
     ],
@@ -460,19 +492,24 @@
      true
     ],
     "prompt_tokens": 19687,
-    "rate_limited_attempts": 0,
-    "reasoning_tokens_reported": 0,
+    "rate_limited_attempts": 1,
+    "reasoning_tokens_reported": null,
     "schema_invalid": 0
    },
    "cards": "bench/results/text/dev-r1/MiMo-V2.6-Flash.cards.jsonl",
    "distinct_transcripts": 83,
    "extractions": "bench/results/text/dev-r1/MiMo-V2.6-Flash.extractions.jsonl",
    "meets_rule": {
+    "fully_audited": false,
     "literal": false,
     "strict": false
    },
    "mode": "spans",
    "receipts": "bench/results/receipts/text-dev-r1-MiMo-V2.6-Flash.jsonl",
+   "rescored": {
+    "at": "2026-10-14T05:10:12+00:00",
+    "git_head": "e34d86c+dirty"
+   },
    "rows": {
     "chatter": {
      "false_card_exchanges": [],
@@ -525,8 +562,15 @@
       "rate": 0.125
      },
      "false_verified": {
+      "ci95": [
+       0.0,
+       0.1936
+      ],
       "count": 0,
-      "exchanges": []
+      "exchanges": [],
+      "k": 0,
+      "n": 16,
+      "rate": 0.0
      },
      "label_exact": {
       "ci95": [
@@ -609,8 +653,12 @@
       "rate": null
      },
      "false_verified": {
+      "ci95": null,
       "count": 0,
-      "exchanges": []
+      "exchanges": [],
+      "k": 0,
+      "n": 0,
+      "rate": null
      },
      "label_exact": {
       "ci95": null,
@@ -664,7 +712,7 @@
     "calls_failed": 0,
     "calls_ok": 83,
     "completion_tokens": 4983,
-    "cost_usd": 0.000439,
+    "cost_usd": 0.0,
     "hosts": [
      "developer.amd.com.cn"
     ],
@@ -678,18 +726,23 @@
     ],
     "prompt_tokens": 21414,
     "rate_limited_attempts": 0,
-    "reasoning_tokens_reported": 0,
+    "reasoning_tokens_reported": null,
     "schema_invalid": 44
    },
    "cards": "bench/results/text/dev-r1/MiniCPM5-2B.cards.jsonl",
    "distinct_transcripts": 83,
    "extractions": "bench/results/text/dev-r1/MiniCPM5-2B.extractions.jsonl",
    "meets_rule": {
+    "fully_audited": false,
     "literal": false,
     "strict": false
    },
    "mode": "spans",
    "receipts": "bench/results/receipts/text-dev-r1-MiniCPM5-2B.jsonl",
+   "rescored": {
+    "at": "2026-10-14T05:10:12+00:00",
+    "git_head": "e34d86c+dirty"
+   },
    "rows": {
     "chatter": {
      "false_card_exchanges": [],
@@ -763,8 +816,15 @@
       "rate": 1.0
      },
      "false_verified": {
+      "ci95": [
+       0.0,
+       0.1936
+      ],
       "count": 0,
-      "exchanges": []
+      "exchanges": [],
+      "k": 0,
+      "n": 16,
+      "rate": 0.0
      },
      "label_exact": {
       "ci95": [
@@ -881,8 +941,12 @@
       "rate": null
      },
      "false_verified": {
+      "ci95": null,
       "count": 0,
-      "exchanges": []
+      "exchanges": [],
+      "k": 0,
+      "n": 0,
+      "rate": null
      },
      "label_exact": {
       "ci95": null,
@@ -932,11 +996,11 @@
   "Qwen3.8-27B": {
    "cache_hits": 85,
    "calls": {
-    "calls": 83,
-    "calls_failed": 0,
+    "calls": 85,
+    "calls_failed": 2,
     "calls_ok": 83,
     "completion_tokens": 21272,
-    "cost_usd": 0.002963,
+    "cost_usd": 0.0,
     "hosts": [
      "developer.amd.com.cn"
     ],
@@ -949,19 +1013,24 @@
      true
     ],
     "prompt_tokens": 22216,
-    "rate_limited_attempts": 0,
-    "reasoning_tokens_reported": 17909,
+    "rate_limited_attempts": 2,
+    "reasoning_tokens_reported": null,
     "schema_invalid": 0
    },
    "cards": "bench/results/text/dev-r1/Qwen3.8-27B.cards.jsonl",
    "distinct_transcripts": 83,
    "extractions": "bench/results/text/dev-r1/Qwen3.8-27B.extractions.jsonl",
    "meets_rule": {
+    "fully_audited": false,
     "literal": false,
     "strict": false
    },
    "mode": "spans",
    "receipts": "bench/results/receipts/text-dev-r1-Qwen3.8-27B.jsonl",
+   "rescored": {
+    "at": "2026-10-14T05:10:12+00:00",
+    "git_head": "e34d86c+dirty"
+   },
    "rows": {
     "chatter": {
      "false_card_exchanges": [],
@@ -1010,8 +1079,15 @@
       "rate": 0.0
      },
      "false_verified": {
+      "ci95": [
+       0.0,
+       0.1936
+      ],
       "count": 0,
-      "exchanges": []
+      "exchanges": [],
+      "k": 0,
+      "n": 16,
+      "rate": 0.0
      },
      "label_exact": {
       "ci95": [
@@ -1087,8 +1163,12 @@
       "rate": null
      },
      "false_verified": {
+      "ci95": null,
       "count": 0,
-      "exchanges": []
+      "exchanges": [],
+      "k": 0,
+      "n": 0,
+      "rate": null
      },
      "label_exact": {
       "ci95": null,
@@ -1142,11 +1222,16 @@
    "distinct_transcripts": 83,
    "extractions": "bench/results/text/dev-r1/regex.extractions.jsonl",
    "meets_rule": {
+    "fully_audited": false,
     "literal": false,
     "strict": false
    },
    "mode": "spans",
    "receipts": null,
+   "rescored": {
+    "at": "2026-10-14T05:10:12+00:00",
+    "git_head": "e34d86c+dirty"
+   },
    "rows": {
     "chatter": {
      "false_card_exchanges": [],
@@ -1195,8 +1280,15 @@
       "rate": 0.0
      },
      "false_verified": {
+      "ci95": [
+       0.0,
+       0.1936
+      ],
       "count": 0,
-      "exchanges": []
+      "exchanges": [],
+      "k": 0,
+      "n": 16,
+      "rate": 0.0
      },
      "label_exact": {
       "ci95": [
@@ -1263,8 +1355,12 @@
       "rate": null
      },
      "false_verified": {
+      "ci95": null,
       "count": 0,
-      "exchanges": []
+      "exchanges": [],
+      "k": 0,
+      "n": 0,
+      "rate": null
      },
      "label_exact": {
       "ci95": null,

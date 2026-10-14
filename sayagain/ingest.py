@@ -31,8 +31,8 @@ class TurnAudio:
 def cut(clean: np.ndarray, exchange_id: str, *, variant: np.ndarray | None = None, sr: int = SR) -> list[TurnAudio]:
     """VAD on `clean`; the samples come from `variant` (a noisy / radio copy of the same take) when given."""
     src = clean if variant is None else variant
-    if len(src) != len(clean):
-        raise ValueError("a variant must be the same take as the clean file (same length)")
+    if len(src) < len(clean):  # a radio copy may be longer (squelch tail appended), never shorter
+        raise ValueError("a variant must be the same take as the clean file (at least as long)")
     out = []
     for k, (s, e) in enumerate(segments(clean, sr)):
         out.append(TurnAudio(f"{exchange_id}-{k}", exchange_id, s, e, src[int(s * sr) : int(e * sr)].copy()))

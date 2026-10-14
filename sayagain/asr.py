@@ -31,7 +31,9 @@ VOCAB_PROMPT = (
     "Copy, roger, say again, correction. Katup, pompa, jalur, tutup, buka, isolasi, siap, ulangi, koreksi."
 )
 NOTEBOOK_ENV = "SAYAGAIN_NOTEBOOK_ASR_URL"
-_AMD_GPU = re.compile(r"\b(?:AMD|Instinct|Radeon|MI\d{3}[A-Z]?)\b", re.IGNORECASE)
+# an AMD GPU product name in the service's own device report; a negation or a CPU-only report never counts
+_AMD_GPU = re.compile(r"\b(?:Instinct|Radeon|MI\d{3}[A-Z]?)\b", re.IGNORECASE)
+_NOT_GPU = re.compile(r"\b(?:no|not|none|without|cpu|unavailable)\b", re.IGNORECASE)
 
 
 class ASRUnavailable(Exception):
@@ -215,11 +217,16 @@ class NotebookASR:
             rec.update(ok=False, error=f"{type(e).__name__}: {e}"[:300], latency_s=round(time.perf_counter() - t0, 4))
             raise ASRFailed("asr error", rec) from e
         gpu = str(body.get("gpu") or "")
-        on_amd = bool(_AMD_GPU.search(gpu))  # only the service's own report of its device counts
+        on_amd = bool(_AMD_GPU.search(gpu)) and not _NOT_GPU.search(gpu)  # only the service's own device report
         rec.update(
             ok=True, gpu=gpu or None, on_amd=on_amd, asr_on_amd=int(on_amd), detected_language=body.get("language")
         )
-        return ASRResult(text.strip(), tokens, body.get("language"), rec)
+        lead = len(text) - len(text.lstrip())  # token offsets index the raw text: shift them with the strip
+        stripped = text.strip()
+        if tokens is not None:
+            tokens = [(s - lead, e - lead, lp) for s, e, lp in tokens if e - lead > 0 and s - lead < len(stripped)]
+            tokens = [(max(0, s), min(len(stripped), e), lp) for s, e, lp in tokens]
+        return ASRResult(stripped, tokens, body.get("language"), rec)
 
 
 def backend(name: str, **kw):
@@ -243,6 +250,8 @@ def transcribe_turn(
     try:
         res = asr.transcribe(turn.samples, language=language, prompt=prompt)
         receipts.append(res.receipt)
+        if not res.text.strip():  # speech was detected but nothing was read: unmeasured, never an empty turn
+            raise ASRFailed("empty transcript")
         t.transcript, t.tokens = res.text, res.tokens
         t.meta["asr_language"] = res.language
         if prompt and unprompted:

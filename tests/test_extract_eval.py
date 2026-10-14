@@ -251,7 +251,8 @@ def test_row_metrics_follow_the_protocol_formulas() -> None:
     m = ev.row_metrics(recs, model_rung=False)
     assert m["errors_flagged"]["k"] == 3 and m["errors_flagged"]["n"] == 5
     assert m["mismatch_only_recall"]["k"] == 1 and m["mismatch_only_recall"]["n"] == 4
-    assert m["false_verified"] == {"count": 1, "exchanges": ["e4"]}
+    assert m["false_verified"]["count"] == 1 and m["false_verified"]["exchanges"] == ["e4"]
+    assert m["false_verified"]["n"] == 5
     assert m["missed_no_card"] == {"count": 1, "exchanges": ["e5"]}
     assert m["false_alarm_load"]["k"] == 1 and m["false_alarm_load"]["n"] == 4
     assert m["not_audited"]["k"] == 1
@@ -259,7 +260,7 @@ def test_row_metrics_follow_the_protocol_formulas() -> None:
     assert m["precision_at_1pct_prevalence"] == round(r * 0.01 / (r * 0.01 + f * 0.99), 4)
     assert m["cards_per_shift_assumption"]["2_errors_per_180"] == round(f * 178 + r * 2, 2)
     s = {"rows": {"held_out": m}}
-    assert ev.meets_rule(s) == {"literal": False, "strict": False}
+    assert ev.meets_rule(s) == {"literal": False, "strict": False, "fully_audited": False}
 
 
 @pytest.mark.parametrize(
@@ -333,3 +334,73 @@ def test_regex_rung_text_rows_rescore_exactly(tmp_path: Path, registry, monkeypa
     assert s["rows"]["refusal"][0]["got"] == "ABSTAIN · unknown tag" and s["rows"]["chatter"]["false_cards"] == 0
     again = ev.rescore_summary(s, cards, registry)
     assert ev._strip(again["rows"]) == ev._strip(s["rows"])
+
+
+# ------------------------------------------------------------------------------------- review round 1 (P2) fixes
+
+
+def test_a_row_nothing_audited_never_meets_the_rule(registry) -> None:
+    """Round-1 high: a budget stop / outage made every card NOT_AUDITED and the rule still passed."""
+    from sayagain.extract import Extraction
+
+    cards = [c for c in ev.load_cards() if ev.row_of(c) == "held_out"]
+    recs = [ev.judge_card(c, lambda t: Extraction(t, None, "budget guard"), registry) for c in cards]
+    s = {"rows": {"held_out": ev.row_metrics(recs, model_rung=True)}}
+    assert s["rows"]["held_out"]["false_verified"]["count"] == 0
+    assert ev.meets_rule(s) == {"literal": False, "strict": False, "fully_audited": False}
+
+
+@pytest.mark.parametrize("content", ["null", "[1, 2]", '"hi"', "42"])
+def test_valid_json_that_is_not_an_object_abstains_and_never_crashes(registry, content: str) -> None:
+    def h(req):
+        return httpx.Response(200, json=chat_json(content))
+
+    ext = TokenFactoryExtractor(make(h), RUNG)
+    e = ext("Copy, closing two-oh-eight, line Bravo.")
+    assert isinstance(e.obj, dict) and e.obj["_invalid"] == "not an object" and e.not_audited is None
+    card = next(c for c in ev.load_cards() if c["exchange_id"] == "H-01")
+    rec = ev.judge_card(card, ext, registry)
+    assert rec["verdict"] == ABSTAIN
+
+
+def test_receipts_on_disk_carry_rung_cost_and_llm_on_amd_even_for_429(tmp_path: Path) -> None:
+    calls: list = []
+
+    def h(req):
+        calls.append(1)
+        if len(calls) == 1:
+            return httpx.Response(429, json={"error": "slow"}, headers={"retry-after": "1"})
+        return httpx.Response(200, json=chat_json(json.dumps(SPANS)))
+
+    c = make(h, tmp_path)
+    c.context = {"rung": "Test-Model", "run": "t"}
+    TokenFactoryExtractor(c, RUNG, sleep=lambda s: None)("Copy, closing two-oh-eight, line Bravo.")
+    lines = [json.loads(x) for x in (tmp_path / "r.jsonl").read_text().splitlines()]
+    assert [r["http_status"] for r in lines] == [429, 200]
+    for r in lines:
+        assert r["rung"] == "Test-Model" and r["run"] == "t" and r["llm_on_amd"] == 1 and "stage_timings" in r
+    assert lines[1]["cost_usd"] == 2e-5 and lines[0]["cost_usd"] is None
+
+
+def test_retry_after_is_capped() -> None:
+    slept: list = []
+    calls: list = []
+
+    def h(req):
+        calls.append(1)
+        if len(calls) == 1:
+            return httpx.Response(429, json={}, headers={"retry-after": "86400"})
+        return httpx.Response(200, json=chat_json(json.dumps(SPANS)))
+
+    TokenFactoryExtractor(make(h), RUNG, sleep=slept.append)("Copy.")
+    assert slept == [60.0]
+
+
+def test_garbage_usage_does_not_crash_the_receipt() -> None:
+    def h(req):
+        body = chat_json(json.dumps(SPANS))
+        body["usage"] = "n/a"
+        return httpx.Response(200, json=body)
+
+    e = TokenFactoryExtractor(make(h), RUNG)("Copy.")
+    assert e.not_audited is None and e.receipt["cost_usd"] is None

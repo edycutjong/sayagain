@@ -48,6 +48,8 @@ def test_noisy_variant_is_cut_at_the_clean_boundaries() -> None:
     assert not np.allclose(a[0].samples, b[0].samples)
     with pytest.raises(ValueError):
         cut(clean, "X", variant=noisy[:-10])
+    tail = np.concatenate([noisy, np.zeros(SR // 4, dtype=np.float32)])  # radioize appends a squelch tail
+    assert [(t.t_start, t.t_end) for t in cut(clean, "X", variant=tail)] == [(t.t_start, t.t_end) for t in a]
 
 
 def test_align_tokens_offsets_point_into_the_text() -> None:
@@ -79,7 +81,17 @@ def test_notebook_backend_is_off_until_the_human_reports_a_gpu(monkeypatch) -> N
         NotebookASR()
 
 
-@pytest.mark.parametrize("gpu, on_amd", [("AMD Instinct MI300X", 1), ("NVIDIA A100", 0), ("", 0)])
+@pytest.mark.parametrize(
+    "gpu, on_amd",
+    [
+        ("AMD Instinct MI300X", 1),
+        ("AMD Radeon PRO W7900", 1),
+        ("NVIDIA A100", 0),
+        ("", 0),
+        ("cpu (AMD EPYC 7763)", 0),
+        ("no AMD GPU found", 0),
+    ],
+)
 def test_notebook_on_amd_comes_from_the_service_report(gpu: str, on_amd: int) -> None:
     def h(req):
         return httpx.Response(
@@ -163,3 +175,26 @@ def test_local_whisper_on_a_tts_fixture(registry) -> None:
     rb = Turn("H-1", "H", 3.5, 6.0, res.text, extract(res.text), tokens=res.tokens)
     v = audit([ins, rb], registry, floor=0.01, audio_gate="floor").judged[0].verdict
     assert v.label == "MISMATCH · tag: XV-203 ≠ XV-208"
+
+
+def test_notebook_token_offsets_follow_the_stripped_text() -> None:
+    def h(req):
+        body = {
+            "text": " Copy, 208.",
+            "tokens": [[0, 5, -0.1], [5, 6, -0.2], [6, 10, -0.9], [10, 11, -0.1]],
+            "language": "en",
+            "gpu": "",
+        }
+        return httpx.Response(200, json=body)
+
+    res = NotebookASR("https://notebook.example/asr", transport=httpx.MockTransport(h)).transcribe(
+        np.zeros(SR, dtype=np.float32)
+    )
+    assert res.text == "Copy, 208."
+    assert [res.text[s:e] for s, e, _ in res.tokens] == ["Copy", ",", " 208", "."]
+
+
+def test_an_empty_transcript_is_not_audited() -> None:
+    fake = FakeASR({(SR, True): "  ", (SR, False): ""})
+    t, recs = transcribe_turn(fake, TurnAudio("X-0", "X", 0.0, 1.0, np.zeros(SR, dtype=np.float32)))
+    assert t.not_audited == "empty transcript"
