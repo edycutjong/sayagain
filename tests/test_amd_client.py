@@ -136,9 +136,11 @@ def test_access_gate_against_fixture(tmp_path: Path) -> None:
     clip.write_bytes(b"RIFF")
     gate = access_gate.run_gate(client(ok_handler([])), model=None, clip=clip)
     assert gate["models"]["audio"] == ["openai/whisper-large-v3"]
-    assert gate["probe_model"] == "Qwen/Qwen3-32B"
-    assert gate["extraction"]["ok"] and gate["extraction"]["grounded"]
-    assert gate["logprobs"]["returned"] is True
+    assert set(gate["extraction"]) == {"Qwen/Qwen3-8B", "Qwen/Qwen3-32B"}
+    ext = gate["extraction"]["Qwen/Qwen3-32B"]
+    assert ext["ok"] and ext["grounded"] and ext["response_mode"] == "json_schema"
+    assert gate["ladder_candidates"] == ["Qwen/Qwen3-32B", "Qwen/Qwen3-8B"]
+    assert gate["logprobs"]["Qwen/Qwen3-32B"]["returned"] is True
     assert gate["asr"]["ok"] and gate["asr"]["segment_avg_logprob"] and not gate["asr"]["token_logprobs"]
     assert gate["asr"]["prompt_accepted"] is True
     assert gate["branch"].startswith("A")
@@ -151,3 +153,32 @@ def test_access_gate_without_key_writes_nothing(tmp_path: Path, monkeypatch) -> 
     out = tmp_path / "gate.json"
     assert access_gate.main(["--out", str(out)]) == 3
     assert not out.exists()
+
+
+def test_gate_falls_back_when_json_schema_is_refused() -> None:
+    import access_gate
+
+    seen: list = []
+
+    def h(req: httpx.Request) -> httpx.Response:
+        if req.url.path.endswith("/models"):
+            return httpx.Response(200, json={"data": [{"id": "DeepSeek-X"}]})
+        body = json.loads(req.content)
+        seen.append(body)
+        if body.get("response_format", {}).get("type") == "json_schema":
+            msg = {"error": {"message": "Model DeepSeek-X does not support JSON schema output mode"}}
+            return httpx.Response(400, json=msg)
+        if body.get("logprobs"):
+            return httpx.Response(200, json=FIX["logprobs"])
+        return httpx.Response(200, json=FIX["extract"])
+
+    gate = access_gate.run_gate(client(h), model=None, clip=None)
+    ext = gate["extraction"]["DeepSeek-X"]
+    assert ext["ok"] and ext["response_mode"] == "json_object" and ext["thinking_off"] == "chat_template_kwargs"
+    assert ext["rejected"][0]["status"] == 400
+    assert "Return only one JSON object" in seen[1]["messages"][0]["content"]
+    assert gate["ladder_candidates"] == ["DeepSeek-X"]
+
+
+def test_china_token_factory_host_counts_as_amd_operated() -> None:
+    assert Config("k", "https://developer.amd.com.cn/radeon/api/v1").on_amd

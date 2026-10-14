@@ -3,8 +3,9 @@
     uv run python scripts/access_gate.py [--model ID] [--clip data/human/hero/H-01.wav]
 
 Probes (each one receipted): GET /models · one JSON-schema extraction with thinking off (falls back to the /no_think
-soft switch if chat_template_kwargs is rejected) · token log-probs on chat · usage token counts · rate-limit headers ·
-an audio route, and whether it accepts a decoding `prompt`. Writes bench/results/access-gate.json.
+soft switch if chat_template_kwargs is rejected), per instruct model, falling back from server-enforced JSON schema to
+JSON mode to prompt-only · token log-probs on chat · usage token counts · rate-limit headers · an audio route, and
+whether it accepts a decoding `prompt`. Writes bench/results/access-gate.json.
 
 Without credentials it writes nothing and exits 3: the key is created by a human, never invented here.
 """
@@ -14,6 +15,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import time
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -21,7 +23,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from referee import coverage, grounding  # noqa: E402
-from sayagain.amd_client import MissingCredentials, NotAuditing, TokenFactory, load_config  # noqa: E402
+from sayagain.amd_client import RESPONSE_MODES, MissingCredentials, NotAuditing, TokenFactory, load_config  # noqa: E402
 
 OUT = ROOT / "bench" / "results" / "access-gate.json"
 RECEIPTS = ROOT / "bench" / "results" / "receipts" / "access-gate.jsonl"
@@ -41,38 +43,63 @@ def _err(e: NotAuditing) -> dict:
     return {"ok": False, "reason": e.reason, "status": e.status, "body": e.body}
 
 
+def _reasoning_tokens(usage: dict | None) -> int | None:
+    if not usage:
+        return None
+    det = usage.get("completion_tokens_details") or {}
+    return det.get("reasoning_tokens", usage.get("reasoning_tokens"))
+
+
+def _kwarg_rejected(e: NotAuditing) -> bool:
+    body = e.body.lower()
+    return e.status == 400 and any(
+        k in body for k in ("chat_template", "enable_thinking", "extra_forbidden", "extra inputs")
+    )
+
+
 def probe_extraction(tf: TokenFactory, model: str) -> dict:
-    """One structured extraction on the hero read-back; thinking off via chat_template_kwargs, else /no_think."""
-    for mode in ("chat_template_kwargs", "no_think"):
-        tf.thinking_off = mode
-        try:
-            obj, rec = tf.extract_spans(HERO_RB, model)
-        except NotAuditing as e:
-            if e.status == 400 and mode == "chat_template_kwargs":
-                continue  # the server rejected the kwarg: try the soft switch
-            return {"thinking_off": mode, **_err(e)}
-        out: dict = {
-            "ok": True,
-            "thinking_off": mode,
-            "schema_valid": rec.params.get("schema_valid"),
-            "think_block_stripped": rec.params.get("think_block_stripped"),
-            "latency_s": rec.latency_s,
-            "usage": rec.usage,
-            "request_id": rec.request_id,
-            "output": obj,
-        }
-        if rec.params.get("schema_valid"):
+    """One extraction of the hero read-back per model: the strongest output mode the model accepts
+    (server-enforced JSON schema, else JSON mode, else prompt-only), thinking off (chat_template_kwargs, else the
+    /no_think soft switch). Records every rejection, schema validity, grounding, latency and reasoning tokens."""
+    rejected: list[dict] = []
+    for mode in RESPONSE_MODES:
+        for think in ("chat_template_kwargs", "no_think"):
+            tf.thinking_off = think
             try:
-                g = grounding.ground(HERO_RB, obj)
-                coverage.check(HERO_RB, g)
-                out["grounded"] = True
-            except (grounding.GroundingError, coverage.CoverageError) as e:
-                out["grounded"], out["grounding_error"] = False, str(e)
-        return out
-    return {"ok": False, "reason": "thinking could not be turned off"}
+                obj, rec = tf.extract_spans(HERO_RB, model, response_mode=mode)
+            except NotAuditing as e:
+                rejected.append({"mode": mode, "thinking_off": think, **_err(e)})
+                if _kwarg_rejected(e):
+                    continue  # only the thinking kwarg was refused: retry this mode with the soft switch
+                if e.status == 400:
+                    break  # this output mode is refused: next mode
+                return {"ok": False, "rejected": rejected}
+            out: dict = {
+                "ok": True,
+                "response_mode": mode,
+                "thinking_off": think,
+                "schema_valid": rec.params.get("schema_valid"),
+                "think_block_stripped": rec.params.get("think_block_stripped"),
+                "reasoning_tokens": _reasoning_tokens(rec.usage),
+                "latency_s": rec.latency_s,
+                "usage": rec.usage,
+                "request_id": rec.request_id,
+                "output": obj,
+                "rejected": rejected,
+            }
+            if rec.params.get("schema_valid"):
+                try:
+                    g = grounding.ground(HERO_RB, obj)
+                    coverage.check(HERO_RB, g)
+                    out["grounded"] = True
+                except (grounding.GroundingError, coverage.CoverageError) as e:
+                    out["grounded"], out["grounding_error"] = False, str(e)
+            return out
+    return {"ok": False, "rejected": rejected}
 
 
-def probe_logprobs(tf: TokenFactory, model: str) -> dict:
+def probe_logprobs(tf: TokenFactory, model: str, thinking_off: str = "chat_template_kwargs") -> dict:
+    tf.thinking_off = thinking_off
     try:
         _, raw, rec = tf.chat(
             model, [{"role": "user", "content": "Reply with the single word: copy"}], logprobs=True, max_tokens=8
@@ -118,7 +145,14 @@ def recommend_branch(gate: dict) -> str:
     return "B or C — no audio route on the Token Factory; depends on the notebook GPU check (human)"
 
 
-def run_gate(tf: TokenFactory, *, model: str | None, clip: Path | None) -> dict:
+TRANSIENT = ("rate limited", "timeout", "network error", "server error")
+
+
+def _transient(ext: dict) -> bool:
+    return not ext.get("ok") and any(r.get("reason") in TRANSIENT for r in ext.get("rejected", [])[-1:])
+
+
+def run_gate(tf: TokenFactory, *, model: str | None, clip: Path | None, retry_after_s: float | None = None) -> dict:
     gate: dict = {
         "run_at": datetime.now(UTC).isoformat(timespec="seconds"),
         "host": tf.config.host,
@@ -131,11 +165,35 @@ def run_gate(tf: TokenFactory, *, model: str | None, clip: Path | None) -> dict:
     except NotAuditing as e:
         gate["models"] = _err(e)
         return gate
-    llm = model or (gate["models"]["instruct"] or gate["models"]["all"] or [None])[0]
-    gate["probe_model"] = llm
-    if llm:
-        gate["extraction"] = probe_extraction(tf, llm)
-        gate["logprobs"] = probe_logprobs(tf, llm)
+    probe = [model] if model else gate["models"]["instruct"]
+    gate["extraction"] = {}
+    gate["logprobs"] = {}
+    for m in probe:
+        ext = probe_extraction(tf, m)
+        gate["extraction"][m] = ext
+        gate["logprobs"][m] = probe_logprobs(tf, m, ext.get("thinking_off", "chat_template_kwargs"))
+    # one retry pass for models that only failed on the rate limit or a timeout (not on a refusal)
+    transient = [
+        m for m in probe if _transient(gate["extraction"][m]) or gate["logprobs"][m].get("reason") in TRANSIENT
+    ]
+    if transient and retry_after_s is not None:
+        time.sleep(retry_after_s)
+        for m in transient:
+            if _transient(gate["extraction"][m]):
+                gate["extraction"][m] = {**probe_extraction(tf, m), "retried": True}
+            if gate["logprobs"][m].get("reason") in TRANSIENT:
+                gate["logprobs"][m] = {
+                    **probe_logprobs(tf, m, gate["extraction"][m].get("thinking_off", "chat_template_kwargs")),
+                    "retried": True,
+                }
+    limits = {
+        r.get("body", "") for e in gate["extraction"].values() for r in e.get("rejected", []) if r.get("status") == 429
+    }
+    if limits:
+        gate["rate_limit_note"] = sorted(limits)[0][:200]
+    gate["ladder_candidates"] = sorted(
+        m for m, e in gate["extraction"].items() if e.get("ok") and e.get("schema_valid") and e.get("grounded")
+    )
     audio = gate["models"]["audio"]
     if audio and clip is not None and clip.exists():
         gate["asr"] = probe_asr(tf, audio[0], clip)
@@ -153,15 +211,17 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--model", help="instruct model id to probe (default: first instruct model listed)")
     ap.add_argument("--clip", type=Path, default=ROOT / "data" / "human" / "hero" / "H-01.wav")
     ap.add_argument("--out", type=Path, default=OUT)
+    ap.add_argument("--interval", type=float, default=3.2, help="seconds between calls (limit: 20 / minute)")
+    ap.add_argument("--retry-after", type=float, default=65.0, help="cool-down before re-probing rate-limited models")
     args = ap.parse_args(argv)
     try:
         cfg = load_config()
     except MissingCredentials as e:
         print(f"SKIPPED: {e}. A human creates the Token Factory key; nothing was written.", file=sys.stderr)
         return 3
-    tf = TokenFactory(cfg, receipts_path=RECEIPTS)
+    tf = TokenFactory(cfg, receipts_path=RECEIPTS, min_interval_s=args.interval)
     try:
-        gate = run_gate(tf, model=args.model, clip=args.clip)
+        gate = run_gate(tf, model=args.model, clip=args.clip, retry_after_s=args.retry_after)
     finally:
         tf.close()
     args.out.parent.mkdir(parents=True, exist_ok=True)

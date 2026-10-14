@@ -5,19 +5,737 @@
   },
   "branch": "B or C \u2014 no audio route on the Token Factory; depends on the notebook GPU check (human)",
   "extraction": {
-    "body": "{\"error\":{\"message\":\"Model DeepSeek-V4-Flash does not support JSON schema output mode\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":null}}",
-    "ok": false,
-    "reason": "rejected (400)",
-    "status": 400,
-    "thinking_off": "no_think"
+    "DeepSeek-V4-Flash": {
+      "grounded": true,
+      "latency_s": 3.174,
+      "ok": true,
+      "output": {
+        "commands": [
+          {
+            "action_span": "closing",
+            "line_span": "line Bravo",
+            "state_span": null,
+            "tag_span": "two-oh-eight"
+          }
+        ],
+        "kind": "readback",
+        "retracted_spans": []
+      },
+      "reasoning_tokens": 0,
+      "rejected": [
+        {
+          "body": "{\"error\":{\"message\":\"Model DeepSeek-V4-Flash does not support JSON schema output mode\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":null}}",
+          "mode": "json_schema",
+          "ok": false,
+          "reason": "rejected (400)",
+          "status": 400,
+          "thinking_off": "chat_template_kwargs"
+        }
+      ],
+      "request_id": "0fecd191d01f428696428ddc1d33b2e5",
+      "response_mode": "json_object",
+      "schema_valid": true,
+      "think_block_stripped": false,
+      "thinking_off": "chat_template_kwargs",
+      "usage": {
+        "completion_tokens": 57,
+        "completion_tokens_details": {
+          "audio_tokens": 0,
+          "image_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "cost": 4.97e-05,
+        "cost_details": {
+          "audio_input_cost": null,
+          "cache_write_input_cost": 0,
+          "cached_input_cost": 0,
+          "image_input_cost": null,
+          "image_output_cost": null,
+          "input_cost": 3.374e-05,
+          "output_cost": 1.596e-05,
+          "request_cost": 0,
+          "total_cost": 4.97e-05,
+          "upstream_inference_completions_cost": 1.596e-05,
+          "upstream_inference_cost": 4.97e-05,
+          "upstream_inference_prompt_cost": 3.374e-05,
+          "web_search_cost": 0
+        },
+        "prompt_tokens": 241,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cache_write_tokens": 0,
+          "cached_tokens": 0,
+          "image_tokens": 0,
+          "video_tokens": 0
+        },
+        "reasoning_tokens": 0,
+        "total_tokens": 298
+      }
+    },
+    "DeepSeek-V4-Flash-Vision-Exp": {
+      "grounded": true,
+      "latency_s": 3.18,
+      "ok": true,
+      "output": {
+        "commands": [
+          {
+            "action_span": "closing",
+            "line_span": "line Bravo",
+            "state_span": null,
+            "tag_span": "two-oh-eight"
+          }
+        ],
+        "kind": "readback",
+        "retracted_spans": []
+      },
+      "reasoning_tokens": 0,
+      "rejected": [
+        {
+          "body": "{\"error\":{\"message\":\"Model DeepSeek-V4-Flash-Vision-Exp does not support JSON schema output mode\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":null}}",
+          "mode": "json_schema",
+          "ok": false,
+          "reason": "rejected (400)",
+          "status": 400,
+          "thinking_off": "chat_template_kwargs"
+        }
+      ],
+      "request_id": "9d481138456d4b63b29a02d71509ed20",
+      "response_mode": "json_object",
+      "schema_valid": true,
+      "think_block_stripped": false,
+      "thinking_off": "chat_template_kwargs",
+      "usage": {
+        "completion_tokens": 57,
+        "completion_tokens_details": {
+          "audio_tokens": 0,
+          "image_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "cost": 4.97e-05,
+        "cost_details": {
+          "audio_input_cost": null,
+          "cache_write_input_cost": 0,
+          "cached_input_cost": 0,
+          "image_input_cost": null,
+          "image_output_cost": null,
+          "input_cost": 3.374e-05,
+          "output_cost": 1.596e-05,
+          "request_cost": 0,
+          "total_cost": 4.97e-05,
+          "upstream_inference_completions_cost": 1.596e-05,
+          "upstream_inference_cost": 4.97e-05,
+          "upstream_inference_prompt_cost": 3.374e-05,
+          "web_search_cost": 0
+        },
+        "prompt_tokens": 241,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cache_write_tokens": 0,
+          "cached_tokens": 0,
+          "image_tokens": 0,
+          "video_tokens": 0
+        },
+        "reasoning_tokens": 0,
+        "total_tokens": 298
+      }
+    },
+    "DeepSeek-V4.1-Flash": {
+      "grounded": true,
+      "latency_s": 2.6316,
+      "ok": true,
+      "output": {
+        "commands": [
+          {
+            "action_span": "closing",
+            "line_span": "line Bravo",
+            "state_span": null,
+            "tag_span": "two-oh-eight"
+          }
+        ],
+        "kind": "readback",
+        "retracted_spans": []
+      },
+      "reasoning_tokens": 0,
+      "rejected": [
+        {
+          "body": "{\"error\":{\"message\":\"Model DeepSeek-V4.1-Flash does not support JSON schema output mode\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":null}}",
+          "mode": "json_schema",
+          "ok": false,
+          "reason": "rejected (400)",
+          "status": 400,
+          "thinking_off": "chat_template_kwargs"
+        }
+      ],
+      "request_id": "9f568db84f6f4b70bb4cc4cded4019d1",
+      "response_mode": "json_object",
+      "schema_valid": true,
+      "think_block_stripped": false,
+      "thinking_off": "chat_template_kwargs",
+      "usage": {
+        "completion_tokens": 57,
+        "completion_tokens_details": {
+          "audio_tokens": 0,
+          "image_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "cost": 9.968e-05,
+        "cost_details": {
+          "audio_input_cost": null,
+          "cache_write_input_cost": 0,
+          "cached_input_cost": 0,
+          "image_input_cost": null,
+          "image_output_cost": null,
+          "input_cost": 6.776e-05,
+          "output_cost": 3.192e-05,
+          "request_cost": 0,
+          "total_cost": 9.968e-05,
+          "upstream_inference_completions_cost": 3.192e-05,
+          "upstream_inference_cost": 9.968e-05,
+          "upstream_inference_prompt_cost": 6.776e-05,
+          "web_search_cost": 0
+        },
+        "prompt_tokens": 242,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cache_write_tokens": 0,
+          "cached_tokens": 0,
+          "image_tokens": 0,
+          "video_tokens": 0
+        },
+        "reasoning_tokens": 0,
+        "total_tokens": 299
+      }
+    },
+    "GLM-5.3-Flash": {
+      "grounded": true,
+      "latency_s": 9.0113,
+      "ok": true,
+      "output": {
+        "commands": [
+          {
+            "action_span": "Copy",
+            "line_span": "line Bravo",
+            "state_span": "closing",
+            "tag_span": "two-oh-eight"
+          }
+        ],
+        "kind": "instruction",
+        "retracted_spans": []
+      },
+      "reasoning_tokens": 0,
+      "rejected": [
+        {
+          "body": "{\"error\":{\"message\":\"Model GLM-5.3-Flash does not support JSON schema output mode\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":null}}",
+          "mode": "json_schema",
+          "ok": false,
+          "reason": "rejected (400)",
+          "status": 400,
+          "thinking_off": "chat_template_kwargs"
+        }
+      ],
+      "request_id": "chatcmpl-mkrx6sHqvbwhdcTTyi9ChjMqnD9SLpcHztXv3mAQ",
+      "response_mode": "json_object",
+      "schema_valid": true,
+      "think_block_stripped": false,
+      "thinking_off": "chat_template_kwargs",
+      "usage": {
+        "completion_tokens": 51,
+        "completion_tokens_details": {
+          "audio_tokens": 0,
+          "image_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "cost": 9.464e-05,
+        "cost_details": {
+          "audio_input_cost": null,
+          "cache_write_input_cost": 0,
+          "cached_input_cost": 0,
+          "image_input_cost": null,
+          "image_output_cost": null,
+          "input_cost": 6.608e-05,
+          "output_cost": 2.856e-05,
+          "request_cost": 0,
+          "total_cost": 9.464e-05,
+          "upstream_inference_completions_cost": 2.856e-05,
+          "upstream_inference_cost": 9.464e-05,
+          "upstream_inference_prompt_cost": 6.608e-05,
+          "web_search_cost": 0
+        },
+        "prompt_tokens": 236,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cache_write_tokens": 0,
+          "cached_tokens": 0,
+          "created_cache_tokens": 0,
+          "image_tokens": 0,
+          "multimodal_tokens": null,
+          "video_tokens": 0
+        },
+        "total_tokens": 287
+      }
+    },
+    "Gemma-4-31B-IT": {
+      "latency_s": 11.8486,
+      "ok": true,
+      "output": {
+        "_content": "{\"//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////",
+        "_invalid": "not JSON"
+      },
+      "reasoning_tokens": 0,
+      "rejected": [
+        {
+          "body": "{\"error\":{\"message\":\"Model Gemma-4-31B-IT does not support JSON schema output mode\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":null}}",
+          "mode": "json_schema",
+          "ok": false,
+          "reason": "rejected (400)",
+          "status": 400,
+          "thinking_off": "chat_template_kwargs"
+        }
+      ],
+      "request_id": "d57243c0bd96468e91d442bb87b67b00",
+      "response_mode": "json_object",
+      "schema_valid": false,
+      "think_block_stripped": false,
+      "thinking_off": "chat_template_kwargs",
+      "usage": {
+        "completion_tokens": 512,
+        "completion_tokens_details": {
+          "audio_tokens": 0,
+          "image_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "cost": 3.60577e-05,
+        "cost_details": {
+          "audio_input_cost": null,
+          "cache_write_input_cost": 0,
+          "cached_input_cost": 1.827e-07,
+          "image_input_cost": null,
+          "image_output_cost": null,
+          "input_cost": 3.5e-08,
+          "output_cost": 3.584e-05,
+          "request_cost": 0,
+          "total_cost": 3.60577e-05,
+          "upstream_inference_completions_cost": 3.584e-05,
+          "upstream_inference_cost": 3.6057700000000005e-05,
+          "upstream_inference_prompt_cost": 2.177e-07,
+          "web_search_cost": 0
+        },
+        "prompt_tokens": 262,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cache_write_tokens": 0,
+          "cached_tokens": 261,
+          "image_tokens": 0,
+          "video_tokens": 0
+        },
+        "reasoning_tokens": 0,
+        "total_tokens": 774
+      }
+    },
+    "MiniCPM-V-4.7-1B": {
+      "latency_s": 1.939,
+      "ok": true,
+      "output": {
+        "kind": "readback",
+        "readback": "Copy, closing two-oh-eight, line Bravo.",
+        "retracted_spans": [
+          "two-oh-eight"
+        ]
+      },
+      "reasoning_tokens": 0,
+      "rejected": [
+        {
+          "body": "{\"error\":{\"message\":\"Model MiniCPM-V-4.7-1B does not support JSON schema output mode\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":null}}",
+          "mode": "json_schema",
+          "ok": false,
+          "reason": "rejected (400)",
+          "status": 400,
+          "thinking_off": "chat_template_kwargs"
+        }
+      ],
+      "request_id": "3a1e1de8a68c47169f05d1daeff9bd37",
+      "response_mode": "json_object",
+      "schema_valid": false,
+      "think_block_stripped": false,
+      "thinking_off": "chat_template_kwargs",
+      "usage": {
+        "completion_tokens": 51,
+        "completion_tokens_details": {
+          "audio_tokens": 0,
+          "image_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "cost": 5.5244e-06,
+        "cost_details": {
+          "audio_input_cost": null,
+          "cache_write_input_cost": 0,
+          "cached_input_cost": 1.344e-07,
+          "image_input_cost": null,
+          "image_output_cost": null,
+          "input_cost": 1.82e-06,
+          "output_cost": 3.57e-06,
+          "request_cost": 0,
+          "total_cost": 5.5244e-06,
+          "upstream_inference_completions_cost": 3.57e-06,
+          "upstream_inference_cost": 5.5244e-06,
+          "upstream_inference_prompt_cost": 1.9544e-06,
+          "web_search_cost": 0
+        },
+        "prompt_tokens": 244,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cache_write_tokens": 0,
+          "cached_tokens": 192,
+          "image_tokens": 0,
+          "video_tokens": 0
+        },
+        "reasoning_tokens": 0,
+        "total_tokens": 295
+      }
+    },
+    "MiniCPM-V-4.7-35B-A3B": {
+      "grounded": true,
+      "latency_s": 5.0425,
+      "ok": true,
+      "output": {
+        "commands": [
+          {
+            "action_span": "closing",
+            "line_span": "line Bravo",
+            "state_span": null,
+            "tag_span": "two-oh-eight"
+          }
+        ],
+        "kind": "readback",
+        "retracted_spans": []
+      },
+      "reasoning_tokens": 0,
+      "rejected": [
+        {
+          "body": "{\"error\":{\"message\":\"Model MiniCPM-V-4.7-35B-A3B does not support JSON schema output mode\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":null}}",
+          "mode": "json_schema",
+          "ok": false,
+          "reason": "rejected (400)",
+          "status": 400,
+          "thinking_off": "chat_template_kwargs"
+        }
+      ],
+      "request_id": "c4012babe30642d3aed89c3709939757",
+      "response_mode": "json_object",
+      "schema_valid": true,
+      "think_block_stripped": false,
+      "thinking_off": "chat_template_kwargs",
+      "usage": {
+        "completion_tokens": 51,
+        "completion_tokens_details": {
+          "audio_tokens": 0,
+          "image_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "cost": 5.5244e-06,
+        "cost_details": {
+          "audio_input_cost": null,
+          "cache_write_input_cost": 0,
+          "cached_input_cost": 1.344e-07,
+          "image_input_cost": null,
+          "image_output_cost": null,
+          "input_cost": 1.82e-06,
+          "output_cost": 3.57e-06,
+          "request_cost": 0,
+          "total_cost": 5.5244e-06,
+          "upstream_inference_completions_cost": 3.57e-06,
+          "upstream_inference_cost": 5.5244e-06,
+          "upstream_inference_prompt_cost": 1.9544e-06,
+          "web_search_cost": 0
+        },
+        "prompt_tokens": 244,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cache_write_tokens": 0,
+          "cached_tokens": 192,
+          "image_tokens": 0,
+          "video_tokens": 0
+        },
+        "reasoning_tokens": 0,
+        "total_tokens": 295
+      }
+    },
+    "MiniCPM5-2B": {
+      "grounded": true,
+      "latency_s": 0.8868,
+      "ok": true,
+      "output": {
+        "commands": [
+          {
+            "action_span": null,
+            "line_span": "closing two-oh-eight, line Bravo.",
+            "state_span": null,
+            "tag_span": "Copy"
+          }
+        ],
+        "kind": "readback",
+        "retracted_spans": []
+      },
+      "reasoning_tokens": 0,
+      "rejected": [
+        {
+          "body": "{\"error\":{\"message\":\"Model MiniCPM5-2B does not support JSON schema output mode\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":null}}",
+          "mode": "json_schema",
+          "ok": false,
+          "reason": "rejected (400)",
+          "status": 400,
+          "thinking_off": "chat_template_kwargs"
+        }
+      ],
+      "request_id": "chatcmpl-feGDntuCJJJQmYrtzZvVenlMRdODFhDUknQi4wSH",
+      "response_mode": "json_object",
+      "schema_valid": true,
+      "think_block_stripped": false,
+      "thinking_off": "chat_template_kwargs",
+      "usage": {
+        "completion_tokens": 57,
+        "completion_tokens_details": {
+          "audio_tokens": 0,
+          "image_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "cost": 1.2985e-05,
+        "cost_details": {
+          "audio_input_cost": null,
+          "cache_write_input_cost": 0,
+          "cached_input_cost": 0,
+          "image_input_cost": null,
+          "image_output_cost": null,
+          "input_cost": 8.995e-06,
+          "output_cost": 3.99e-06,
+          "request_cost": 0,
+          "total_cost": 1.2985e-05,
+          "upstream_inference_completions_cost": 3.99e-06,
+          "upstream_inference_cost": 1.2984999999999998e-05,
+          "upstream_inference_prompt_cost": 8.995e-06,
+          "web_search_cost": 0
+        },
+        "prompt_tokens": 257,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cache_write_tokens": 0,
+          "cached_tokens": 0,
+          "image_tokens": 0,
+          "multimodal_tokens": null,
+          "video_tokens": 0
+        },
+        "total_tokens": 314
+      }
+    },
+    "Qwen3.8-27B": {
+      "grounded": true,
+      "latency_s": 3.0515,
+      "ok": true,
+      "output": {
+        "commands": [
+          {
+            "action_span": "closing",
+            "line_span": "line Bravo",
+            "state_span": null,
+            "tag_span": "two-oh-eight"
+          }
+        ],
+        "kind": "readback",
+        "retracted_spans": []
+      },
+      "reasoning_tokens": 0,
+      "rejected": [
+        {
+          "body": "{\"error\":{\"message\":\"Model Qwen3.8-27B does not support JSON schema output mode\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":null}}",
+          "mode": "json_schema",
+          "ok": false,
+          "reason": "rejected (400)",
+          "status": 400,
+          "thinking_off": "chat_template_kwargs"
+        }
+      ],
+      "request_id": "2364baa708104f348d954d94d26596fa",
+      "response_mode": "json_object",
+      "schema_valid": true,
+      "think_block_stripped": false,
+      "thinking_off": "chat_template_kwargs",
+      "usage": {
+        "completion_tokens": 51,
+        "completion_tokens_details": {
+          "audio_tokens": 0,
+          "image_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "cost": 5.5244e-06,
+        "cost_details": {
+          "audio_input_cost": null,
+          "cache_write_input_cost": 0,
+          "cached_input_cost": 1.344e-07,
+          "image_input_cost": null,
+          "image_output_cost": null,
+          "input_cost": 1.82e-06,
+          "output_cost": 3.57e-06,
+          "request_cost": 0,
+          "total_cost": 5.5244e-06,
+          "upstream_inference_completions_cost": 3.57e-06,
+          "upstream_inference_cost": 5.5244e-06,
+          "upstream_inference_prompt_cost": 1.9544e-06,
+          "web_search_cost": 0
+        },
+        "prompt_tokens": 244,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cache_write_tokens": 0,
+          "cached_tokens": 192,
+          "image_tokens": 0,
+          "video_tokens": 0
+        },
+        "reasoning_tokens": 0,
+        "total_tokens": 295
+      }
+    },
+    "Qwen3.8-Flash-Next": {
+      "grounded": true,
+      "latency_s": 2.9414,
+      "ok": true,
+      "output": {
+        "commands": [
+          {
+            "action_span": "closing",
+            "line_span": "line Bravo",
+            "state_span": null,
+            "tag_span": "two-oh-eight"
+          }
+        ],
+        "kind": "readback",
+        "retracted_spans": []
+      },
+      "reasoning_tokens": 0,
+      "rejected": [
+        {
+          "body": "{\"error\":{\"message\":\"Model Qwen3.8-Flash-Next does not support JSON schema output mode\",\"type\":\"invalid_request_error\",\"param\":null,\"code\":null}}",
+          "mode": "json_schema",
+          "ok": false,
+          "reason": "rejected (400)",
+          "status": 400,
+          "thinking_off": "chat_template_kwargs"
+        }
+      ],
+      "request_id": "cf2266aa9f664234895197c89f84b0bc",
+      "response_mode": "json_object",
+      "schema_valid": true,
+      "think_block_stripped": false,
+      "thinking_off": "chat_template_kwargs",
+      "usage": {
+        "completion_tokens": 76,
+        "completion_tokens_details": {
+          "audio_tokens": 0,
+          "image_tokens": 0,
+          "reasoning_tokens": 0
+        },
+        "cost": 2.90976e-05,
+        "cost_details": {
+          "audio_input_cost": null,
+          "cache_write_input_cost": 0,
+          "cached_input_cost": 5.376e-07,
+          "image_input_cost": null,
+          "image_output_cost": null,
+          "input_cost": 7.28e-06,
+          "output_cost": 2.128e-05,
+          "request_cost": 0,
+          "total_cost": 2.90976e-05,
+          "upstream_inference_completions_cost": 2.128e-05,
+          "upstream_inference_cost": 2.9097599999999997e-05,
+          "upstream_inference_prompt_cost": 7.8176e-06,
+          "web_search_cost": 0
+        },
+        "prompt_tokens": 244,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cache_write_tokens": 0,
+          "cached_tokens": 192,
+          "image_tokens": 0,
+          "video_tokens": 0
+        },
+        "reasoning_tokens": 0,
+        "total_tokens": 320
+      }
+    }
   },
   "host": "developer.amd.com.cn",
   "key_expiry": "not exposed by the API \u2014 check the Token Factory console",
+  "ladder_candidates": [
+    "DeepSeek-V4-Flash",
+    "DeepSeek-V4-Flash-Vision-Exp",
+    "DeepSeek-V4.1-Flash",
+    "GLM-5.3-Flash",
+    "MiniCPM-V-4.7-35B-A3B",
+    "MiniCPM5-2B",
+    "Qwen3.8-27B",
+    "Qwen3.8-Flash-Next"
+  ],
   "logprobs": {
-    "ok": true,
-    "rate_limit_headers": {},
-    "returned": false,
-    "usage_present": true
+    "DeepSeek-V4-Flash": {
+      "ok": true,
+      "rate_limit_headers": {},
+      "retried": true,
+      "returned": false,
+      "usage_present": true
+    },
+    "DeepSeek-V4-Flash-Vision-Exp": {
+      "ok": true,
+      "rate_limit_headers": {},
+      "returned": false,
+      "usage_present": true
+    },
+    "DeepSeek-V4.1-Flash": {
+      "ok": true,
+      "rate_limit_headers": {},
+      "returned": false,
+      "usage_present": true
+    },
+    "GLM-5.3-Flash": {
+      "ok": true,
+      "rate_limit_headers": {},
+      "returned": false,
+      "usage_present": true
+    },
+    "Gemma-4-31B-IT": {
+      "ok": true,
+      "rate_limit_headers": {},
+      "returned": false,
+      "usage_present": true
+    },
+    "MiniCPM-V-4.7-1B": {
+      "ok": true,
+      "rate_limit_headers": {},
+      "returned": false,
+      "usage_present": true
+    },
+    "MiniCPM-V-4.7-35B-A3B": {
+      "ok": true,
+      "rate_limit_headers": {},
+      "returned": false,
+      "usage_present": true
+    },
+    "MiniCPM5-2B": {
+      "ok": true,
+      "rate_limit_headers": {},
+      "returned": false,
+      "usage_present": true
+    },
+    "Qwen3.8-27B": {
+      "ok": true,
+      "rate_limit_headers": {},
+      "returned": false,
+      "usage_present": true
+    },
+    "Qwen3.8-Flash-Next": {
+      "ok": true,
+      "rate_limit_headers": {},
+      "returned": false,
+      "usage_present": true
+    }
   },
   "models": {
     "all": [
@@ -49,10 +767,9 @@
     ]
   },
   "models_request": {
-    "latency_s": 0.7675,
+    "latency_s": 0.7312,
     "rate_limit_headers": {}
   },
-  "on_amd": false,
-  "probe_model": "DeepSeek-V4-Flash",
-  "run_at": "2026-10-13T23:54:39+00:00"
+  "on_amd": true,
+  "run_at": "2026-10-14T00:00:27+00:00"
 }

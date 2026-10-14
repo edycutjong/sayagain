@@ -24,7 +24,16 @@ import httpx
 from referee.schema import SPAN_SCHEMA, SYSTEM_PROMPT, validate_extraction
 
 ENV_PATH = Path.home() / ".config" / "amd-tokenfactory" / "env"
+AMD_DOMAINS = ("amd.com", "amd.com.cn")
+RESPONSE_MODES = ("json_schema", "json_object", "prompt")
 _THINK = re.compile(r"^\s*<think>.*?</think>\s*", re.DOTALL)
+_FENCE = re.compile(r"^```(?:json)?\s*|\s*```$")
+SCHEMA_IN_PROMPT = (
+    "\nReturn only one JSON object, no prose, with exactly these keys: "
+    '{"kind": "instruction"|"readback"|"say_again"|"other", '
+    '"commands": [{"action_span": string|null, "tag_span": string|null, "state_span": string|null, '
+    '"line_span": string|null}], "retracted_spans": [string]}'
+)
 _RATE_HEADERS = (
     "retry-after",
     "x-ratelimit-limit-requests",
@@ -63,8 +72,9 @@ class Config:
 
     @property
     def on_amd(self) -> bool:
-        """The Token Factory is AMD-hosted; anything else is recorded as off-AMD."""
-        return self.host == "amd.com" or self.host.endswith(".amd.com")
+        """Served by an AMD-operated endpoint (amd.com / amd.com.cn). It says where the API is hosted — not which GPU
+        ran the model, which the API does not expose."""
+        return any(self.host == d or self.host.endswith("." + d) for d in AMD_DOMAINS)
 
 
 def _parse_env_file(path: Path) -> dict[str, str]:
@@ -120,11 +130,14 @@ class TokenFactory:
         transport: httpx.BaseTransport | None = None,
         receipts_path: Path | None = None,
         thinking_off: str = "chat_template_kwargs",  # or "no_think" (Qwen3 soft switch), chosen by the access gate
+        min_interval_s: float = 0.0,  # client-side pacing: the Token Factory allows 20 requests / minute per model
     ):
         self.config = config
         self.receipts_path = receipts_path
         self.thinking_off = thinking_off
         self.receipts: list[Receipt] = []
+        self.min_interval_s = min_interval_s
+        self._last_call = 0.0
         self._http = httpx.Client(
             base_url=config.base_url,
             headers={"Authorization": f"Bearer {config.api_key}"},
@@ -157,6 +170,10 @@ class TokenFactory:
         asr_prompt: str | None = None,
         **kw,
     ) -> tuple[httpx.Response, Receipt]:
+        wait = self._last_call + self.min_interval_s - time.monotonic()
+        if wait > 0:
+            time.sleep(wait)
+        self._last_call = time.monotonic()
         started = datetime.now(UTC).isoformat(timespec="milliseconds")
         t0 = time.perf_counter()
 
@@ -224,6 +241,7 @@ class TokenFactory:
         *,
         schema: dict | None = None,
         schema_name: str = "spans",
+        response_mode: str = "json_schema",
         temperature: float = 0.0,
         logprobs: bool = False,
         max_tokens: int = 512,
@@ -236,11 +254,13 @@ class TokenFactory:
             "temperature": temperature,
             "max_tokens": max_tokens,
         }
-        if schema is not None:
+        if schema is not None and response_mode == "json_schema":
             body["response_format"] = {
                 "type": "json_schema",
                 "json_schema": {"name": schema_name, "schema": schema, "strict": True},
             }
+        elif schema is not None and response_mode == "json_object":
+            body["response_format"] = {"type": "json_object"}
         if self.thinking_off == "chat_template_kwargs":
             body["chat_template_kwargs"] = {"enable_thinking": False}
         elif self.thinking_off == "no_think":
@@ -250,7 +270,7 @@ class TokenFactory:
         params = {
             "temperature": temperature,
             "thinking_off": self.thinking_off,
-            "json_schema": schema is not None,
+            "response_mode": response_mode if schema is not None else None,
             "logprobs": logprobs,
             "max_tokens": max_tokens,
         }
@@ -265,11 +285,21 @@ class TokenFactory:
         rec.params["think_block_stripped"] = stripped != content
         return stripped, raw, rec
 
-    def extract_spans(self, transcript: str, model: str, *, temperature: float = 0.0) -> tuple[dict, Receipt]:
-        """The extractor rung: spans of the transcript, in the span schema. Invalid output -> NotAuditing never;
-        it is returned as-is so the referee abstains on it (grounding) and the eval counts it."""
-        msgs = [{"role": "system", "content": SYSTEM_PROMPT}, {"role": "user", "content": f"Transcript: {transcript}"}]
-        content, _, rec = self.chat(model, msgs, schema=SPAN_SCHEMA, temperature=temperature, stage="extract")
+    def extract_spans(
+        self, transcript: str, model: str, *, temperature: float = 0.0, response_mode: str = "json_schema"
+    ) -> tuple[dict, Receipt]:
+        """The extractor rung: spans of the transcript, in the span schema.
+
+        response_mode: "json_schema" (server-enforced), else "json_object" / "prompt" for models that refuse a schema —
+        the schema then travels in the system prompt and is checked locally either way. Invalid output is returned
+        as-is (never repaired) so the referee abstains on it and the eval counts it.
+        """
+        system = SYSTEM_PROMPT if response_mode == "json_schema" else SYSTEM_PROMPT + SCHEMA_IN_PROMPT
+        msgs = [{"role": "system", "content": system}, {"role": "user", "content": f"Transcript: {transcript}"}]
+        content, _, rec = self.chat(
+            model, msgs, schema=SPAN_SCHEMA, temperature=temperature, stage="extract", response_mode=response_mode
+        )
+        content = _FENCE.sub("", content).strip()
         try:
             obj = json.loads(content)
         except json.JSONDecodeError:
