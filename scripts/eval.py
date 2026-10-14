@@ -869,10 +869,11 @@ def report_lines(path: Path) -> list[str]:
             if doc.get("reaudit_of")
             else []
         ),
-        "| Rung | Thinking | False-VERIFIED | No card | Errors flagged [Wilson CI] | MISMATCH-only recall | "
+        "| Rung | Thinking | False-VERIFIED | No card | Not audited | Errors flagged [Wilson CI] | "
+        "MISMATCH-only recall | "
         "False-alarm load [Wilson CI] | Label exact | Ungrounded | Refusal R-01 | Chatter false cards | "
         "Median / 95th-pct latency, s | Source |",
-        "|---|---|---|---|---|---|---|---|---|---|---|---|---|",
+        "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
     ]
     for name, s in groups.items():
         rows = s["rows"]
@@ -883,10 +884,17 @@ def report_lines(path: Path) -> list[str]:
         thinking = (s.get("rung") or {}).get("thinking", "")
         out.append(
             f"| {name} | {thinking} | {h['false_verified']['count']} | {h['missed_no_card']['count']} | "
+            f"{h['not_audited']['k']} | "
             f"{_r(h['errors_flagged'])}{_ci(h['errors_flagged'])} | {_r(h['mismatch_only_recall'])} | "
             f"{_r(h['false_alarm_load'])}{_ci(h['false_alarm_load'])} | {_r(h['label_exact'])} | "
             f"{_r(h.get('ungrounded_rate')) if h.get('ungrounded_rate') else '—'} | {ref} | "
             f"{rows['chatter']['false_cards']} | {lat} | {rel} |"
+        )
+    if any(g["rows"][row]["not_audited"]["k"] for g in groups.values()) and not doc.get("reaudit_of"):
+        out.append("")
+        out.append(
+            "Cards in the *Not audited* column had a failed call (server error, time-out): they count in no rate "
+            "and keep the row from meeting the rule; a re-audit result, where one exists, is listed above."
         )
     out.append("")
     return out
