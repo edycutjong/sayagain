@@ -641,7 +641,7 @@ def cmd_ladder(args) -> int:
     if paid and allowed <= 0:
         print(f"daily spend guard: {snap}", file=sys.stderr)
         return 2
-    budget, pacer = Budget(allowed), Pacer(PACE_S)
+    budget, pacer = Budget(allowed), Pacer(args.pace)
     run = args.run or f"{args.subset}-{datetime.now(UTC).strftime('%Y%m%dT%H%M%SZ')}"
     extra = {"subset": args.subset, "budget_usd": round(allowed, 4), "usage_before": snap}
     if first is not None:
@@ -698,7 +698,7 @@ def cmd_single(args, kind: str) -> int:
     if allowed <= 0:
         print(f"daily spend guard: {snap}", file=sys.stderr)
         return 2
-    budget, pacer = Budget(allowed), Pacer(PACE_S)
+    budget, pacer = Budget(allowed), Pacer(args.pace)
     run = args.run or f"{kind}-{datetime.now(UTC).strftime('%Y%m%dT%H%M%SZ')}"
     meta = metadata(run, cards, {"subset": args.subset, "budget_usd": round(allowed, 4), "usage_before": snap})
     if kind == "ablate-grounding":
@@ -888,6 +888,7 @@ def main(argv: list[str] | None = None) -> int:
         "--budget", type=float, default=0.50, help="USD this run may spend (also capped by the daily guard)"
     )
     ap.add_argument("--run", help="run name (default: subset + UTC time)")
+    ap.add_argument("--pace", type=float, default=PACE_S, help="seconds between call starts (20 RPM per account)")
     ap.add_argument("--reaudit", help="--ladder: re-request only the NOT_AUDITED transcripts of this ladder result")
     ap.add_argument("--write", action="store_true", help="--rescore: rewrite results that differ (offline)")
     ap.add_argument("--reuse", help="--ablate: take the with-grounding side from this ladder result file")
