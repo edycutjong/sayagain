@@ -2,7 +2,7 @@
 
 Provenance **`text·scripted`**: every turn's transcript is the card's script — no audio, no speech-to-text. These rows are the ASR-free ceiling of each rung, not the pre-registered headline (the 0 dB audio row, bench/PROTOCOL.md). Row `held_out` = A2 + H minus the dev slice; `dev` = the dev slice. Every row cites its file.
 
-### ladder-r1-reaudit — `text·scripted`, row `held_out`, 145 cards run, this run spent $0.000875 (bench/results/text/ladder-r1-reaudit.json)
+### ladder-r1-reaudit — `text·scripted`, row `held_out`, 145 cards run, this run's calls cost $0.000876 (sum of `usage.cost` over its receipts; bench/results/text/ladder-r1-reaudit.json)
 
 Re-audit of bench/results/text/ladder-r1.json: only the transcripts that pass could not audit were requested again; latency and cost columns cover those calls only.
 
@@ -14,7 +14,7 @@ Re-audit of bench/results/text/ladder-r1.json: only the transcripts that pass co
 | Qwen3.8-27B | on | 0 | 0 | 0 | 41/41 (100 %) [91.43 % – 100 %] | 37/38 (97.37 %) | 4/48 (8.33 %) [3.29 % – 19.55 %] | 83/89 (93.26 %) | 0/194 (0 %) | ABSTAIN · unknown tag | 0 | 20.2488 / 30.9589 | bench/results/text/ladder-r1-reaudit.json |
 | regex | none | 0 | 0 | 0 | 41/41 (100 %) [91.43 % – 100 %] | 38/38 (100 %) | 0/48 (0 %) [0 % – 7.41 %] | 89/89 (100 %) | — | ABSTAIN · unknown tag | 0 | — | bench/results/text/ladder-r1-reaudit.json |
 
-### ladder-r1 — `text·scripted`, row `held_out`, 145 cards run, this run spent $0.153844 (bench/results/text/ladder-r1.json)
+### ladder-r1 — `text·scripted`, row `held_out`, 145 cards run, this run's calls cost $0.028843 (sum of `usage.cost` over its receipts; bench/results/text/ladder-r1.json)
 
 | Rung | Thinking | False-VERIFIED | No card | Not audited | Errors flagged [Wilson CI] | MISMATCH-only recall | False-alarm load [Wilson CI] | Label exact | Ungrounded | Refusal R-01 | Chatter false cards | Median / 95th-pct latency, s | Source |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -26,7 +26,7 @@ Re-audit of bench/results/text/ladder-r1.json: only the transcripts that pass co
 
 Cards in the *Not audited* column had a failed call (server error, time-out). They stay in the denominators but are never counted as flagged errors or as false alarms — conservative for errors flagged, optimistic for false-alarm load — and they keep the row from meeting the rule; a re-audit result, where one exists, is listed above.
 
-### ablate-grounding-r1-reaudit — `text·scripted`, row `held_out`, 145 cards run, this run spent $0.000209 (bench/results/text/ablate-grounding-r1-reaudit.json)
+### ablate-grounding-r1-reaudit — `text·scripted`, row `held_out`, 145 cards run, this run's calls cost $0.000209 (sum of `usage.cost` over its receipts; bench/results/text/ablate-grounding-r1-reaudit.json)
 
 Re-audit of bench/results/text/ablate-grounding-r1.json: only the transcripts that pass could not audit were requested again; latency and cost columns cover those calls only.
 
@@ -37,7 +37,7 @@ Re-audit of bench/results/text/ablate-grounding-r1.json: only the transcripts th
 
 Cards in the *Not audited* column had a failed call (server error, time-out). They stay in the denominators but are never counted as flagged errors or as false alarms — conservative for errors flagged, optimistic for false-alarm load — and they keep the row from meeting the rule; a re-audit result, where one exists, is listed above.
 
-### llm-judge-r1-reaudit — `text·scripted`, row `held_out`, 145 cards run, this run spent $0.00787 (bench/results/text/llm-judge-r1-reaudit.json)
+### llm-judge-r1-reaudit — `text·scripted`, row `held_out`, 145 cards run, this run's calls cost $0.00187 (sum of `usage.cost` over its receipts; bench/results/text/llm-judge-r1-reaudit.json)
 
 Re-audit of bench/results/text/llm-judge-r1.json: only the transcripts that pass could not audit were requested again; latency and cost columns cover those calls only.
 
@@ -47,7 +47,7 @@ Re-audit of bench/results/text/llm-judge-r1.json: only the transcripts that pass
 
 Cards in the *Not audited* column had a failed call (server error, time-out). They stay in the denominators but are never counted as flagged errors or as false alarms — conservative for errors flagged, optimistic for false-alarm load — and they keep the row from meeting the rule; a re-audit result, where one exists, is listed above.
 
-### dev-r1 — `text·scripted`, row `dev`, 40 cards run, this run spent $0.009858 (bench/results/text/dev-r1.json)
+### dev-r1 — `text·scripted`, row `dev`, 40 cards run, this run's calls cost $0.009858 (sum of `usage.cost` over its receipts; bench/results/text/dev-r1.json)
 
 | Rung | Thinking | False-VERIFIED | No card | Not audited | Errors flagged [Wilson CI] | MISMATCH-only recall | False-alarm load [Wilson CI] | Label exact | Ungrounded | Refusal R-01 | Chatter false cards | Median / 95th-pct latency, s | Source |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|

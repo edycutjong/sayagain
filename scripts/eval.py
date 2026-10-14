@@ -259,7 +259,14 @@ def chatter_metrics(cards: list[dict]) -> dict:
 def receipt_metrics(receipts: list[dict]) -> dict:
     final = [r for r in receipts if r.get("ok")]
     lat = [r["latency_s"] for r in final]
-    cost = sum(r.get("cost_usd") or 0.0 for r in receipts)
+
+    def _cost(r: dict) -> float:  # older receipts carry the cost only inside `usage`
+        c = r.get("cost_usd")
+        if c is None and isinstance(r.get("usage"), dict):
+            c = r["usage"].get("cost")
+        return float(c) if isinstance(c, int | float) and not isinstance(c, bool) else 0.0
+
+    cost = sum(_cost(r) for r in receipts)
     toks = [r.get("usage") or {} for r in final]
     rt = [r.get("reasoning_tokens") for r in final if r.get("reasoning_tokens") is not None]
     return {
@@ -675,6 +682,7 @@ def cmd_ladder(args) -> int:
         "smallest_rung_meeting_rule": headline,
         "rungs": results,
     }
+    out["calls_cost_usd"] = _run_cost(results)
     path = OUT / f"{run}.json"
     write_json(path, out)
     print(json.dumps({n: _brief(s) for n, s in results.items()}, indent=1))
@@ -750,8 +758,9 @@ def cmd_single(args, kind: str) -> int:
         **meta,
         "kind": kind,
         "finished_at": datetime.now(UTC).isoformat(timespec="seconds"),
-        "spent_usd": round(budget.spent, 6),
+        "spent_usd": round(budget.spent, 6),  # the budget guard's tally (placeholder for cost-less calls)
         "results": res,
+        "calls_cost_usd": _run_cost(res),  # what the calls cost: sum of `usage.cost` over the receipts
     }
     path = OUT / f"{run}.json"
     write_json(path, out)
@@ -824,6 +833,9 @@ def cmd_rescore(args) -> int:
                 summary.update({k: new[k] for k in keys})
                 summary["rescored"] = {"at": datetime.now(UTC).isoformat(timespec="seconds"), "git_head": git_head()}
                 changed = True
+        if args.write and groups and doc.get("calls_cost_usd") != _run_cost(groups):
+            doc["calls_cost_usd"] = _run_cost(groups)
+            changed = True
         if changed:
             if doc.get("rungs"):
                 order = [n for n in doc.get("ladder_order", []) if n in groups]
@@ -851,6 +863,14 @@ def _ci(w: dict | None) -> str:
     return f" [{lo} % – {hi} %]"
 
 
+def _run_cost(groups: dict) -> float:
+    """What the run's own calls cost, from the receipts' `usage.cost` (`calls.cost_usd`); reused groups excluded.
+    The result file's `spent_usd` is the budget guard's tally, which charges a placeholder for calls without a cost."""
+    return round(
+        sum((g.get("calls") or {}).get("cost_usd") or 0.0 for g in groups.values() if not g.get("reused_from")), 6
+    )
+
+
 def report_lines(path: Path) -> list[str]:
     doc = json.loads(path.read_text(encoding="utf-8"))
     row = "dev" if doc.get("subset") == "dev" else "held_out"
@@ -858,7 +878,8 @@ def report_lines(path: Path) -> list[str]:
     groups = doc.get("rungs") or doc.get("results") or {}
     out = [
         f"### {doc['run']} — `{doc['provenance']}`, row `{row}`, {doc['n_cards']} cards run, "
-        f"this run spent ${doc.get('spent_usd', 0)} ({rel})",
+        f"this run's calls cost ${doc.get('calls_cost_usd', _run_cost(groups))} (sum of `usage.cost` over its "
+        f"receipts; {rel})",
         "",
         *(
             [

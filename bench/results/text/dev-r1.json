@@ -1,5 +1,6 @@
 {
  "budget_usd": 0.15,
+ "calls_cost_usd": 0.009858,
  "canonical_prompt_sha256": "22f984e087c93f49c4c7e7fdcb808a4320b75fb66672de0ecc6e035b52e309fb",
  "cards_sha256": "02766dc15ff4edb90933fbef2ee85b87de7c1fb7b8c3103598d6623416e0f724",
  "finished_at": "2026-10-14T04:58:30+00:00",
@@ -27,7 +28,7 @@
     "calls_failed": 0,
     "calls_ok": 83,
     "completion_tokens": 5333,
-    "cost_usd": 0.0,
+    "cost_usd": 0.0043,
     "hosts": [
      "developer.amd.com.cn"
     ],
@@ -55,8 +56,8 @@
    "mode": "spans",
    "receipts": "bench/results/receipts/text-dev-r1-DeepSeek-V4-Flash.jsonl",
    "rescored": {
-    "at": "2026-10-14T05:10:12+00:00",
-    "git_head": "e34d86c+dirty"
+    "at": "2026-10-14T08:27:56+00:00",
+    "git_head": "1d6a529+dirty"
    },
    "rows": {
     "chatter": {
@@ -253,7 +254,7 @@
     "calls_failed": 0,
     "calls_ok": 83,
     "completion_tokens": 4628,
-    "cost_usd": 0.0,
+    "cost_usd": 0.000389,
     "hosts": [
      "developer.amd.com.cn"
     ],
@@ -281,8 +282,8 @@
    "mode": "spans",
    "receipts": "bench/results/receipts/text-dev-r1-Gemma-4-31B-IT.jsonl",
    "rescored": {
-    "at": "2026-10-14T05:10:12+00:00",
-    "git_head": "e34d86c+dirty"
+    "at": "2026-10-14T08:27:56+00:00",
+    "git_head": "1d6a529+dirty"
    },
    "rows": {
     "chatter": {
@@ -479,7 +480,7 @@
     "calls_failed": 1,
     "calls_ok": 83,
     "completion_tokens": 4276,
-    "cost_usd": 0.0,
+    "cost_usd": 0.001767,
     "hosts": [
      "developer.amd.com.cn"
     ],
@@ -507,8 +508,8 @@
    "mode": "spans",
    "receipts": "bench/results/receipts/text-dev-r1-MiMo-V2.6-Flash.jsonl",
    "rescored": {
-    "at": "2026-10-14T05:10:12+00:00",
-    "git_head": "e34d86c+dirty"
+    "at": "2026-10-14T08:27:56+00:00",
+    "git_head": "1d6a529+dirty"
    },
    "rows": {
     "chatter": {
@@ -712,7 +713,7 @@
     "calls_failed": 0,
     "calls_ok": 83,
     "completion_tokens": 4983,
-    "cost_usd": 0.0,
+    "cost_usd": 0.000439,
     "hosts": [
      "developer.amd.com.cn"
     ],
@@ -740,8 +741,8 @@
    "mode": "spans",
    "receipts": "bench/results/receipts/text-dev-r1-MiniCPM5-2B.jsonl",
    "rescored": {
-    "at": "2026-10-14T05:10:12+00:00",
-    "git_head": "e34d86c+dirty"
+    "at": "2026-10-14T08:27:56+00:00",
+    "git_head": "1d6a529+dirty"
    },
    "rows": {
     "chatter": {
@@ -1000,7 +1001,7 @@
     "calls_failed": 2,
     "calls_ok": 83,
     "completion_tokens": 21272,
-    "cost_usd": 0.0,
+    "cost_usd": 0.002963,
     "hosts": [
      "developer.amd.com.cn"
     ],
@@ -1028,8 +1029,8 @@
    "mode": "spans",
    "receipts": "bench/results/receipts/text-dev-r1-Qwen3.8-27B.jsonl",
    "rescored": {
-    "at": "2026-10-14T05:10:12+00:00",
-    "git_head": "e34d86c+dirty"
+    "at": "2026-10-14T08:27:56+00:00",
+    "git_head": "1d6a529+dirty"
    },
    "rows": {
     "chatter": {
