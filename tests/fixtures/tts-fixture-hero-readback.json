@@ -1,0 +1,6 @@
+{
+ "badge": "tts·fixture",
+ "text": "Copy, closing two-oh-eight, line Bravo.",
+ "made_with": "macOS `say -v Samantha`, 16 kHz mono",
+ "use": "unit-test fixture for the local-whisper backend only; never an eval row"
+}
