@@ -750,10 +750,18 @@ REPORT_BACK_WORDS = frozenset(
 
 
 def report_back(tokens: list[Token], m: Mention) -> bool:
+    """A past participle / Bahasa di- passive right after a report-back word, with no tag after it in its clause."""
     idx = next((i for i, t in enumerate(tokens) if t.start == m.start), None)
-    if idx is None or tokens[idx].norm in IMPERATIVE_ACTIONS:
+    if idx is None:
         return False
-    return any(t.norm in REPORT_BACK_WORDS for t in tokens[max(0, idx - 2) : idx])
+    w = tokens[idx].norm
+    if not (w.endswith("ed") or w.startswith("di")):
+        return False  # "once done, opening valve 208" is a command, not a report-back
+    if not any(t.norm in REPORT_BACK_WORDS for t in tokens[max(0, idx - 2) : idx]):
+        return False
+    clause_end = next((j for j in range(idx + 1, len(tokens)) if tokens[j].pre_punct), len(tokens))
+    tags_after = [t for t in tag_mentions(tokens) if tokens[idx].end <= t.start < (tokens[clause_end - 1].end + 1)]
+    return not tags_after
 
 
 def all_mentions(text: str) -> list[Mention]:

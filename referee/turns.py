@@ -52,6 +52,8 @@ class TurnAnalysis:
     readback_shaped: bool = False  # opens with copy / roger / siap …: never opens a window of its own
     stand_by: bool = False  # "stand by" / "wait one" / "tunggu" with no command: the reply is still coming
     query: bool = False  # "… do you copy?" / "how copy" — the operator asking for the read-back
+    ack_only: bool = False  # "Roger." / "Copy." / "Go ahead." — no command: not a read-back
+    verb_first: bool = False  # opens (after copy / roger / siap) with an action verb that is not a past participle
     opens_window: bool = False
     disagrees: bool = False  # prompted vs unprompted ASR read differently (only with an unprompted pass)
 
@@ -116,6 +118,23 @@ _QUERY = (
     ("konfirmasi",),
     ("acknowledge",),
 )
+
+
+def is_ack_only(text: str) -> bool:
+    toks = al.tokenize(text)
+    if not toks or al.tag_mentions(toks) or al.action_mentions(toks):
+        return False
+    return toks[0].norm in al.READBACK_CUES or al.contains_phrase(toks, ("go", "ahead")) or toks[0].norm == "lanjut"
+
+
+def verb_first(text: str) -> bool:
+    toks = al.tokenize(text)
+    while toks and (toks[0].norm in al.READBACK_CUES or toks[0].norm in _LEAD_FILLERS or toks[0].norm == "that"):
+        toks = toks[1:]
+    if not toks or toks[0].norm not in al.ACTION_WORDS:
+        return False
+    w = toks[0].norm
+    return not (w.endswith("ed") or w.startswith("di"))
 
 
 def has_query(text: str) -> bool:
@@ -207,6 +226,8 @@ def analyze(turn: Turn, registry: Registry) -> TurnAnalysis:
     a.imperative = is_imperative(text)
     a.readback_shaped = readback_shaped(text)
     a.query = has_query(text)
+    a.ack_only = is_ack_only(text)
+    a.verb_first = verb_first(text)
     a.stand_by = is_stand_by(text)
     if turn.alt_transcript is not None:
         a.disagrees = canonical_tuples(text, registry) != canonical_tuples(turn.alt_transcript, registry)
@@ -239,7 +260,18 @@ def analyze(turn: Turn, registry: Registry) -> TurnAnalysis:
 
     cmds: list[CanonCommand] = []
     prev_action: str | None = None
+    all_toks = al.tokenize(text)
+    tag_ms = al.tag_mentions(all_toks)
+    act_ms = al.action_mentions(all_toks)
+    prev_end: int | None = None
     for sp in g.commands:
+        spans_here = [x for x in sp.values() if x is not None]
+        if sp["action_span"] is None and prev_end is not None:
+            here = min(x[0] for x in spans_here)
+            if any(prev_end <= m.start < here for m in act_ms):
+                # a verb sits between the commands but belongs to neither: never inherit across it
+                return fail(R_COVERAGE, "a verb between commands is assigned to none of them")
+        prev_end = max(x[1] for x in spans_here)
         vals: dict = {}
         if sp["action_span"] is not None:
             act = al.canon_action(text[sp["action_span"][0] : sp["action_span"][1]])
@@ -251,7 +283,12 @@ def analyze(turn: Turn, registry: Registry) -> TurnAnalysis:
         prev_action = vals["action"]
         if sp["tag_span"] is not None:
             s, e = sp["tag_span"]
-            m = al.canon_tag(text[s:e], preceding_word=_prev_word(text, s))
+            # read the whole alias mention the span points into: a span cannot shorten "valve two-oh-three-eight"
+            # to "valve two-oh-three", or drop the "pump" of "pump two-oh-three"
+            full = [t for t in tag_ms if t.start < e and s < t.end]
+            if len(full) > 1:
+                return fail(r_unmapped(text[s:e]), "one tag span holds two tags")
+            m = full[0] if full else al.canon_tag(text[s:e], preceding_word=_prev_word(text, s))
             if isinstance(m, al.Unmapped):
                 return fail(r_unmapped(m.word), "tag words not in the alias tables")
             res = registry.resolve(m.prefix, m.suffix or "")
