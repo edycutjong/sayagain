@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SayAgain · every radioed safety read-back, checked</title>
-<meta name="description" content="Checks each read-back of a radioed safety order against the plant registry; wrong ones go to the shift supervisor. Measured on scripts, no audio yet.">
+<meta name="description" content="Checks each read-back of a radioed safety order against the plant registry; wrong ones go to the shift supervisor. Measured on scripts; no human recording yet.">
 <meta name="theme-color" content="#272A2B">
 <meta name="color-scheme" content="dark">
 <!-- bump og.png?v= whenever og.png changes: platforms cache the card by URL -->
@@ -174,7 +174,7 @@
 <a class="btn ink lg" href="replay/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 3-6.2M4 4v4h4"/><path d="M10 9l5 3-5 3z"/></svg>Open the replay</a>
 </div>
 <div class="receipts" role="group" aria-label="Receipts">
-<p class="lab">Receipts · 89 held-out exchanges · written scripts, no audio yet</p>
+<p class="lab">Receipts · 89 held-out exchanges · written scripts, no human recording yet</p>
 <ul>
 <li data-src="bench/results/text/llm-judge-r1-reaudit.json bench/results/text/ladder-r1-reaudit.json"><b class="num"><span class="was">2</span><span class="arw" aria-hidden="true">→</span><span class="sr"> versus </span><span>0</span></b><span>wrong read-backs passed<br>LLM&nbsp;judge&nbsp;2, referee&nbsp;0</span></li>
 <li data-src="bench/results/text/ladder-r1-reaudit.json"><b class="num"><span data-count="41">41</span>/41</b><span>seeded errors caught, Gemma-4-31B-IT</span></li>
@@ -858,7 +858,7 @@
 <p class="lede">Span extraction, the model’s one job, runs on the AMD Token Factory: it copies out the words that carry the order. Each call leaves a receipt with the gateway host, the model served, the request id and the cost, and every card prints where each stage ran.</p>
 </div>
 <ol class="stages">
-<li class="pending"><p class="st">Speech-to-text</p><p class="where">not measured yet</p><p class="what">Local Whisper is planned and badged with where it ran. The Token Factory lists no transcription model.</p><p class="slot">no audio evaluation in this submission</p></li>
+<li class="pending"><p class="st">Speech-to-text</p><p class="where">not measured on human speech</p><p class="what">Local Whisper, off-AMD, has run only on synthetic speech so far (README, exploratory rows). The Token Factory lists no transcription model.</p><p class="slot">no human-recording evaluation in this submission</p></li>
 <li class="on"><p class="st">Span extraction</p><p class="where">AMD Token Factory · developer.amd.com.cn</p><p class="what">Gemma-4-31B-IT, DeepSeek-V4-Flash, Qwen3.8-27B and MiniCPM5-2B served the ladder; every call has a receipt in <code>bench/results/receipts/</code>.</p></li>
 <li><p class="st">Referee</p><p class="where">local · plain Python</p><p class="what" data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">1.07 ms for card H-01, from the stored run.</p></li>
 <li><p class="st">Supervisor queue</p><p class="where">local · FastAPI</p><p class="what">Server-sent events to the queue page; reviews in SQLite.</p></li>
@@ -891,7 +891,7 @@
 <ul class="pay-facts">
 <li data-src="evidence/sources.json"><b>Buyer.</b> The HSE / K3 manager and the mill manager. Under PP 50/2012 a company with at least 100 workers or a high hazard potential must run SMK3, which is audited; a timestamped record of order, read-back, verdict and supervisor decision can serve as audit evidence.</li>
 <li><b>Wedge.</b> A free 30-day listen-only baseline at one mill: measure the plant’s own read-back error rate, the number nobody has published.</li>
-<li data-src="evidence/sources.json"><b>Privacy.</b> Voice that identifies a person is personal data under Indonesia’s UU PDP 27/2022. Planned for production: run inside the company network, keep audio only for queue cards, score procedures, never people. Today the exchanges carry roles, not names, and no audio has been processed.</li>
+<li data-src="evidence/sources.json"><b>Privacy.</b> Voice that identifies a person is personal data under Indonesia’s UU PDP 27/2022. Planned for production: run inside the company network, keep audio only for queue cards, score procedures, never people. Today the exchanges carry roles, not names, and no human voice has been processed.</li>
 <li data-src="bench/results/text/ladder-r1.json bench/results/text/ladder-r1-reaudit.json"><b>Compute.</b> Gemma-4-31B-IT’s first pass over the shift: 300 calls, 178 answered (the other 122 failed at the gateway: server errors, time-outs and 4 rate-limited attempts), USD 0.000895 at the Token Factory’s price; the re-audit’s 118 calls for the cards they left cost USD 0.000512.</li>
 </ul>
 </div>
@@ -904,13 +904,13 @@
 <p class="lede">SayAgain refuses to clear what it cannot check. So does this page: these are the claims it does not make yet.</p>
 </div>
 <div class="abst">
-<blockquote class="ab"><p class="ab-h">ABSTAIN · honest limit 1</p><p class="ab-q">No recorded speech has been measured. Every result is <code>text·scripted</code>, each rung&#x27;s result on clean written words.</p><cite>build/README.md</cite></blockquote>
+<blockquote class="ab"><p class="ab-h">ABSTAIN · honest limit 1</p><p class="ab-q">No human recording has been measured. The scored rows are <code>text·scripted</code> (each rung&#x27;s result on clean written words) and the exploratory <code>tts·synthetic</code> rows (ElevenLabs voices through the simulated radio path), which are not pre-registered and say nothing about a technician on a real radio.</p><cite>build/README.md</cite></blockquote>
 <blockquote class="ab"><p class="ab-h">ABSTAIN · honest limit 2</p><p class="ab-q">The held-out set is 89 cards, so the intervals are wide: the best model&#x27;s 2/48 false alarms is a 4.17 % rate with a Wilson interval of 1.15 % to 13.98 % (bench/results/text/RESULTS.md).</p><cite>build/README.md</cite></blockquote>
 <blockquote class="ab"><p class="ab-h">ABSTAIN · honest limit 3</p><p class="ab-q">On scripted words the plain regex rung meets the rule with no model, so what a language model adds is unproven until the audio rows exist.</p><cite>build/README.md</cite></blockquote>
 <blockquote class="ab"><p class="ab-h">ABSTAIN · honest limit 4</p><p class="ab-q">The plant, its 120 tags and every exchange are fictional; the error mix is seeded, not sampled from a real site.</p><cite>build/README.md</cite></blockquote>
 </div>
 <div class="pending-wrap">
-<p class="lab">No audio evaluation in this submission</p>
+<p class="lab">No human-recording evaluation in this submission</p>
 <ul class="slots">
 <li><b>Audio row</b><span>errors flagged, false-alarm load and false-VERIFIED on recorded speech at 0 dB</span></li>
 <li><b>Failure case</b><span>−6 dB look-alike pairs: <span class="nw">XV-203</span> vs <span class="nw">XV-208</span>, <span class="nw">P-114</span> vs <span class="nw">P-140</span>, <span class="nw">MOV-31A</span> vs <span class="nw">MOV-31H</span></span></li>
@@ -934,17 +934,17 @@
 <details><summary>A regex already meets the rule. Why a model at all?</summary>
 <p>On clean written words it does: that is our own result, and the page says so. Real speech is not clean: recognition errors, code-switched Bahasa, other people’s phrasing. The audio rows decide whether a model earns its place; if they say it does not, the report will say that.</p></details>
 <details><summary>What happens when the radio is too noisy to hear?</summary>
-<p>On the written-word rows, a failed model call is NOT_AUDITED and an exchange the referee cannot clear reaches a human as ABSTAIN, in amber: listen yourself. How it behaves on noisy audio is not measured in this build; the −6 dB look-alike failure case needs the human recordings (no audio evaluation in this submission).</p></details>
+<p>On the written-word rows, a failed model call is NOT_AUDITED and an exchange the referee cannot clear reaches a human as ABSTAIN, in amber: listen yourself. On noisy audio it has been measured only on synthetic speech (README, exploratory rows); the −6 dB look-alike failure case needs the human recordings (no human-recording evaluation in this submission).</p></details>
 <details><summary>Does SayAgain control anything in the plant?</summary>
 <p>No. It has no write path to the plant. A card leaves the queue only when a supervisor confirms it or dismisses it with a reason.</p></details>
 <details><summary>Isn’t this a way to watch workers?</summary>
-<p data-src="evidence/sources.json">It is planned to check procedures, not people: the exchanges carry roles (operator, field tech), not names, and nothing scores a person. No audio has been processed yet. Voice that identifies a person is personal data under UU PDP 27/2022, so production is planned to run inside the company network, keeping audio only for cards in the queue.</p></details>
+<p data-src="evidence/sources.json">It is planned to check procedures, not people: the exchanges carry roles (operator, field tech), not names, and nothing scores a person. No human voice has been processed yet. Voice that identifies a person is personal data under UU PDP 27/2022, so production is planned to run inside the company network, keeping audio only for cards in the queue.</p></details>
 <details><summary>Don’t radio loggers already do this?</summary>
 <p>They record and transcribe, and some spot keywords. Among the loggers we checked, none documents comparing an instruction with its read-back. Automatic read-back checking exists in air-traffic research (HAAWAII); we have not found it on plant radio.</p></details>
 <details><summary>Why is it called SayAgain?</summary>
 <p>“Say again” is the radio procedure word for “repeat that”. A wrong read-back deserves one; SayAgain makes sure somebody asks for it.</p></details>
 <details><summary>What on this page is real today?</summary>
-<p>Every verdict, trace, receipt and count comes from files in this repository: <code>bench/results/</code>, <code>docs/replay/data/</code>, <code>evidence/</code>. The exchanges are written scripts for a fictional plant (text·scripted); no recording has been measured. Dashed boxes are results that do not exist yet.</p></details>
+<p>Every verdict, trace, receipt and count comes from files in this repository: <code>bench/results/</code>, <code>docs/replay/data/</code>, <code>evidence/</code>. The exchanges are written scripts for a fictional plant (text·scripted); no human recording has been measured. Dashed boxes are results that do not exist yet.</p></details>
 </div>
 </section>
 
