@@ -815,6 +815,7 @@
 <p class="note" data-src="bench/results/text/ladder-r1-reaudit.json"><b>On written words, rung 0 already meets the rule.</b> A frozen regex, no model: 41/41 errors flagged, 0/48 false alarms. Whether that survives real speech, noise and other people’s phrasing is what the audio rows measure.</p>
 <p class="note" data-src="bench/results/text/ablate-grounding-r1-reaudit.json"><b>Grounding is load-bearing.</b> The same model returning values instead of copied words: false alarms 2/48 → 6/48 (one more correct card not audited), in 4 of the 6 turning a spoken pump or motor-valve tag into a valve tag the registry does not have.</p>
 <p class="note" data-src="bench/results/text/llm-judge-r1-reaudit.json"><b>Judging is not the model’s job.</b> Given the whole exchange and no registry, the LLM-as-judge baseline passed 2 wrong read-backs as VERIFIED, both missing the action word, and passed the <span class="nw">XV-205</span> order, a valve the plant does not have.</p>
+<p class="note" data-src="bench/results/tts/RESULTS.md"><b>Through synthetic speech the false alarms come back (exploratory, not the audio row).</b> ElevenLabs voices through a simulated radio, then local Whisper off-AMD: still 0 wrong read-backs passed as VERIFIED in every row, but 16/48 false alarms on the regex rung and 17/48 on Gemma-4-31B-IT, and at −6 dB 26 of 41 seeded errors raised no card. No human recording has been measured.</p>
 </div>
 </section>
 
