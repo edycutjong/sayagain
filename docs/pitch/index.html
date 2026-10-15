@@ -239,7 +239,7 @@
 <div class="lr"><span class="nm">Qwen3.8-27B<small>thinking on · <i class="ra">re-audit</i></small></span><span class="fv" data-src="bench/results/text/ladder-r1-reaudit.json">0</span><span class="cells"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="fa" data-src="bench/results/text/ladder-r1-reaudit.json">4/48</span><span class="mr">over budget</span></div>
 <div class="lr judge"><span class="nm">LLM-as-judge<small>baseline · DeepSeek-V4.1-Flash · no registry</small></span><span class="fv bad" data-src="bench/results/text/llm-judge-r1-reaudit.json">2</span><span class="cells"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="na"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="fa" data-src="bench/results/text/llm-judge-r1-reaudit.json">1/48</span><span class="mr">passed <span class="nw">XV-205</span></span></div>
 </div>
-<p class="ev" data-src="bench/results/text/ladder-r1-reaudit.json bench/results/tts/tts-r1-radio-clean.json"><b>On written words, regex meets the rule too</b>Through synthetic speech (exploratory) it raised <span class="n">16/48 false alarms</span>; audio decides.</p>
+<p class="ev" data-src="bench/results/text/ladder-r1-reaudit.json bench/results/tts/tts-r1-radio-clean.json"><b>On written words, regex meets the rule too</b>Through synthetic speech (exploratory, no added noise) it raised <span class="n">16/48 false alarms</span>; audio decides.</p>
 <aside class="speaker-notes" data-src="bench/results/text/RESULTS.md">The rule was pre-registered before the first model call: the smallest rung with no wrong read-back passed and a false-alarm load the shift can absorb. No rung passed a wrong read-back; the LLM-judge baseline did, twice. Gemma is the only model rung inside the budget, in its re-audit: the first pass left 45 of the 89 held-out cards not audited after gateway errors, and Qwen's first pass left 3. With 48 correct read-backs the interval on Gemma's two false alarms is wide: the 95 percent Wilson interval runs from 1.15 to 13.98 percent. On clean written words the plain regex meets the rule too; the recordings will show whether that survives real speech.</aside>
 </section>
 
@@ -250,7 +250,7 @@
 <h2>Priced per channel. Bought by HSE.</h2>
 <div class="calc" data-src="evidence/sources.json"><p><span class="n">1,318</span><span>mills, Indonesia 2022 (Trase)</span></p><p><span class="n">× 30 %</span><span>addressable*</span></p><p><span class="n">× 6</span><span>channels per mill*</span></p><p><span class="n">× USD 2,400</span><span>per channel-year*</span></p><p class="tot"><span class="n">≈ USD 5.7 M</span><span>a year, mills only (estimate)</span></p><p class="ast">* assumption</p></div>
 <div class="wedge"><p class="wl">Wedge</p><p class="wb">Free <span class="nw">30-day</span> <span class="nw">listen-only</span> baseline</p></div>
-<p class="ev" data-src="evidence/sources.json"><b>Why they buy</b><span class="n">SMK3 audits</span> (PP 50/2012, 100+ workers): this record is built for them. Next, unsized: refineries, mines, ports.</p>
+<p class="ev" data-src="evidence/sources.json"><b>Why they buy</b><span class="n">SMK3 compliance</span> (PP 50/2012, 100+ workers): this record is built for them. Next, unsized: refineries, mines, ports.</p>
 <aside class="speaker-notes">We sell an on-prem licence per monitored radio channel to the HSE or K3 manager, for whom the record can serve as evidence in the SMK3 audit. The wedge is a free thirty-day listen-only baseline at one mill; after Indonesian mills come the Malaysian mills, refineries, mines and ports, none of them sized yet. The mills line alone, from our labelled assumptions, is an estimate of about 5.7 million dollars a year in Indonesia.</aside>
 </section>
 
@@ -321,7 +321,7 @@
 <p class="phone">This deck is 16:9. On a phone, open the <a href="sayagain-pitch-deck.pdf">PDF</a> or turn the phone sideways.</p>
 <div class="notes-panel" id="notesPanel" aria-live="polite"><div class="nt" id="noteText"></div><div class="meta" id="noteMeta"></div></div>
 <div class="overview" id="overview" role="dialog" aria-label="Slide overview"></div>
-<script>window.DECK_VERSION = "built on 111afad · 2026-10-15";</script>
+<script>window.DECK_VERSION = "built on 8d66562 · 2026-10-15";</script>
 <script src="deck.js" defer></script>
 </body>
 </html>

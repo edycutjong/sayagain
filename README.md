@@ -291,4 +291,4 @@ tests/          767 tests, with regression tests from five review rounds (`test_
 
 ## 📄 License
 
-MIT, see [LICENSE](LICENSE).
+MIT, see [LICENSE](LICENSE). Built by one developer working with Claude Code (Anthropic); the evaluation protocol was written down before the first model call.
