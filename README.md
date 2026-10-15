@@ -28,9 +28,10 @@
 
 **Track:** Intelligent Industry · lablab AMD Developer Hackathon ACT III
 
-> **Status: AMD Developer Hackathon ACT III submission (Oct 2026).** Every result below comes from a file in
-> `bench/results/`. No recorded speech has been measured yet: the rows that exist feed the written words of the recording
-> cards to each extractor (`text·scripted`), and are labelled that way everywhere.
+> **Status: AMD Developer Hackathon ACT III submission (Oct 2026).** Built and tested: the referee, span extraction on the
+> AMD Token Factory with a receipt per call, the supervisor queue and its static replay. Measured on the written words of the
+> 145 recording cards (`text·scripted`, 89 held out); no recorded speech has been measured yet. Every result below comes
+> from a file in `bench/results/`.
 
 ## 📸 See it in Action
 
@@ -57,8 +58,8 @@ nobody does.
 
 ### The Solution
 
-SayAgain transcribes both turns and asks a language model to **point at the words** that carry the action, the
-equipment tag and the line. **Plain code** then decides: the words must really be in the transcript, every safety word
+SayAgain takes the transcript of both turns (today: the cards' written words) and asks a language model to **point at the
+words** that carry the action, the equipment tag and the line. **Plain code** then decides: the words must really be in the transcript, every safety word
 must be accounted for, spoken digits and NATO letters become plant tags through alias tables, and a pure function returns
 `VERIFIED`, `MISMATCH`, `NO-READBACK` or `ABSTAIN`. A shift supervisor confirms or dismisses every card. Nothing is ever
 sent to the plant.
@@ -200,7 +201,7 @@ placeholder, a hardware or serving-stack name no receipt backs, or a number its 
 2. The held-out set is 89 cards, so the intervals are wide: the best model's 2/48 false alarms is a 4.17 % rate with a Wilson interval of 1.15 % to 13.98 % (bench/results/text/RESULTS.md).
 3. On scripted words the plain regex rung meets the rule with no model, so what a language model adds is unproven until the audio rows exist.
 4. The plant, its 120 tags and every exchange are fictional; the error mix is seeded, not sampled from a real site.
-5. The first Gemma-4-31B-IT pass left 45 cards not audited; the headline row is a re-audit of those, and the as-run pass is kept next to it (bench/results/text/ladder-r1.json).
+5. The first Gemma-4-31B-IT pass left 45 of the 89 held-out cards not audited; the headline row is a re-audit of those, and the as-run pass is kept next to it (bench/results/text/ladder-r1.json).
 6. Temperature 0 does not make the gateway deterministic; the repeat run agreed on 40/40 cards (bench/results/text/repro-dev-DeepSeek-V4-Flash.json), which is evidence and not a guarantee.
 7. The Token Factory is a hosted API: receipts name the model and host, never a GPU, so no page here claims one (`on_amd` in a receipt means only that the endpoint host is under amd.com or amd.com.cn; the receipts' host is developer.amd.com.cn).
 8. The gateway ignores `logprobs` for the extraction models. Speech-to-text is planned on local Whisper, whose token probabilities can feed the confidence floor, with the disagreement gate between two transcription passes as the fallback; neither has run on a human recording (the Whisper token probabilities and the confidence floor ran only on one synthetic text-to-speech clip, `tts·fixture`, in an opt-in unit test, never in an eval row).
