@@ -95,7 +95,7 @@ flowchart LR
 | Front end | one static page, no framework: `web/` (live) and `docs/replay/` (static export of the same page) |
 | Quality | ruff, pytest, pip-audit, gitleaks; GitHub Actions workflows and CodeQL |
 
-### Build status (2026-10-14)
+### Build status (2026-10-15)
 
 | Part | Where | State |
 |---|---|---|
@@ -171,7 +171,7 @@ transcription will run elsewhere, and every stage will be labelled with where it
 ## 📊 Engineering Rigor
 
 762 tests (`uv run pytest`; one runs only with local Whisper weights), ruff lint and format, `pip-audit` and gitleaks over the
-full history (`make ci`, `make secrets`), CI workflows for the same checks plus CodeQL (none has executed yet, see Testing & CI), and a readiness gate (`scripts/check_submission_readiness.py`) that fails the build on an unfilled
+full history (`make ci`, `make secrets`), the same checks plus CodeQL in GitHub Actions on every push (see Testing & CI), and a readiness gate (`scripts/check_submission_readiness.py`) that fails the build on an unfilled
 placeholder, a hardware or serving-stack name no receipt backs, or a number its cited file does not contain.
 
 ### Attacks defeated
@@ -247,8 +247,9 @@ uv run python scripts/eval.py --rescore   # re-judge every stored model output o
 
 Workflows in `.github/workflows/`: `ci` (quality + security jobs), `gitleaks` (full history), `codeql` (Python and
 JavaScript), `release` (semantic version tag from conventional commits). Dependabot is grouped and monthly; major bumps are ignored for
-Python dependencies. **None of these workflows has executed yet:** every run since the first push failed to start because of a GitHub
-account billing block, not a test failure. The same checks pass locally with `make ci` and `make secrets`.
+Python dependencies. The workflows have run on every push since 2026-10-15 (before that, runs on the private repository could not
+start because of a GitHub account billing block); the CI badge at the top shows the latest run. The same checks run locally with
+`make ci` and `make secrets`.
 
 ## 📁 Project Structure
 
@@ -274,7 +275,7 @@ tests/          762 tests, with regression tests from five review rounds (`test_
 - [ ] Audio rows: local kill test, speech-to-text, headline row and failure case
 - [ ] Blind auditor set
 - [x] Landing page and pitch deck with its PDF (`docs/`)
-- [ ] Demo video
+- [x] Demo video (on the lablab submission page)
 
 ## 📄 License
 
