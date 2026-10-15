@@ -86,7 +86,7 @@ img,svg{display:block}
 .brand{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;border-radius:4px;transition:opacity .18s}
 .brand:hover{opacity:.85}
 .wordmark{font:400 28px/1 var(--font-display);letter-spacing:.03em;text-transform:uppercase}
-.wordmark span{color:var(--ink)}
+.wordmark span{color:var(--after)} /* same split as the README hero and the landing: SAY ink, AGAIN red */
 .top-lab{padding-left:14px;border-left:1px solid var(--rule)}
 .runbox{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;margin-left:auto}
 .mode{font:600 11px/1 var(--font-data);letter-spacing:.14em;text-transform:uppercase;padding:7px 9px;border-radius:2px;border:1px dashed var(--rule);color:var(--mid);white-space:nowrap}

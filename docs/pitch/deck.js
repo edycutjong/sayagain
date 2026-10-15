@@ -9,7 +9,7 @@
   // footers + counters written once, so print and the overview carry them too
   slides.forEach(function (s, i) {
     var f = doc.createElement('div'); f.className = 'foot';
-    f.innerHTML = '<span class="wm">SAYAGAIN</span><span>AMD Developer Hackathon · ACT III</span><span>' + (window.DECK_VERSION || '') + '</span><a class="rel" href="https://github.com/edycutjong/sayagain/releases/latest" data-release><span data-rv>Releases</span></a><span class="ct">' + pad(i + 1) + ' / ' + pad(n) + '</span>';
+    f.innerHTML = '<span class="wm">SAY<span class="ag">AGAIN</span></span><span>AMD Developer Hackathon · ACT III</span><span>' + (window.DECK_VERSION || '') + '</span><a class="rel" href="https://github.com/edycutjong/sayagain/releases/latest" data-release><span data-rv>Releases</span></a><span class="ct">' + pad(i + 1) + ' / ' + pad(n) + '</span>';
     s.appendChild(f);
   });
 

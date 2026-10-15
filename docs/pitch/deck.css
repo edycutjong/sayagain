@@ -42,7 +42,7 @@ h2 .ln{display:block}
 .nw{white-space:nowrap}
 .speaker-notes{display:none}
 .foot{position:absolute;left:120px;right:120px;bottom:40px;display:flex;align-items:baseline;gap:28px;font:400 16px var(--font-data);color:var(--mid)}
-.foot .wm{font:400 22px var(--font-display);letter-spacing:.04em;color:var(--ink)}
+.foot .wm{display:inline-block;font:400 24px var(--font-display);letter-spacing:.04em;color:var(--ink)}
 .foot .ct{margin-left:auto;color:var(--ink)}
 .foot .rel{color:var(--mid);text-decoration:none;border-bottom:1px solid var(--rule)}
 .foot .rel:hover{color:var(--ink)}
@@ -97,6 +97,7 @@ svg.connectors line.amb{stroke:var(--abstain);stroke-dasharray:6 6}
 .s-cover .xc-v{font-size:54px}
 .wm{display:flex;align-items:center;gap:18px;margin:36px 0 0;font:400 46px/1 var(--font-display);letter-spacing:.04em}
 .wm img{width:64px;height:64px}
+.wm .ag{color:var(--after)} /* SAY ink, AGAIN red, like the README hero; >= 24px so it is large text */
 .s-cover h1{margin-top:40px;font-size:96px;line-height:.94;text-wrap:balance}
 .s-cover h1 .g{display:block;color:var(--before)}
 .s-cover h1 .k{display:block;margin-top:.16em;color:var(--ink)}
