@@ -194,17 +194,18 @@
     termTimers.forEach(clearTimeout); termTimers = [];
     var lines = $$('.ln', pre);
     if (!MOTION) { lines.forEach(function (l) { l.hidden = false; }); return; }
-    lines.forEach(function (l) { l.hidden = true; if (l.getAttribute('data-full') === null) l.setAttribute('data-full', l.innerHTML); });
+    // keep each line's original nodes (not an HTML string) so the replay never re-parses markup
+    lines.forEach(function (l) { l.hidden = true; if (!l._full) l._full = Array.prototype.map.call(l.childNodes, function (n) { return n.cloneNode(true); }); });
     pre.scrollTop = 0;
     var t = 200;
     lines.forEach(function (l) {
-      var isCmd = l.classList.contains('cmd'), full = l.getAttribute('data-full');
+      var isCmd = l.classList.contains('cmd'), full = l._full;
       if (isCmd) {
         var txt = l.textContent, n = txt.length;
         termTimers.push(later(function () { l.hidden = false; l.textContent = ''; }, t));
         for (var k = 1; k <= n; k += 4) (function (k) { termTimers.push(later(function () { l.textContent = txt.slice(0, k); pre.scrollTop = pre.scrollHeight; }, t + k * 3)); })(k);
         t += n * 3 + 220;
-        termTimers.push(later(function () { l.innerHTML = full; }, t));
+        termTimers.push(later(function () { l.replaceChildren.apply(l, full.map(function (n) { return n.cloneNode(true); })); }, t));
       } else {
         termTimers.push(later(function () { l.hidden = false; pre.scrollTop = pre.scrollHeight; }, t));
         t += l.classList.contains('com') ? 200 : 34;

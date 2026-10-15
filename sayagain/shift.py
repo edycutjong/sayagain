@@ -95,10 +95,11 @@ def list_runs() -> list[dict]:
 
 
 def _summary(run: str) -> dict:
-    p = RESULTS / f"{run}.json"
-    if not p.exists() or p.parent != RESULTS:
-        raise KeyError(run)
-    return json.loads(p.read_text(encoding="utf-8"))
+    # the file is chosen from the directory listing, never built from the request: no path can escape RESULTS
+    for p in RESULTS.glob("*.json"):
+        if p.stem == run:
+            return json.loads(p.read_text(encoding="utf-8"))
+    raise KeyError(run)
 
 
 def _rung_info(run: str, rung: str) -> dict:
