@@ -97,7 +97,7 @@
 <ul class="xc-badges">
 <li>speaker <b>text·scripted</b></li>
 <li class="amd">extraction <b>Gemma-4-31B-IT · <span class="nw">AMD-hosted API</span></b></li>
-<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">referee <b>local · 0.77 ms</b></li>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">referee <b>local · 1.07 ms</b></li>
 </ul>
 </article>
 <div class="tcard" data-src="evidence/terminal-2026-10-14.log"><p class="tb">zsh · build/</p><p class="tl cmd">jq -r '…' bench/results/text/llm-judge-r1-reaudit.json</p><p class="tl">llm_judge  false-VERIFIED <b class="bad">2</b>  false alarms 1/48</p><p class="tl cmd">jq -r '…' bench/results/text/ladder-r1-reaudit.json</p><p class="tl">Gemma-4-31B-IT  false-VERIFIED 0  false alarms 2/48</p><p class="tl">regex  false-VERIFIED 0  false alarms 0/48</p><p class="tl com"># 3 more rungs, false-VERIFIED 0 on each</p></div>
@@ -213,7 +213,7 @@
 <li>speaker <b>text·scripted</b></li>
 <li>radio <b>none (no audio)</b></li>
 <li class="amd">extraction <b>Gemma-4-31B-IT · <span class="nw">AMD-hosted API</span></b></li>
-<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">referee <b>local · 0.607 ms</b></li>
+<li data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json">referee <b>local · 0.768 ms</b></li>
 </ul>
 </article></div>
 </div>
@@ -222,7 +222,7 @@
 
 <section class="slide s-ladder" data-title="The model ladder" aria-label="Slide 7, the model ladder">
 <p class="lab" data-src="bench/results/text/ladder-r1-reaudit.json">Model ladder · AMD Token Factory · 89 held-out · text·scripted</p>
-<h2 class="h7" data-src="bench/results/text/llm-judge-r1-reaudit.json bench/results/text/ladder-r1-reaudit.json"><b class="bad">2</b><span class="arw" aria-hidden="true">→</span>0 wrong read-backs passed.</h2>
+<h2 class="h7" data-src="bench/results/text/llm-judge-r1-reaudit.json bench/results/text/ladder-r1-reaudit.json"><b class="bad">2</b><span class="arw" aria-hidden="true">→</span><span class="sr"> versus </span>0 wrong read-backs passed.</h2>
 <p class="sub7" data-src="bench/results/text/ladder-r1-reaudit.json">The LLM-as-judge baseline passed 2. Each of the five rungs passed 0.</p>
 <div class="ld render">
 <p class="hd" data-src="bench/results/text/ladder-r1-reaudit.json"><span>rung</span><span>false-VERIFIED</span><span>false alarms on 48 correct read-backs · dashed: 5 % budget</span><span></span><span>rule</span></p>
@@ -312,7 +312,7 @@
 <p class="phone">This deck is 16:9. On a phone, open the <a href="sayagain-pitch-deck.pdf">PDF</a> or turn the phone sideways.</p>
 <div class="notes-panel" id="notesPanel" aria-live="polite"><div class="nt" id="noteText"></div><div class="meta" id="noteMeta"></div></div>
 <div class="overview" id="overview" role="dialog" aria-label="Slide overview"></div>
-<script>window.DECK_VERSION = "built on e35b760 · 2026-10-15";</script>
+<script>window.DECK_VERSION = "built on 12a3866 · 2026-10-15";</script>
 <script src="deck.js" defer></script>
 </body>
 </html>

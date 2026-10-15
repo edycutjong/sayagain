@@ -623,3 +623,6 @@ summary::-webkit-details-marker{display:none}
   .foot{background:#fff;margin-top:40px}
   a{text-decoration:none}
 }
+
+/* a2a r05: text for screen readers only (the "2 → 0" arrow is aria-hidden; without this the name read "20") */
+.sr{position:absolute!important;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
