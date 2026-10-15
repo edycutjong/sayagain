@@ -14,6 +14,12 @@ dependencies = [
     "uvicorn>=0.54.0",
 ]
 
+[project.urls]
+Homepage = "https://sayagain.edycu.dev/"
+Replay = "https://sayagain.edycu.dev/replay/"
+Pitch = "https://sayagain.edycu.dev/pitch/"
+Repository = "https://github.com/edycutjong/sayagain"
+
 [project.optional-dependencies]
 # local Whisper for the kill test only (Mac / CPU); never on the judged path
 killtest = [
