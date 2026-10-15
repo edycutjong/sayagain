@@ -15,7 +15,9 @@
 
   function fit() {
     var W = doc.documentElement.clientWidth, H = doc.documentElement.clientHeight * (body.classList.contains('presenter') ? .78 : 1);
-    stage.style.setProperty('--s', Math.min(W / 1920, H / 1080));
+    var sc = Math.min(W / 1920, H / 1080);
+    stage.style.setProperty('--s', sc);
+    doc.documentElement.style.setProperty('--s', sc); // the window background scales its ruled lines with the slide
     links();
   }
 

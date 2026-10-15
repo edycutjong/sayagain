@@ -19,7 +19,7 @@
   --ease:cubic-bezier(.16,1,.3,1); --land:cubic-bezier(.34,1.3,.64,1);
 }
 *,*::before,*::after{box-sizing:border-box}
-html,body{margin:0;height:100%;background:#1E2021;color:var(--ink);overflow:hidden}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);overflow:hidden}
 body{font:400 28px/1.4 var(--font-body);-webkit-font-smoothing:antialiased}
 ::selection{background:var(--before);color:var(--bg)}
 :focus-visible{outline:3px solid var(--ink);outline-offset:3px}
@@ -341,13 +341,26 @@ body.show-overview .overview{display:grid;grid-template-columns:repeat(4,1fr);ga
 .thumb{position:relative;aspect-ratio:16/9;overflow:hidden;border:2px solid var(--rule);border-radius:6px;background:var(--bg);cursor:pointer;padding:0;font:inherit;color:inherit;text-align:left}
 .thumb:hover{border-color:var(--before)}
 .thumb.cur{border-color:var(--ink)}
-.thumb > .slide{display:flex;transform-origin:0 0;pointer-events:none}
+.thumb > .slide{display:flex;inset:auto;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;pointer-events:none}
 .thumb > b{position:absolute;left:8px;bottom:8px;padding:3px 8px;border-radius:4px;background:rgba(24,26,27,.9);font:500 13px var(--font-data);color:var(--ink)}
 body.debug-contrast .slide *{outline:1px dashed rgba(230,160,25,.5)}
 
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 body.still *{animation:none!important}
 
+/* screen: the slide's paint fills the whole window, so a non-16:9 window or a phone shows no bars and no seam.
+   Ruled lines are scaled by --s and phased to the slide's top edge; the slide itself is transparent on screen
+   (thumbnails in the overview keep their own paint via .thumb > .slide). */
+@media screen{
+  .viewport{background-color:var(--bg);
+    background-image:radial-gradient(50% 60% at 78% 24%,color-mix(in srgb,var(--desk),var(--ink) 4%) 0,transparent 70%),
+      linear-gradient(180deg,transparent calc(59px*var(--s,1)),rgba(236,230,214,.025) calc(59px*var(--s,1)));
+    background-size:100% 100%,100% calc(60px*var(--s,1));
+    background-position:0 0,0 calc(50% - 540px*var(--s,1));
+    background-repeat:no-repeat,repeat}
+  body.presenter .viewport{background-position:0 0,0 calc(39vh - 540px*var(--s,1))}
+  .stage > .slide{background:transparent}
+}
 @media print{
   @page{size:20in 11.25in;margin:0}
   html,body{height:auto;overflow:visible;background:var(--bg)}
