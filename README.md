@@ -64,7 +64,7 @@ must be accounted for, spoken digits and NATO letters become plant tags through 
 `VERIFIED`, `MISMATCH`, `NO-READBACK` or `ABSTAIN`. A shift supervisor confirms or dismisses every card. Nothing is ever
 sent to the plant.
 
-The referee half of that design exists and is tested today; the speech half waits for the recordings.
+The referee half of that design exists and is tested today; the speech half has run only on synthetic speech and waits for human recordings.
 
 ## 🏗️ Architecture & Tech Stack
 
@@ -114,7 +114,7 @@ flowchart LR
 | Supervisor queue: read-back strip card, confirm, or dismiss with a required reason, "Try the refused one", end-of-shift list (spot-checks, caught on channel, not audited, read-backs with no order heard), receipts per model call | `sayagain/server.py`, `sayagain/shift.py`, `web/` | done, over the stored text runs |
 | Static replay of stored runs (same page, live at [sayagain.edycu.dev/replay/](https://sayagain.edycu.dev/replay/)) | `scripts/export_run.py` → `docs/replay/` | done |
 | Landing page and pitch deck with its PDF, built from the stored results and the sources listed in `evidence/sources.json` (live at [sayagain.edycu.dev](https://sayagain.edycu.dev/)) | `docs/index.html`, `docs/pitch/` | done |
-| Human recordings, audio eval rows | — | not built yet |
+| Human recordings and the pre-registered audio rows | — | not run yet (exploratory synthetic-speech rows: see below) |
 
 ## 🏆 AMD Token Factory Integration
 
@@ -173,7 +173,7 @@ transcription will run elsewhere, and every stage will be labelled with where it
 
 ElevenLabs text-to-speech of the 145 card scripts (two voices; bench/results/tts/manifest.json), through the simulated radio path, transcribed by local Whisper-large-v3 (off-AMD), with spans extracted on the AMD Token Factory (Gemma-4-31B-IT) or by the regex rung (`tts·synthetic`, `scripts/eval_tts.py`). **No human recording has been evaluated.** This run was added after the text rows, is not pre-registered (bench/PROTOCOL.md, Deviations, 2026-10-15) and does not replace the audio row; referee, aliases and thresholds were frozen for it. Scored on the same 89 held-out cards, with the disagreement gate between a prompted and an unprompted Whisper pass. Tables and Whisper WER per card set: bench/results/tts/RESULTS.md.
 
-- **0 false-VERIFIED in every row run:** regex at all four noise levels and Gemma-4-31B-IT at radio without noise and at −6 dB, 0/41 seeded errors each, Wilson interval 0 % to 8.57 % (bench/results/tts/tts-r1-radio-clean.json, bench/results/tts/tts-r1-radio-clean-reaudit3.json, bench/results/tts/tts-r1-radio-p6dB.json, bench/results/tts/tts-r1-radio-0dB.json, bench/results/tts/tts-r1-radio-m6dB-reaudit2.json).
+- **0 false-VERIFIED in every row run:** regex at all four noise levels and Gemma-4-31B-IT at radio without noise and at −6 dB, 0/41 seeded errors each, Wilson interval 0 % to 8.57 % (bench/results/tts/tts-r1-radio-clean.json, bench/results/tts/tts-r1-radio-clean-reaudit3.json, bench/results/tts/tts-r1-radio-p6dB.json, bench/results/tts/tts-r1-radio-0dB.json, bench/results/tts/tts-r1-radio-m6dB.json, bench/results/tts/tts-r1-radio-m6dB-reaudit2.json).
 - **Radio, no noise:** Whisper's word error rate on the held-out cards was 0.87 % (10/1150 words). Regex flagged 39/41 seeded errors with 16/48 false alarms (33.33 %, 21.68 % – 47.46 %; bench/results/tts/tts-r1-radio-clean.json); Gemma, fully audited after three re-audit passes, flagged 39/41 with 17/48 false alarms (35.42 %, 23.43 % – 49.56 %; bench/results/tts/tts-r1-radio-clean-reaudit3.json). On written words the same rungs had 0/48 and 2/48: transcription turns correct read-backs into abstains (spoken digit runs split by commas, the two Whisper passes disagreeing; one regex false alarm, A2-030, is a false MISMATCH instead), so neither rung meets the 5 % false-alarm budget on synthetic speech.
 - **Seeded errors that formed no card at all:** 2/41 at radio without noise on both rungs, where Whisper wrote "for three Bravo" (A2-032) and "tutu, hotel" (A2-097) for the tag in the instruction, so no order was heard (bench/results/tts/tts-r1-radio-clean.json, bench/results/tts/tts-r1-radio-clean-reaudit3.json); 26/41 at −6 dB on both rungs (bench/results/tts/tts-r1-radio-m6dB.json, bench/results/tts/tts-r1-radio-m6dB-reaudit2.json). None was marked VERIFIED, but none raised a live card either; the stricter form of the ladder rule counts them as failures.
 - **Noise sweep, regex rung** (MIMII machine noise before the radio, held-out word error rate): +6 dB 38/41 flagged, 36/48 false alarms, 9.57 % (bench/results/tts/tts-r1-radio-p6dB.json); 0 dB 36/41, 43/48, 51.39 % (bench/results/tts/tts-r1-radio-0dB.json); −6 dB 15/41, 14/48, 85.13 % (bench/results/tts/tts-r1-radio-m6dB.json). Gemma was run at −6 dB only among the noisy levels: 15/41 and 14/48 once fully audited (bench/results/tts/tts-r1-radio-m6dB-reaudit2.json).
