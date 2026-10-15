@@ -17,6 +17,8 @@
   [![License](https://img.shields.io/badge/License-MIT-yellow)](https://opensource.org/licenses/MIT)
   [![CI](https://github.com/edycutjong/sayagain/actions/workflows/ci.yml/badge.svg)](https://github.com/edycutjong/sayagain/actions/workflows/ci.yml)
   [![Release](https://img.shields.io/github/v/release/edycutjong/sayagain)](https://github.com/edycutjong/sayagain/releases)
+  [![Landing page](https://img.shields.io/badge/Landing_page-live-E23B2E)](https://sayagain.edycu.dev/)
+  [![Pitch deck](https://img.shields.io/badge/Pitch_deck-live-272A2B)](https://sayagain.edycu.dev/pitch/)
 
 </div>
 

@@ -267,3 +267,18 @@
   }
   root.classList.add('ready');
 })();
+
+/* GitHub release: every [data-release] link shows the latest tag (e.g. "Release v0.3.3"); offline it still reads "Releases". */
+(function () {
+  var spots = document.querySelectorAll('[data-rv]');
+  if (!spots.length) return;
+  function show(tag) { [].forEach.call(spots, function (e) { e.textContent = 'Release ' + tag; }); }
+  var k = 'sayagain-release', t = null;
+  try { t = sessionStorage.getItem(k); } catch (e) {}
+  if (t) { show(t); return; }
+  if (!window.fetch) return;
+  fetch('https://api.github.com/repos/edycutjong/sayagain/releases/latest', { headers: { Accept: 'application/vnd.github+json' } })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (j) { if (j && j.tag_name) { show(j.tag_name); try { sessionStorage.setItem(k, j.tag_name); } catch (e) {} } })
+    .catch(function () {});
+})();

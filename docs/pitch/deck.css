@@ -44,6 +44,9 @@ h2 .ln{display:block}
 .foot{position:absolute;left:120px;right:120px;bottom:40px;display:flex;align-items:baseline;gap:28px;font:400 16px var(--font-data);color:var(--mid)}
 .foot .wm{font:400 22px var(--font-display);letter-spacing:.04em;color:var(--ink)}
 .foot .ct{margin-left:auto;color:var(--ink)}
+.foot .rel{color:var(--mid);text-decoration:none;border-bottom:1px solid var(--rule)}
+.foot .rel:hover{color:var(--ink)}
+.qr p.small a{color:var(--mid)}
 
 /* the read-back card: same anatomy as the landing and the queue */
 .xcard{position:relative;background:linear-gradient(180deg,var(--panel-hi),var(--panel-lo));border:1px solid var(--rule);border-radius:8px;padding:30px 34px 26px 38px;
