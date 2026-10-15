@@ -331,3 +331,14 @@ def test_chat_sends_reasoning_effort_and_rung_describes_itself() -> None:
         "params_b": 2.0,
         "max_tokens": 99,
     }
+
+
+def test_first_call_never_waits_even_on_a_fresh_machine(monkeypatch) -> None:
+    # time.monotonic() counts from boot: on a CI runner up for less than min_interval_s the
+    # first call used to sleep, because the last-call time started at 0.0.
+    slept: list[float] = []
+    monkeypatch.setattr(amd_client.time, "sleep", slept.append)
+    monkeypatch.setattr(amd_client.time, "monotonic", lambda: 5.0)
+    tf = tf_for(lambda r: httpx.Response(200, json={"data": []}), min_interval_s=1000.0)
+    tf.models()
+    assert slept == []

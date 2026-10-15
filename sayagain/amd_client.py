@@ -159,7 +159,7 @@ class TokenFactory:
         self.receipts: list[Receipt] = []
         self.context: dict = {}  # merged into every receipt this client writes (e.g. {"rung": "Gemma-4-31B-IT"})
         self.min_interval_s = min_interval_s
-        self._last_call = 0.0
+        self._last_call = float("-inf")  # no previous call: the first one never waits, whatever the machine uptime
         self._http = httpx.Client(
             base_url=config.base_url,
             headers={"Authorization": f"Bearer {config.api_key}"},
