@@ -30,8 +30,8 @@
 
 > **Status: AMD Developer Hackathon ACT III submission (Oct 2026).** Built and tested: the referee, span extraction on the
 > AMD Token Factory with a receipt per call, the supervisor queue and its static replay. Measured on the written words of the
-> 145 recording cards (`text·scripted`, 89 held out); no recorded speech has been measured yet. Every result below comes
-> from a file in `bench/results/`.
+> 145 recording cards (`text·scripted`, 89 held out), plus exploratory synthetic-speech rows (`tts·synthetic`, below); no human
+> recording has been measured yet. Every result below comes from a file in `bench/results/`.
 
 ## 📸 See it in Action
 
