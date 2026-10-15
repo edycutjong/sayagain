@@ -1,8 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="SayAgain — checks every radio read-back, spans extracted on the AMD Token Factory: &quot;Close valve two-oh-three, line Bravo.&quot; — &quot;Copy, closing two-oh-three, line Alpha.&quot; Alpha turns red.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="SayAgain — checks every radio read-back, spans extracted on the AMD Token Factory: &quot;Close valve two-oh-three, line Bravo.&quot; — &quot;Copy, closing two-oh-eight, line Bravo.&quot; Two-oh-eight turns red.">
 <!-- STORYBOARD (dur 6s — must equal this file's single master dur)
   0-10%   steady state: the lockout tag, grommet, instruction bars and read-back bars all grey — every read-back unaudited (poster rule)
   10-25%  trigger:      the read-back's waveform pulses in; a scan line drops from the instruction to the read-back   data-story="beat-2"
-  25-55%  mechanism:    "Close valve two-oh-three, line Bravo." — "Copy, closing two-oh-three, line Alpha." Alpha turns red.
+  25-55%  mechanism:    "Close valve two-oh-three, line Bravo." — "Copy, closing two-oh-eight, line Bravo." Two-oh-eight turns red.
           (two grey joins draw; the third join is a red dashed cut; the third read-back field becomes the red block)   data-story="beat-3"
   55-80%  resolution:   the red block holds with one glow breath — the alert persists until a human acts
   80-100% breathe + seam fade: story layer fades 96-100% back to all-grey

@@ -2,7 +2,7 @@
   <img src="docs/assets/icon-animated.svg" alt="SayAgain icon: a lockout tag whose read-back bar turns red when it differs from the instruction" width="144">
   <h1>SayAgain 📻</h1>
   <p><em>Checks every radio read-back of a safety instruction, and sends the wrong ones to a human.</em></p>
-  <img src="docs/assets/readme-hero-animated.svg" alt="SayAgain checks every radio read-back: &quot;Close valve two-oh-three, line Bravo.&quot; — &quot;Copy, closing two-oh-three, line Alpha.&quot; Alpha turns red, and the verdict is made by code." width="1000">
+  <img src="docs/assets/readme-hero-animated.svg" alt="SayAgain checks every radio read-back: &quot;Close valve two-oh-three, line Bravo.&quot; — &quot;Copy, closing two-oh-eight, line Bravo.&quot; Two-oh-eight turns red, and the verdict is made by code." width="1000">
 
   <br/>
 
@@ -24,11 +24,13 @@
 
 **Track:** Intelligent Industry · lablab AMD Developer Hackathon ACT III
 
-> **Status: under construction (AMD Developer Hackathon ACT III, Oct 2026).** Every result below comes from a file in
+> **Status: AMD Developer Hackathon ACT III submission (Oct 2026).** Every result below comes from a file in
 > `bench/results/`. No recorded speech has been measured yet: the rows that exist feed the written words of the recording
 > cards to each extractor (`text·scripted`), and are labelled that way everywhere.
 
 ## 📸 See it in Action
+
+**Live:** [queue replay](https://sayagain.edycu.dev/replay/) · [landing page](https://sayagain.edycu.dev/) · [pitch deck](https://sayagain.edycu.dev/pitch/) — static pages on GitHub Pages, replaying stored runs.
 
 The supervisor queue, replaying a stored run over the 145 recording cards. Red marks only the read-back word that differs from
 the instruction; the card leaves the queue only through **Confirm**, or **Dismiss** (a reason is required).
@@ -61,6 +63,10 @@ The referee half of that design exists and is tested today; the speech half wait
 
 ## 🏗️ Architecture & Tech Stack
 
+<img src="docs/assets/architecture.png" alt="SayAgain architecture: each radio turn's transcript (the card's written words today; a local, off-AMD Whisper speech path not yet run on recorded speech) goes to span extraction on the AMD Token Factory, which writes a receipt per call and fails closed to NOT_AUDITED; a plain-Python referee with no model returns VERIFIED, MISMATCH, NO_READBACK, ABSTAIN or NOT_AUDITED, routes MISMATCH, NO_READBACK and ABSTAIN to the FastAPI + SSE supervisor queue and the rest to the end-of-shift list, and the same stored runs are exported as a static replay on GitHub Pages." width="1000">
+
+<details><summary>The same flow as a Mermaid chart</summary>
+
 ```mermaid
 flowchart LR
     W["one WAV per card"] --> V["VAD: split into turns"]
@@ -73,6 +79,8 @@ flowchart LR
     X -. "a receipt per call" .-> C[("bench/results/receipts")]
     Q --> D["Confirm / Dismiss"]
 ```
+
+</details>
 
 | Layer | Choice |
 |---|---|
@@ -99,8 +107,8 @@ flowchart LR
 | Speech path: one WAV per card → VAD turns → speech-to-text (local Whisper, labelled off-AMD; AMD notebook backend switched off until a notebook GPU is confirmed) → disagreement gate | `sayagain/ingest.py`, `sayagain/asr.py` | unit tests done; Whisper has not yet run on a human recording (only on one `tts·fixture` clip, in an opt-in test) |
 | Local kill test (Whisper-large-v3 on a laptop, off-AMD) | `scripts/kill_test_local.py` | harness ready, waiting for recordings |
 | Supervisor queue: read-back strip card, confirm, or dismiss with a required reason, "Try the refused one", end-of-shift list (spot-checks, caught on channel, not audited, read-backs with no order heard), receipts per model call | `sayagain/server.py`, `sayagain/shift.py`, `web/` | done, over the stored text runs |
-| Static replay of stored runs (same page, GitHub Pages-ready, not published) | `scripts/export_run.py` → `docs/replay/` | done |
-| Landing page and pitch deck with its PDF, built from the stored results and the sources listed in `evidence/sources.json` (GitHub Pages-ready, not published) | `docs/index.html`, `docs/pitch/` | done |
+| Static replay of stored runs (same page, live at [sayagain.edycu.dev/replay/](https://sayagain.edycu.dev/replay/)) | `scripts/export_run.py` → `docs/replay/` | done |
+| Landing page and pitch deck with its PDF, built from the stored results and the sources listed in `evidence/sources.json` (live at [sayagain.edycu.dev](https://sayagain.edycu.dev/)) | `docs/index.html`, `docs/pitch/` | done |
 | Human recordings, audio eval rows | — | not built yet |
 
 ## 🏆 AMD Token Factory Integration
