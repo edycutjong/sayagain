@@ -6,6 +6,7 @@
 
   <br/>
 
+  [![Demo video](https://img.shields.io/badge/Demo-Video-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/6a4IF-iJmxg)
   [![Landing page](https://img.shields.io/badge/Landing-Page-E23B2E?style=for-the-badge)](https://sayagain.edycu.dev/)
   [![Live replay](https://img.shields.io/badge/Live-Replay-ECE6D6?style=for-the-badge)](https://sayagain.edycu.dev/replay/)
   [![Pitch deck](https://img.shields.io/badge/Pitch-Deck-272A2B?style=for-the-badge)](https://sayagain.edycu.dev/pitch/)
@@ -34,6 +35,10 @@
 > recording has been measured yet. Every result below comes from a file in `bench/results/`.
 
 ## 📸 See it in Action
+
+<a href="https://youtu.be/6a4IF-iJmxg"><img src="docs/assets/demo-video-thumb.png" alt="Demo video on YouTube: the H-01 read-back two-oh-eight blocked red under the order two-oh-three, verdict MISMATCH" width="720"></a>
+
+**Demo video:** [youtu.be/6a4IF-iJmxg](https://youtu.be/6a4IF-iJmxg) — narration is a synthetic voice; the screen captures are the real queue and receipts.
 
 **Live:** [queue replay](https://sayagain.edycu.dev/replay/) · [landing page](https://sayagain.edycu.dev/) · [pitch deck](https://sayagain.edycu.dev/pitch/) — static pages on GitHub Pages, replaying stored runs.
 
