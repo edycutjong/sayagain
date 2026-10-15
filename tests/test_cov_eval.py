@@ -105,9 +105,17 @@ def test_pct_interpolates_and_handles_empty() -> None:
 
 def test_receipt_metrics_counts_cost_from_usage_and_flags() -> None:
     rs = [
-        {"ok": True, "latency_s": 1.0, "cost_usd": 0.5, "usage": {"prompt_tokens": 10, "completion_tokens": 2},
-         "reasoning_tokens": 7, "model_served": "m1", "on_amd": True, "host": "h",
-         "params": {"schema_valid": False}},
+        {
+            "ok": True,
+            "latency_s": 1.0,
+            "cost_usd": 0.5,
+            "usage": {"prompt_tokens": 10, "completion_tokens": 2},
+            "reasoning_tokens": 7,
+            "model_served": "m1",
+            "on_amd": True,
+            "host": "h",
+            "params": {"schema_valid": False},
+        },
         {"ok": True, "latency_s": 3.0, "usage": {"cost": 0.25}, "model_served": "m1", "on_amd": True, "host": "h"},
         {"ok": True, "latency_s": 2.0, "usage": {"cost": True}},  # a bool is not a cost
         {"ok": False, "http_status": 429, "usage": "weird", "on_amd": False},
@@ -203,8 +211,16 @@ def test_check_daily_caps_at_guard_and_fails_closed(env) -> None:
 
 def test_stored_extractor_and_reaudit_reuse_only_audited_rows() -> None:
     rows = [
-        {"text": "t1", "obj": {"k": 1}, "not_audited": None, "attempts": 2, "request_id": "r", "client_id": "c",
-         "latency_s": 1.5, "cost_usd": 0.1},
+        {
+            "text": "t1",
+            "obj": {"k": 1},
+            "not_audited": None,
+            "attempts": 2,
+            "request_id": "r",
+            "client_id": "c",
+            "latency_s": 1.5,
+            "cost_usd": 0.1,
+        },
         {"text": "t2", "obj": None, "not_audited": "timeout"},
     ]
     s = ev.stored_extractor(rows)("t2")
@@ -289,8 +305,9 @@ def test_regex_rung_makes_no_call_and_canonical_tag(env, registry) -> None:
     held = s["rows"]["held_out"]
     assert held["false_verified"]["count"] == 0 and held["errors_flagged"]["k"] == 2  # H-01 and H-02 are caught
     assert (ev.OUT / "r2" / "regex.cards.jsonl").exists()
-    c = ev.run_extraction_rung("r2", RUNGS["Gemma-4-31B-IT"], small_cards(), registry, Pacer(0.0), ev.Budget(1.0),
-                               mode="canonical")
+    c = ev.run_extraction_rung(
+        "r2", RUNGS["Gemma-4-31B-IT"], small_cards(), registry, Pacer(0.0), ev.Budget(1.0), mode="canonical"
+    )
     assert c["mode"] == "canonical" and c["cards"].endswith("Gemma-4-31B-IT.canonical.cards.jsonl")
     assert (ev.RECEIPTS / "text-r2-Gemma-4-31B-IT.canonical.jsonl").exists()
 
@@ -498,8 +515,23 @@ def test_ablate_grounding_with_and_without_reuse_and_reaudit(env, capsys) -> Non
 
     # reuse: the with-grounding side is copied from a ladder run on the same cards, no second call
     assert ev.main(ladder("--rungs", "regex,Gemma-4-31B-IT", run="lad")) == 0
-    assert ev.main(["--ablate", "grounding", "--model", "Gemma-4-31B-IT", "--run", "ab2", "--pace", "0",
-                    "--reuse", str(ev.OUT / "lad.json")]) == 0
+    assert (
+        ev.main(
+            [
+                "--ablate",
+                "grounding",
+                "--model",
+                "Gemma-4-31B-IT",
+                "--run",
+                "ab2",
+                "--pace",
+                "0",
+                "--reuse",
+                str(ev.OUT / "lad.json"),
+            ]
+        )
+        == 0
+    )
     ab2 = result("ab2")
     assert ab2["results"]["with_grounding"]["reused_from"] == "bench/results/text/lad.json"
     assert ab2["calls_cost_usd"] == pytest.approx(ab2["results"]["without_grounding"]["calls"]["cost_usd"])
@@ -509,8 +541,12 @@ def test_ablate_grounding_with_and_without_reuse_and_reaudit(env, capsys) -> Non
     bad["cards_sha256"] = "f" * 64
     ev.write_json(ev.OUT / "lad.json", bad)
     capsys.readouterr()
-    assert ev.main(["--ablate", "grounding", "--run", "ab3", "--model", "Gemma-4-31B-IT", "--reuse",
-                    str(ev.OUT / "lad.json")]) == 2
+    assert (
+        ev.main(
+            ["--ablate", "grounding", "--run", "ab3", "--model", "Gemma-4-31B-IT", "--reuse", str(ev.OUT / "lad.json")]
+        )
+        == 2
+    )
     assert "--reuse" in capsys.readouterr().err
 
     # reaudit of the ablation: only failed canonical transcripts are asked again
@@ -519,8 +555,23 @@ def test_ablate_grounding_with_and_without_reuse_and_reaudit(env, capsys) -> Non
     ab4 = result("ab4")
     assert ab4["results"]["without_grounding"]["rows"]["held_out"]["not_audited"]["k"] == 0
     server = env(Server())
-    assert ev.main(["--ablate", "grounding", "--model", "Gemma-4-31B-IT", "--run", "ab5", "--pace", "0",
-                    "--reaudit", str(ev.OUT / "ab4.json")]) == 0
+    assert (
+        ev.main(
+            [
+                "--ablate",
+                "grounding",
+                "--model",
+                "Gemma-4-31B-IT",
+                "--run",
+                "ab5",
+                "--pace",
+                "0",
+                "--reaudit",
+                str(ev.OUT / "ab4.json"),
+            ]
+        )
+        == 0
+    )
     ab5 = result("ab5")
     assert ab5["reaudit_of"] == "bench/results/text/ab4.json"
     assert ab5["results"]["with_grounding"] == ab4["results"]["with_grounding"]
@@ -533,8 +584,21 @@ def test_ablate_grounding_with_and_without_reuse_and_reaudit(env, capsys) -> Non
     doc["subset"] = "dev"
     ev.write_json(ev.OUT / "ab4.json", doc)
     capsys.readouterr()
-    assert ev.main(["--ablate", "grounding", "--model", "Gemma-4-31B-IT", "--run", "ab6", "--reaudit",
-                    str(ev.OUT / "ab4.json")]) == 2
+    assert (
+        ev.main(
+            [
+                "--ablate",
+                "grounding",
+                "--model",
+                "Gemma-4-31B-IT",
+                "--run",
+                "ab6",
+                "--reaudit",
+                str(ev.OUT / "ab4.json"),
+            ]
+        )
+        == 2
+    )
     assert "other cards" in capsys.readouterr().err
 
 
@@ -654,8 +718,16 @@ def test_report_helpers_edge_cases() -> None:
     assert ev._r({"k": 1, "n": 2, "rate": 0.5}) == "1/2 (50 %)"
     assert ev._ci(None) == "" and ev._ci({"ci95": None}) == ""
     assert ev._ci({"ci95": [0.1, 0.5]}) == " [10 % – 50 %]"
-    assert ev._run_cost({"a": {"calls": {"cost_usd": 0.2}}, "b": {"calls": None}, "c": {"reused_from": "x",
-            "calls": {"cost_usd": 9}}}) == 0.2
+    assert (
+        ev._run_cost(
+            {
+                "a": {"calls": {"cost_usd": 0.2}},
+                "b": {"calls": None},
+                "c": {"reused_from": "x", "calls": {"cost_usd": 9}},
+            }
+        )
+        == 0.2
+    )
 
 
 def test_report_dev_row_without_cost_key(env, capsys, tmp_path) -> None:

@@ -34,7 +34,9 @@ def test_env_file_skips_blank_comment_and_keyless_lines(tmp_path: Path, monkeypa
     monkeypatch.delenv("AMD_TF_API_KEY", raising=False)
     monkeypatch.delenv("AMD_TF_BASE_URL", raising=False)
     env = tmp_path / "env"
-    env.write_text("\n# comment\njunk line without equals\nAMD_TF_API_KEY='abc'\nAMD_TF_BASE_URL=https://h.amd.com/v1/\n")
+    env.write_text(
+        "\n# comment\njunk line without equals\nAMD_TF_API_KEY='abc'\nAMD_TF_BASE_URL=https://h.amd.com/v1/\n"
+    )
     cfg = load_config(env)
     assert (cfg.api_key, cfg.base_url) == ("abc", "https://h.amd.com/v1")
 

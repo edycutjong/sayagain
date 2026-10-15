@@ -50,9 +50,7 @@ def test_load_receipts_skips_invalid_json_and_reads_valid(tmp_path: Path) -> Non
 def test_extraction_on_amd_without_receipt_is_flagged(tmp_path: Path) -> None:
     (tmp_path / "README.md").write_text("Extraction runs on AMD.\n", encoding="utf-8")
     findings = cr.check_files(tmp_path, "build")
-    assert [(f.check, f.text) for f in findings] == [
-        ("amd-stage", "extraction on AMD with no AMD extraction receipt")
-    ]
+    assert [(f.check, f.text) for f in findings] == [("amd-stage", "extraction on AMD with no AMD extraction receipt")]
 
 
 def test_collect_tests_parses_pytest_output(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
