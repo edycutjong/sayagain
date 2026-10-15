@@ -477,8 +477,9 @@
     if (vk === 'VERIFIED' && !spot) word = TICK + ' VERIFIED';
     var rf = rowFields(c), r = S.reviews[c.exchange_id];
     return '<li><button type="button" class="' + cls + '" data-id="' + esc(c.exchange_id) + '"' +
-      (S.selected === c.exchange_id ? ' aria-current="true"' : '') + ' aria-label="' + esc(c.exchange_id + ', ' + (c.verdict ? c.verdict.label : 'no card')) + '">' +
-      '<span class="t">' + clock(c._at) + '</span><span class="c">' + esc((S.meta && S.meta.channel || 'CH-01').replace('CH-', '')) + '</span>' +
+      (S.selected === c.exchange_id ? ' aria-current="true"' : '') + '>' +
+      // the visible cells are the accessible name (WCAG 2.5.3 label in name); the id is read first, not shown
+      '<span class="sr">' + esc(c.exchange_id) + ', </span><span class="t">' + clock(c._at) + '</span><span class="c">' + esc((S.meta && S.meta.channel || 'CH-01').replace('CH-', '')) + '</span>' +
       '<span class="vw">' + word + (r ? '<span class="stamp">' + esc(r.decision) + '</span>' : '') + '</span>' +
       '<span class="f">' + rf.f + '</span><span class="ft">' + rf.ft + '</span></button></li>';
   }
@@ -535,8 +536,8 @@
         return (c.caught || []).map(function (k) {
           var diff = String(k.label).split(' · ').slice(1).join(' · ');
           var m = /^(\w+): (.+) ≠ (.+)$/.exec(diff);
-          return '<li><button type="button" class="row v-CAUGHT" data-id="' + esc(id) + '" aria-label="' + esc(id + ', caught on channel: ' + k.label) + '">' +
-            '<span class="t">' + clock(c._at) + '</span><span class="c">' + esc((S.meta.channel || 'CH-01').replace('CH-', '')) + '</span>' +
+          return '<li><button type="button" class="row v-CAUGHT" data-id="' + esc(id) + '">' +
+            '<span class="sr">' + esc(id) + ', caught on channel: </span><span class="t">' + clock(c._at) + '</span><span class="c">' + esc((S.meta.channel || 'CH-01').replace('CH-', '')) + '</span>' +
             '<span class="vw">CAUGHT<span class="stamp">on air</span></span><span class="f">' + esc(m ? m[1] : diff.split(':')[0]) + '</span>' +
             '<span class="ft">' + (m ? '<span class="ok nw">' + esc(m[2]) + '\u00a0→</span> <b>' + esc(m[3]) + '</b>' : '<b>' + esc(diff || k.label) + '</b>') +
             ' · then ' + esc(VERDICT_WORD[vkey(c)] || '') + '</span></button></li>';

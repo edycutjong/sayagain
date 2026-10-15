@@ -87,7 +87,7 @@ nav.jump{display:none}
 .brand{display:inline-flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
 .brand span{font:400 25px/1 var(--font-display);letter-spacing:.03em}
 .brand img{width:34px;height:34px}
-.brand .ag{color:var(--after)} /* same split as the README hero: "Say" in ink, "Again" in MISMATCH red (a wordmark: WCAG 1.4.3 logotype exception) */
+.brand .ag{color:var(--after)} /* >= 24px everywhere: large text, so the hero red passes the 3:1 AA bar (3.4:1) */ /* same split as the README hero: "Say" in ink, "Again" in MISMATCH red (a wordmark: WCAG 1.4.3 logotype exception) */
 .nav nav{margin-left:auto}
 .links{display:flex;gap:4px;margin:0;padding:0;list-style:none}
 .links a{display:block;padding:8px 10px;border-radius:4px;color:var(--mid);text-decoration:none;font-size:16px;white-space:nowrap}
@@ -472,7 +472,7 @@ summary::-webkit-details-marker{display:none}
 .foot ul a{color:var(--mid);font-size:15px}
 .foot ul a:hover{color:var(--ink)}
 .foot .ver{grid-column:1 / -1;font:400 12.5px var(--font-data);color:var(--mid)}
-.foot .brand span{font-size:20px}
+.foot .brand span{font-size:24px}
 .foot .brand img{width:28px;height:28px}
 
 /* ---------- responsive ---------- */
@@ -542,7 +542,7 @@ summary::-webkit-details-marker{display:none}
   .t-lg{display:none}.t-sm{display:inline}
   .tape{display:none}
   .gh-btn{padding:0 12px}
-  .brand span{font-size:22px}
+  .brand span{font-size:24px}
   .fold{padding-top:28px}
   h1{font-size:clamp(32px,9.2vw,46px)}
   .lede{font-size:18px}
