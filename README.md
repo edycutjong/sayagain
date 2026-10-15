@@ -182,7 +182,7 @@ ElevenLabs text-to-speech of the 145 card scripts (two voices; bench/results/tts
 
 ## 📊 Engineering Rigor
 
-762 tests (`uv run pytest`; one runs only with local Whisper weights), ruff lint and format, `pip-audit` and gitleaks over the
+767 tests (`uv run pytest`; one runs only with local Whisper weights), ruff lint and format, `pip-audit` and gitleaks over the
 full history (`make ci`, `make secrets`), the same checks plus CodeQL in GitHub Actions on every push (see Testing & CI), and a readiness gate (`scripts/check_submission_readiness.py`) that fails the build on an unfilled
 placeholder, a hardware or serving-stack name no receipt backs, or a number its cited file does not contain.
 
@@ -274,7 +274,7 @@ docs/           landing page, pitch deck + PDF (docs/pitch), static replay (docs
 evidence/       recorded terminal sessions, live-call receipts, the external sources the pages quote
 bench/          pre-registered protocol and every stored result and receipt
 data/           fictional plant registry and the 145 recording cards
-tests/          762 tests, with regression tests from five review rounds (`test_review_round*.py`)
+tests/          767 tests, with regression tests from five review rounds (`test_review_round*.py`)
 ```
 
 ## 🗺️ Roadmap

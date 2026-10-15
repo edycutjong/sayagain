@@ -55,6 +55,7 @@ source = ["referee", "sayagain", "scripts"]
 
 [tool.coverage.report]
 show_missing = true
+fail_under = 100
 skip_covered = true
 exclude_also = [
     'if __name__ == "__main__":',
