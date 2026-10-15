@@ -1,0 +1,533 @@
+{
+ "asr": {
+  "backend": "local-whisper",
+  "language": "auto",
+  "model": "openai/whisper-large-v3",
+  "on_amd": false
+ },
+ "audio_gate": "disagreement",
+ "badges": [
+  "tts·synthetic",
+  "radio·simulated",
+  "asr·off-AMD"
+ ],
+ "budget_usd": 0.0,
+ "calls_cost_usd": 0.0,
+ "canonical_prompt_sha256": "22f984e087c93f49c4c7e7fdcb808a4320b75fb66672de0ecc6e035b52e309fb",
+ "cards_sha256": "02766dc15ff4edb90933fbef2ee85b87de7c1fb7b8c3103598d6623416e0f724",
+ "condition": "radio-0dB",
+ "finished_at": "2026-10-15T03:05:32+00:00",
+ "git_head": "72af1d4+dirty",
+ "headline_note": "the pre-registered headline is the 0 dB HUMAN audio row (bench/PROTOCOL.md §5): not run",
+ "judge_prompt_sha256": "0b62697b10c61b979446141b1635c1ddc16f80aa9677d7548cf4e6da39d31927",
+ "ladder_order": [
+  "regex"
+ ],
+ "n_cards": 145,
+ "noise": "MIMII pump / valve / fan (CC BY-SA 4.0, eval only), scripts/mix.py seed 1018",
+ "provenance": "tts·synthetic",
+ "provenance_note": "EXPLORATORY: ElevenLabs text-to-speech of the card scripts (bench/results/tts/manifest.json) through the simulated radio path, local Whisper-large-v3 (off-AMD), extraction rungs as the text rows; not pre-registered, never the audio row (bench/PROTOCOL.md Deviations, 2026-10-15)",
+ "rule": "0 false-VERIFIED AND false-alarm load <= 5 % (held_out row, tts·synthetic, exploratory)",
+ "run": "tts-r1-radio-0dB",
+ "rungs": {
+  "regex": {
+   "audio_gate": "disagreement",
+   "cache_hits": 20,
+   "calls": null,
+   "cards": "bench/results/tts/tts-r1-radio-0dB/regex.cards.jsonl",
+   "distinct_transcripts": 325,
+   "extractions": "bench/results/tts/tts-r1-radio-0dB/regex.extractions.jsonl",
+   "meets_rule": {
+    "fully_audited": true,
+    "literal": false,
+    "strict": false
+   },
+   "mode": "spans",
+   "receipts": null,
+   "rows": {
+    "chatter": {
+     "false_card_exchanges": [],
+     "false_cards": 0,
+     "n_cards": 15,
+     "n_turns": 30,
+     "per_channel_hour": "not measurable on text rows (no audio duration); measured on the audio rows"
+    },
+    "dev": {
+     "abstain_rate": {
+      "ci95": [
+       0.446,
+       0.7365
+      ],
+      "k": 24,
+      "n": 40,
+      "rate": 0.6
+     },
+     "cards_per_shift_assumption": {
+      "2_errors_per_180": 135.25,
+      "5_errors_per_180": 135.62
+     },
+     "caught_on_channel_detected": {
+      "ci95": null,
+      "k": 0,
+      "n": 0,
+      "rate": null
+     },
+     "errors_flagged": {
+      "ci95": [
+       0.6398,
+       0.965
+      ],
+      "k": 14,
+      "n": 16,
+      "rate": 0.875
+     },
+     "false_alarm_exchanges": [
+      "A2-001: ABSTAIN · audio",
+      "A2-004: MISMATCH · line: missing (expected C)",
+      "A2-010: ABSTAIN · audio",
+      "A2-012: ABSTAIN · audio",
+      "A2-018: ABSTAIN · unknown tag",
+      "A2-019: ABSTAIN · coverage",
+      "KT-01: ABSTAIN · coverage",
+      "KT-02: ABSTAIN · audio",
+      "KT-04: ABSTAIN · audio",
+      "KT-05: ABSTAIN · audio",
+      "KT-06: ABSTAIN · audio",
+      "KT-09: ABSTAIN · coverage",
+      "KT-10: ABSTAIN · audio",
+      "KT-11: NO-READBACK",
+      "KT-14: NO-READBACK",
+      "KT-15: ABSTAIN · coverage",
+      "KT-19: NO-READBACK",
+      "KT-20: ABSTAIN · coverage"
+     ],
+     "false_alarm_load": {
+      "ci95": [
+       0.551,
+       0.88
+      ],
+      "k": 18,
+      "n": 24,
+      "rate": 0.75
+     },
+     "false_verified": {
+      "ci95": [
+       0.0,
+       0.1936
+      ],
+      "count": 0,
+      "exchanges": [],
+      "k": 0,
+      "n": 16,
+      "rate": 0.0
+     },
+     "label_exact": {
+      "ci95": [
+       0.0138,
+       0.165
+      ],
+      "k": 2,
+      "n": 40,
+      "rate": 0.05
+     },
+     "label_misses": [
+      "A2-001: expected 'VERIFIED', got 'ABSTAIN · audio'",
+      "A2-002: expected 'MISMATCH · action: OPEN ≠ CLOSE', got 'ABSTAIN · unknown tag'",
+      "A2-003: expected 'MISMATCH · tag: P-114 ≠ P-140', got 'ABSTAIN · audio'",
+      "A2-004: expected 'VERIFIED', got 'MISMATCH · line: missing (expected C)'",
+      "A2-006: expected 'VERIFIED', got None",
+      "A2-007: expected 'MISMATCH · line: B ≠ D', got 'ABSTAIN · audio'",
+      "A2-008: expected 'MISMATCH · line: missing (expected A)', got 'MISMATCH · command: omitted'",
+      "A2-009: expected 'VERIFIED', got None",
+      "A2-010: expected 'VERIFIED', got 'ABSTAIN · audio'",
+      "A2-012: expected 'VERIFIED', got 'ABSTAIN · audio'",
+      "A2-013: expected 'MISMATCH · tag: P-114 ≠ P-140', got None",
+      "A2-014: expected 'MISMATCH · tag: P-114 ≠ P-140', got 'ABSTAIN · audio'",
+      "A2-015: expected 'MISMATCH · action: START ≠ STOP', got 'ABSTAIN · audio'",
+      "A2-016: expected 'VERIFIED', got None",
+      "A2-017: expected 'MISMATCH · tag: MOV-31H ≠ MOV-31A', got 'ABSTAIN · audio'",
+      "A2-018: expected 'VERIFIED', got 'ABSTAIN · unknown tag'",
+      "A2-019: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "A2-020: expected 'MISMATCH · tag: P-140 ≠ P-114', got 'ABSTAIN · audio'",
+      "KT-01: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "KT-02: expected 'VERIFIED', got 'ABSTAIN · audio'",
+      "KT-03: expected 'MISMATCH · tag: XV-203 ≠ XV-208', got 'ABSTAIN · audio'",
+      "KT-04: expected 'VERIFIED', got 'ABSTAIN · audio'",
+      "KT-05: expected 'VERIFIED', got 'ABSTAIN · audio'",
+      "KT-06: expected 'VERIFIED', got 'ABSTAIN · audio'",
+      "KT-07: expected 'VERIFIED', got None",
+      "KT-08: expected 'MISMATCH · tag: MOV-31A ≠ MOV-31H', got None",
+      "KT-09: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "KT-10: expected 'VERIFIED', got 'ABSTAIN · audio'",
+      "KT-11: expected 'VERIFIED', got 'NO-READBACK'",
+      "KT-12: expected 'VERIFIED', got None",
+      "KT-13: expected 'MISMATCH · tag: P-114 ≠ P-140', got 'ABSTAIN · audio'",
+      "KT-14: expected 'VERIFIED', got 'NO-READBACK'",
+      "KT-15: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "KT-16: expected 'MISMATCH · line: C ≠ B', got 'NO-READBACK'",
+      "KT-17: expected 'VERIFIED', got None",
+      "KT-18: expected 'MISMATCH · tag: XV-203 ≠ XV-208', got 'ABSTAIN · audio'",
+      "KT-19: expected 'VERIFIED', got 'NO-READBACK'",
+      "KT-20: expected 'VERIFIED', got 'ABSTAIN · coverage'"
+     ],
+     "mismatch_only_recall": {
+      "ci95": [
+       0.0374,
+       0.3788
+      ],
+      "k": 2,
+      "n": 15,
+      "rate": 0.1333
+     },
+     "missed_no_card": {
+      "count": 2,
+      "exchanges": [
+       "A2-013",
+       "KT-08"
+      ]
+     },
+     "n_cards": 40,
+     "n_correct": 24,
+     "n_seeded_errors": 16,
+     "not_audited": {
+      "ci95": [
+       0.0,
+       0.0876
+      ],
+      "k": 0,
+      "n": 40,
+      "rate": 0.0
+     },
+     "precision_at_1pct_prevalence": 0.0116,
+     "precision_at_corpus_prevalence": 0.4375
+    },
+    "held_out": {
+     "abstain_rate": {
+      "ci95": [
+       0.5483,
+       0.7425
+      ],
+      "k": 58,
+      "n": 89,
+      "rate": 0.6517
+     },
+     "cards_per_shift_assumption": {
+      "2_errors_per_180": 161.21,
+      "5_errors_per_180": 161.16
+     },
+     "caught_on_channel_detected": {
+      "ci95": [
+       0.2505,
+       0.8418
+      ],
+      "k": 4,
+      "n": 7,
+      "rate": 0.5714
+     },
+     "errors_flagged": {
+      "ci95": [
+       0.7446,
+       0.9468
+      ],
+      "k": 36,
+      "n": 41,
+      "rate": 0.878
+     },
+     "false_alarm_exchanges": [
+      "A2-021: ABSTAIN · coverage",
+      "A2-022: ABSTAIN · unknown tag",
+      "A2-024: NO-READBACK",
+      "A2-025: ABSTAIN · audio",
+      "A2-026: ABSTAIN · audio",
+      "A2-028: ABSTAIN · unknown tag",
+      "A2-035: ABSTAIN · coverage",
+      "A2-036: ABSTAIN · audio",
+      "A2-037: ABSTAIN · coverage",
+      "A2-038: MISMATCH · command: omitted",
+      "A2-040: ABSTAIN · audio",
+      "A2-041: ABSTAIN · audio",
+      "A2-042: ABSTAIN · coverage",
+      "A2-045: ABSTAIN · audio",
+      "A2-047: ABSTAIN · coverage",
+      "A2-048: MISMATCH · command: omitted",
+      "A2-049: MISMATCH · tag: missing (expected XV-243)",
+      "A2-050: MISMATCH · line: missing (expected C)",
+      "A2-051: ABSTAIN · audio",
+      "A2-054: MISMATCH · tag: missing (expected XV-254); line: missing (expected A)",
+      "A2-058: MISMATCH · line: missing (expected B)",
+      "A2-059: ABSTAIN · unknown tag",
+      "A2-060: ABSTAIN · audio",
+      "A2-062: NO-READBACK",
+      "A2-067: ABSTAIN · audio",
+      "A2-070: ABSTAIN · audio",
+      "A2-072: MISMATCH · line: missing (expected B)",
+      "A2-073: ABSTAIN · audio",
+      "A2-077: ABSTAIN · audio",
+      "A2-079: ABSTAIN · coverage",
+      "A2-081: ABSTAIN · audio",
+      "A2-084: ABSTAIN · audio",
+      "A2-087: ABSTAIN · unknown tag",
+      "A2-088: ABSTAIN · unknown tag",
+      "A2-090: ABSTAIN · unknown tag",
+      "A2-094: ABSTAIN · coverage",
+      "A2-095: MISMATCH · command: omitted",
+      "A2-096: MISMATCH · action: missing (expected CLOSE); line: missing (expected B)",
+      "A2-099: ABSTAIN · audio",
+      "A2-100: ABSTAIN · unknown tag",
+      "A2-102: ABSTAIN · audio",
+      "A2-103: ABSTAIN · audio",
+      "A2-104: ABSTAIN · audio"
+     ],
+     "false_alarm_load": {
+      "ci95": [
+       0.7783,
+       0.9547
+      ],
+      "k": 43,
+      "n": 48,
+      "rate": 0.8958
+     },
+     "false_verified": {
+      "ci95": [
+       0.0,
+       0.0857
+      ],
+      "count": 0,
+      "exchanges": [],
+      "k": 0,
+      "n": 41,
+      "rate": 0.0
+     },
+     "label_exact": {
+      "ci95": [
+       0.0313,
+       0.1394
+      ],
+      "k": 6,
+      "n": 89,
+      "rate": 0.0674
+     },
+     "label_misses": [
+      "H-01: expected 'MISMATCH · tag: XV-203 ≠ XV-208', got 'MISMATCH · tag: XV-203 ≠ XV-208; line: missing (expected B)'",
+      "H-02: expected 'MISMATCH · line: B ≠ A', got 'ABSTAIN · audio'",
+      "A2-021: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "A2-022: expected 'VERIFIED', got 'ABSTAIN · unknown tag'",
+      "A2-023: expected 'MISMATCH · line: B ≠ C', got None",
+      "A2-024: expected 'VERIFIED', got 'NO-READBACK'",
+      "A2-025: expected 'VERIFIED', got 'ABSTAIN · audio'",
+      "A2-026: expected 'VERIFIED', got 'ABSTAIN · audio'",
+      "A2-028: expected 'VERIFIED', got 'ABSTAIN · unknown tag'",
+      "A2-029: expected 'MISMATCH · line: missing (expected B)', got 'ABSTAIN · audio'",
+      "A2-030: expected 'VERIFIED', got None",
+      "A2-031: expected 'MISMATCH · line: A ≠ C', got 'ABSTAIN · audio'",
+      "A2-032: expected 'MISMATCH · action: OPEN ≠ CLOSE', got None",
+      "A2-033: expected 'MISMATCH · action: OPEN ≠ CLOSE', got 'ABSTAIN · audio'",
+      "A2-034: expected 'MISMATCH · tag: MOV-31A ≠ MOV-31H', got 'ABSTAIN · audio'",
+      "A2-035: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "A2-036: expected 'VERIFIED', got 'ABSTAIN · audio'",
+      "A2-037: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "A2-038: expected 'VERIFIED', got 'MISMATCH · command: omitted'",
+      "A2-040: expected 'VERIFIED', got 'ABSTAIN · audio'",
+      "A2-041: expected 'VERIFIED', got 'ABSTAIN · audio'",
+      "A2-042: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "A2-043: expected 'MISMATCH · line: C ≠ B', got 'ABSTAIN · unknown tag'",
+      "A2-044: expected 'MISMATCH · action: missing (expected ISOLATE)', got None",
+      "A2-045: expected 'VERIFIED', got 'ABSTAIN · audio'",
+      "A2-046: expected 'MISMATCH · line: A ≠ C', got 'ABSTAIN · audio'",
+      "A2-047: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "A2-048: expected 'VERIFIED', got 'MISMATCH · command: omitted'",
+      "A2-049: expected 'VERIFIED', got 'MISMATCH · tag: missing (expected XV-243)'",
+      "A2-050: expected 'VERIFIED', got 'MISMATCH · line: missing (expected C)'",
+      "A2-051: expected 'VERIFIED', got 'ABSTAIN · audio'",
+      "A2-052: expected 'MISMATCH · command: omitted', got 'ABSTAIN · coverage'",
+      "A2-053: expected 'MISMATCH · line: C ≠ A', got 'ABSTAIN · audio'",
+      "A2-054: expected 'VERIFIED', got 'MISMATCH · tag: missing (expected XV-254); line: missing (expected A)'",
+      "A2-055: expected 'MISMATCH · tag: XV-203 ≠ XV-208', got 'ABSTAIN · audio'",
+      "A2-056: expected 'MISMATCH · line: missing (expected A)', got 'ABSTAIN · coverage'",
+      "A2-057: expected 'VERIFIED', got None",
+      "A2-058: expected 'VERIFIED', got 'MISMATCH · line: missing (expected B)'",
+      "A2-059: expected 'VERIFIED', got 'ABSTAIN · unknown tag'",
+      "A2-060: expected 'VERIFIED', got 'ABSTAIN · audio'",
+      "A2-061: expected 'MISMATCH · line: B ≠ A', got 'ABSTAIN · audio'",
+      "A2-062: expected 'VERIFIED', got 'NO-READBACK'",
+      "A2-063: expected 'MISMATCH · line: C ≠ B', got 'ABSTAIN · audio'",
+      "A2-064: expected 'MISMATCH · tag: P-114 ≠ P-140', got 'NO-READBACK'",
+      "A2-065: expected 'MISMATCH · line: A ≠ B', got 'ABSTAIN · coverage'",
+      "A2-066: expected 'MISMATCH · action: missing (expected START)', got 'ABSTAIN · audio'",
+      "A2-067: expected 'VERIFIED', got 'ABSTAIN · audio'",
+      "A2-068: expected 'MISMATCH · line: D ≠ A', got 'ABSTAIN · coverage'",
+      "A2-069: expected 'MISMATCH · tag: P-140 ≠ P-114', got None",
+      "A2-070: expected 'VERIFIED', got 'ABSTAIN · audio'",
+      "A2-071: expected 'MISMATCH · command: omitted', got 'ABSTAIN · unknown tag'",
+      "A2-072: expected 'VERIFIED', got 'MISMATCH · line: missing (expected B)'",
+      "A2-073: expected 'VERIFIED', got 'ABSTAIN · audio'",
+      "A2-074: expected 'MISMATCH · line: A ≠ C', got 'ABSTAIN · coverage'",
+      "A2-076: expected 'MISMATCH · line: B ≠ C', got 'ABSTAIN · coverage'",
+      "A2-077: expected 'VERIFIED', got 'ABSTAIN · audio'",
+      "A2-078: expected 'MISMATCH · line: missing (expected D)', got 'NO-READBACK'",
+      "A2-079: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "A2-080: expected 'MISMATCH · line: A ≠ D', got 'NO-READBACK'",
+      "A2-081: expected 'VERIFIED', got 'ABSTAIN · audio'",
+      "A2-083: expected 'VERIFIED', got None",
+      "A2-084: expected 'VERIFIED', got 'ABSTAIN · audio'",
+      "A2-085: expected 'MISMATCH · line: B ≠ C', got 'ABSTAIN · audio'",
+      "A2-086: expected 'VERIFIED', got None",
+      "A2-087: expected 'VERIFIED', got 'ABSTAIN · unknown tag'",
+      "A2-088: expected 'VERIFIED', got 'ABSTAIN · unknown tag'",
+      "A2-089: expected 'MISMATCH · tag: P-140 ≠ P-114', got 'ABSTAIN · audio'",
+      "A2-090: expected 'VERIFIED', got 'ABSTAIN · unknown tag'",
+      "A2-092: expected 'MISMATCH · tag: P-140 ≠ P-114', got 'ABSTAIN · audio'",
+      "A2-093: expected 'MISMATCH · command: omitted', got 'MISMATCH · tag: XV-298 ≠ XV-272'",
+      "A2-094: expected 'VERIFIED', got 'ABSTAIN · coverage'",
+      "A2-095: expected 'VERIFIED', got 'MISMATCH · command: omitted'",
+      "A2-096: expected 'VERIFIED', got 'MISMATCH · action: missing (expected CLOSE); line: missing (expected B)'",
+      "A2-097: expected 'MISMATCH · action: OPEN ≠ CLOSE', got None",
+      "A2-098: expected 'MISMATCH · action: ISOLATE ≠ START', got 'ABSTAIN · audio'",
+      "A2-099: expected 'VERIFIED', got 'ABSTAIN · audio'",
+      "A2-100: expected 'VERIFIED', got 'ABSTAIN · unknown tag'",
+      "A2-101: expected 'MISMATCH · action: CLOSE ≠ OPEN', got 'ABSTAIN · audio'",
+      "A2-102: expected 'VERIFIED', got 'ABSTAIN · audio'",
+      "A2-103: expected 'VERIFIED', got 'ABSTAIN · audio'",
+      "A2-104: expected 'VERIFIED', got 'ABSTAIN · audio'",
+      "A2-105: expected 'MISMATCH · tag: XV-203 ≠ XV-208', got 'ABSTAIN · audio'",
+      "A2-107: expected 'MISMATCH · command: omitted', got 'ABSTAIN · audio'"
+     ],
+     "mismatch_only_recall": {
+      "ci95": [
+       0.0417,
+       0.2413
+      ],
+      "k": 4,
+      "n": 38,
+      "rate": 0.1053
+     },
+     "missed_no_card": {
+      "count": 5,
+      "exchanges": [
+       "A2-023",
+       "A2-032",
+       "A2-044",
+       "A2-069",
+       "A2-097"
+      ]
+     },
+     "n_cards": 89,
+     "n_correct": 48,
+     "n_seeded_errors": 41,
+     "not_audited": {
+      "ci95": [
+       0.0,
+       0.0414
+      ],
+      "k": 0,
+      "n": 89,
+      "rate": 0.0
+     },
+     "precision_at_1pct_prevalence": 0.0098,
+     "precision_at_corpus_prevalence": 0.4557
+    },
+    "refusal": [
+     {
+      "exchange_id": "R-01",
+      "expected": "ABSTAIN · unknown tag",
+      "got": "ABSTAIN · unknown tag"
+     }
+    ]
+   },
+   "rung": {
+    "max_tokens": 512,
+    "model": null,
+    "name": "regex",
+    "params_b": 0.0,
+    "reasoning_effort": null,
+    "thinking": "none"
+   },
+   "transcripts": "bench/results/tts/transcripts/radio-0dB.jsonl",
+   "wall_s": 0.8
+  }
+ },
+ "shift_assumption": "180 exchanges per shift, 2-5 real errors",
+ "smallest_rung_meeting_rule": null,
+ "snr": "0dB",
+ "span_prompt_sha256": "b79578f3acc9d4301958637513f2ead0848bf9c2a286a4a1947bc75aa0016d97",
+ "speech_path": "TTS take -> mix.noisy_copy -> radioize -> VAD on the clean take -> Whisper, prompted + unprompted",
+ "spent_usd": 0.0,
+ "started_at": "2026-10-15T03:05:31+00:00",
+ "subset": "all",
+ "transcripts": "bench/results/tts/transcripts/radio-0dB.jsonl",
+ "usage_before": {},
+ "wer": {
+  "all": {
+   "cards": 145,
+   "errors": 780,
+   "ref_words": 1780,
+   "wer": 0.4382
+  },
+  "chatter": {
+   "cards": 15,
+   "errors": 45,
+   "ref_words": 158,
+   "wer": 0.2848
+  },
+  "dev": {
+   "cards": 40,
+   "errors": 144,
+   "ref_words": 462,
+   "wer": 0.3117
+  },
+  "held_out": {
+   "cards": 89,
+   "errors": 591,
+   "ref_words": 1150,
+   "wer": 0.5139
+  },
+  "lang:en": {
+   "cards": 88,
+   "errors": 169,
+   "ref_words": 1030,
+   "wer": 0.1641
+  },
+  "lang:mix": {
+   "cards": 57,
+   "errors": 611,
+   "ref_words": 750,
+   "wer": 0.8147
+  },
+  "refusal": {
+   "cards": 1,
+   "errors": 0,
+   "ref_words": 10,
+   "wer": 0.0
+  },
+  "set:A2": {
+   "cards": 107,
+   "errors": 650,
+   "ref_words": 1366,
+   "wer": 0.4758
+  },
+  "set:C": {
+   "cards": 15,
+   "errors": 45,
+   "ref_words": 158,
+   "wer": 0.2848
+  },
+  "set:H": {
+   "cards": 2,
+   "errors": 3,
+   "ref_words": 20,
+   "wer": 0.15
+  },
+  "set:KT": {
+   "cards": 20,
+   "errors": 82,
+   "ref_words": 226,
+   "wer": 0.3628
+  },
+  "set:R": {
+   "cards": 1,
+   "errors": 0,
+   "ref_words": 10,
+   "wer": 0.0
+  }
+ }
+}

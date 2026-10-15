@@ -1,0 +1,15 @@
+{
+ "badge": "tts·synthetic",
+ "calls_cost_usd_total": 0.002448,
+ "files": [
+  "bench/results/tts/tts-r1-radio-clean.json",
+  "bench/results/tts/tts-r1-radio-clean-reaudit.json",
+  "bench/results/tts/tts-r1-radio-clean-reaudit2.json",
+  "bench/results/tts/tts-r1-radio-clean-reaudit3.json",
+  "bench/results/tts/tts-r1-radio-p6dB.json",
+  "bench/results/tts/tts-r1-radio-0dB.json",
+  "bench/results/tts/tts-r1-radio-m6dB.json",
+  "bench/results/tts/tts-r1-radio-m6dB-reaudit.json",
+  "bench/results/tts/tts-r1-radio-m6dB-reaudit2.json"
+ ]
+}
