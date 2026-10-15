@@ -1,0 +1,2867 @@
+{
+ "badge": "tts·synthetic",
+ "exploratory": true,
+ "note": "synthetic speech, not the pre-registered human recordings (bench/PROTOCOL.md Deviations, 2026-10-15)",
+ "provider": "ElevenLabs text-to-speech API",
+ "model_id": "eleven_multilingual_v2",
+ "voices": {
+  "operator": {
+   "voice_id": "onwK4e9ZLuTAKqWW03F9",
+   "name": "Daniel"
+  },
+  "tech": {
+   "voice_id": "iP95p4xoKVk53GoZ742B",
+   "name": "Chris"
+  }
+ },
+ "voice_settings": {
+  "stability": 0.5,
+  "similarity_boost": 0.75,
+  "style": 0.0,
+  "speed": 1.0,
+  "use_speaker_boost": true
+ },
+ "seed": 1018,
+ "output_format": "mp3_44100_128, decoded and resampled to 16 kHz mono WAV",
+ "layout": {
+  "lead_s": 0.4,
+  "gap_s": 0.9,
+  "tail_s": 0.4,
+  "per_turn_peak": 0.7
+ },
+ "synthesised_on": "2026-10-15",
+ "cards_sha256": "02766dc15ff4edb90933fbef2ee85b87de7c1fb7b8c3103598d6623416e0f724",
+ "n_cards": 145,
+ "chars_in_cards": 13596,
+ "note_chars": "a (voice, text) pair said twice is synthesised once; chars_sent_total = this run + 193 chars sent by an earlier smoke run (H-01, H-02, R-01) whose cached turns this run reused",
+ "audio_committed": false,
+ "cards": [
+  {
+   "exchange_id": "H-01",
+   "chars": 76,
+   "seconds": 7.133,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 37,
+     "seconds": 3.158
+    },
+    {
+     "role": "tech",
+     "chars": 39,
+     "seconds": 2.276
+    }
+   ],
+   "wav_sha256": "2106d0c6c8bcee487eb5fd95365901c1f8c7c034455ac4ae6b960184de4a260f"
+  },
+  {
+   "exchange_id": "H-02",
+   "chars": 76,
+   "seconds": 6.948,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 37,
+     "seconds": 3.158
+    },
+    {
+     "role": "tech",
+     "chars": 39,
+     "seconds": 2.09
+    }
+   ],
+   "wav_sha256": "6ec61040d9d3824344735191c3babe88211c8ad921e01e799fed1d30a4b2f536"
+  },
+  {
+   "exchange_id": "R-01",
+   "chars": 78,
+   "seconds": 6.716,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 38,
+     "seconds": 3.019
+    },
+    {
+     "role": "tech",
+     "chars": 40,
+     "seconds": 1.997
+    }
+   ],
+   "wav_sha256": "aabc46823606f93dac2e728b89b78fa34755fa6183c63291ac4a0ca55f96a194"
+  },
+  {
+   "exchange_id": "A2-001",
+   "chars": 164,
+   "seconds": 15.76,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 50,
+     "seconds": 3.762
+    },
+    {
+     "role": "tech",
+     "chars": 7,
+     "seconds": 0.789
+    },
+    {
+     "role": "operator",
+     "chars": 63,
+     "seconds": 5.248
+    },
+    {
+     "role": "tech",
+     "chars": 44,
+     "seconds": 2.461
+    }
+   ],
+   "wav_sha256": "55e003b578e1ce51e82b2a56977f057564857560e80bf66cbb84220d851239a1"
+  },
+  {
+   "exchange_id": "A2-002",
+   "chars": 77,
+   "seconds": 7.366,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 37,
+     "seconds": 3.344
+    },
+    {
+     "role": "tech",
+     "chars": 40,
+     "seconds": 2.322
+    }
+   ],
+   "wav_sha256": "cd80d06962c57aa17c9d7c61aa99ee214a95f7233eeaf7f216336d2476ada90e"
+  },
+  {
+   "exchange_id": "A2-003",
+   "chars": 102,
+   "seconds": 8.248,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 52,
+     "seconds": 3.762
+    },
+    {
+     "role": "tech",
+     "chars": 50,
+     "seconds": 2.786
+    }
+   ],
+   "wav_sha256": "fc7d79781835e209c5c1a49038c77b39e5398fa03328a88ac57d59087ca07fe3"
+  },
+  {
+   "exchange_id": "A2-004",
+   "chars": 84,
+   "seconds": 6.948,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 40,
+     "seconds": 3.111
+    },
+    {
+     "role": "tech",
+     "chars": 44,
+     "seconds": 2.136
+    }
+   ],
+   "wav_sha256": "7ce6fb5408491c4d8acf84f4db665f22f6b22f37d2c1e79f1dca9e7e55cb9820"
+  },
+  {
+   "exchange_id": "A2-005",
+   "chars": 39,
+   "seconds": 13.726,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 39,
+     "seconds": 2.926
+    }
+   ],
+   "wav_sha256": "d82a9da2d368191ab742daabf441e3c6b5cf9252e4bc9dc0478d696e313058e9"
+  },
+  {
+   "exchange_id": "A2-006",
+   "chars": 84,
+   "seconds": 6.855,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 45,
+     "seconds": 3.065
+    },
+    {
+     "role": "tech",
+     "chars": 39,
+     "seconds": 2.09
+    }
+   ],
+   "wav_sha256": "37b58abe63ebe277247522f5d2dd3c5f37aa9fb172e00a2e370f00c8383ea9d9"
+  },
+  {
+   "exchange_id": "A2-007",
+   "chars": 85,
+   "seconds": 7.969,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 38,
+     "seconds": 3.437
+    },
+    {
+     "role": "tech",
+     "chars": 47,
+     "seconds": 2.833
+    }
+   ],
+   "wav_sha256": "1562483805a1259a2d3051d229b61a8a418ce2a2e079c6051dfa230995f0d26c"
+  },
+  {
+   "exchange_id": "A2-008",
+   "chars": 71,
+   "seconds": 6.762,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 42,
+     "seconds": 3.297
+    },
+    {
+     "role": "tech",
+     "chars": 29,
+     "seconds": 1.765
+    }
+   ],
+   "wav_sha256": "b160dad8cb0a945d79dbd975788bebb77f0edf5df4aec58c05615ea843b928fc"
+  },
+  {
+   "exchange_id": "A2-009",
+   "chars": 91,
+   "seconds": 9.102,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 45,
+     "seconds": 3.483
+    },
+    {
+     "role": "tech",
+     "chars": 38,
+     "seconds": 2.183
+    },
+    {
+     "role": "operator",
+     "chars": 8,
+     "seconds": 0.836
+    }
+   ],
+   "wav_sha256": "e0cadba812ba3eb2a0b194bb77cf187acd51a90006e365ca1589254584fa6ff8"
+  },
+  {
+   "exchange_id": "A2-010",
+   "chars": 119,
+   "seconds": 11.284,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 63,
+     "seconds": 5.387
+    },
+    {
+     "role": "tech",
+     "chars": 48,
+     "seconds": 2.461
+    },
+    {
+     "role": "operator",
+     "chars": 8,
+     "seconds": 0.836
+    }
+   ],
+   "wav_sha256": "4a80ca449e946a5af233420fc10f2e91d9dcd9aad29f4f879582ab935697cf50"
+  },
+  {
+   "exchange_id": "A2-011",
+   "chars": 79,
+   "seconds": 6.716,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 39,
+     "seconds": 2.786
+    },
+    {
+     "role": "tech",
+     "chars": 40,
+     "seconds": 2.229
+    }
+   ],
+   "wav_sha256": "595352fed4820bcb4cfdf86db2fe1adf23e241841f966e1e0ef58890c4ac42b3"
+  },
+  {
+   "exchange_id": "A2-012",
+   "chars": 98,
+   "seconds": 8.527,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 49,
+     "seconds": 3.947
+    },
+    {
+     "role": "tech",
+     "chars": 49,
+     "seconds": 2.879
+    }
+   ],
+   "wav_sha256": "212904faaf12d130070e6e54f5c9a9dd4f16b0ed15fd9efb37c485dcf8edcbe0"
+  },
+  {
+   "exchange_id": "A2-013",
+   "chars": 87,
+   "seconds": 6.994,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 44,
+     "seconds": 3.065
+    },
+    {
+     "role": "tech",
+     "chars": 43,
+     "seconds": 2.229
+    }
+   ],
+   "wav_sha256": "b50b9a9a06f1f80848cabd6eb6936621b5ca06302fe7cc8a917bd4f0a5fa8975"
+  },
+  {
+   "exchange_id": "A2-014",
+   "chars": 84,
+   "seconds": 7.087,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 37,
+     "seconds": 2.694
+    },
+    {
+     "role": "tech",
+     "chars": 47,
+     "seconds": 2.694
+    }
+   ],
+   "wav_sha256": "66401e89aeb1596aef2c8737680bea6c77452f864273f6c7035c3a2c760a81c2"
+  },
+  {
+   "exchange_id": "A2-015",
+   "chars": 76,
+   "seconds": 6.994,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 36,
+     "seconds": 3.065
+    },
+    {
+     "role": "tech",
+     "chars": 40,
+     "seconds": 2.229
+    }
+   ],
+   "wav_sha256": "1b706b923d92053fa4d92cbf4e79f277de5b85340c2cbff4c70f2295871a91e9"
+  },
+  {
+   "exchange_id": "A2-016",
+   "chars": 92,
+   "seconds": 7.644,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 43,
+     "seconds": 3.158
+    },
+    {
+     "role": "tech",
+     "chars": 49,
+     "seconds": 2.786
+    }
+   ],
+   "wav_sha256": "5beb03bf9e85b4d27b48b1941c38406906b58791913783a85fd59bf20195bd47"
+  },
+  {
+   "exchange_id": "A2-017",
+   "chars": 93,
+   "seconds": 8.248,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 48,
+     "seconds": 3.947
+    },
+    {
+     "role": "tech",
+     "chars": 45,
+     "seconds": 2.601
+    }
+   ],
+   "wav_sha256": "cc4ca375f1ec0822e01f432bb826d3cfdda297ab1fad42da318ee503a04790ff"
+  },
+  {
+   "exchange_id": "A2-018",
+   "chars": 126,
+   "seconds": 12.585,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 69,
+     "seconds": 6.13
+    },
+    {
+     "role": "tech",
+     "chars": 51,
+     "seconds": 2.879
+    },
+    {
+     "role": "operator",
+     "chars": 6,
+     "seconds": 0.975
+    }
+   ],
+   "wav_sha256": "5b25e61f7b01adff272b20cc8d8ef82e99b2b6f85bd8d64332ab43c6ebd03ae8"
+  },
+  {
+   "exchange_id": "A2-019",
+   "chars": 113,
+   "seconds": 10.03,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 48,
+     "seconds": 3.529
+    },
+    {
+     "role": "tech",
+     "chars": 57,
+     "seconds": 3.065
+    },
+    {
+     "role": "operator",
+     "chars": 8,
+     "seconds": 0.836
+    }
+   ],
+   "wav_sha256": "c03d5a96427ca80c83d8a58736194f6764be5ffbd16e3daf64087c30b4a7336b"
+  },
+  {
+   "exchange_id": "A2-020",
+   "chars": 93,
+   "seconds": 7.412,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 43,
+     "seconds": 3.111
+    },
+    {
+     "role": "tech",
+     "chars": 50,
+     "seconds": 2.601
+    }
+   ],
+   "wav_sha256": "3ce72605622b6de970308c4c07f4c32f231c883c577cc0df28f738c595b8bc8a"
+  },
+  {
+   "exchange_id": "A2-021",
+   "chars": 188,
+   "seconds": 18.443,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 40,
+     "seconds": 3.251
+    },
+    {
+     "role": "tech",
+     "chars": 43,
+     "seconds": 2.136
+    },
+    {
+     "role": "operator",
+     "chars": 9,
+     "seconds": 0.929
+    },
+    {
+     "role": "operator",
+     "chars": 40,
+     "seconds": 3.251
+    },
+    {
+     "role": "tech",
+     "chars": 48,
+     "seconds": 2.74
+    },
+    {
+     "role": "operator",
+     "chars": 8,
+     "seconds": 0.836
+    }
+   ],
+   "wav_sha256": "06f10e9de73ff5bf51edeb209700919f18ddd3ce4f005ca8769523ab592fe88f"
+  },
+  {
+   "exchange_id": "A2-022",
+   "chars": 79,
+   "seconds": 6.901,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 38,
+     "seconds": 3.065
+    },
+    {
+     "role": "tech",
+     "chars": 41,
+     "seconds": 2.136
+    }
+   ],
+   "wav_sha256": "067953f2a6b2fc7d77cf2096f38d157b1dc02e610fc112fb17130f74eb0ec90d"
+  },
+  {
+   "exchange_id": "A2-023",
+   "chars": 90,
+   "seconds": 7.18,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 44,
+     "seconds": 3.251
+    },
+    {
+     "role": "tech",
+     "chars": 46,
+     "seconds": 2.229
+    }
+   ],
+   "wav_sha256": "6e9c0c5de46ea7dae9631639ee779a8620c239b159da79a135ffc589e0be4b20"
+  },
+  {
+   "exchange_id": "A2-024",
+   "chars": 75,
+   "seconds": 7.041,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 36,
+     "seconds": 3.251
+    },
+    {
+     "role": "tech",
+     "chars": 39,
+     "seconds": 2.09
+    }
+   ],
+   "wav_sha256": "b1c2297a5459efa9d764a25248ff70b2ad812cf8f33749caf55ae0a10736cdad"
+  },
+  {
+   "exchange_id": "A2-025",
+   "chars": 79,
+   "seconds": 9.055,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 34,
+     "seconds": 3.344
+    },
+    {
+     "role": "tech",
+     "chars": 37,
+     "seconds": 2.276
+    },
+    {
+     "role": "operator",
+     "chars": 8,
+     "seconds": 0.836
+    }
+   ],
+   "wav_sha256": "f3a0db5aee4f270f4c72b50207b0b0368de2a609cdedeefebc0feb69f2220ef8"
+  },
+  {
+   "exchange_id": "A2-026",
+   "chars": 177,
+   "seconds": 16.985,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 37,
+     "seconds": 3.158
+    },
+    {
+     "role": "tech",
+     "chars": 46,
+     "seconds": 2.601
+    },
+    {
+     "role": "operator",
+     "chars": 47,
+     "seconds": 3.762
+    },
+    {
+     "role": "tech",
+     "chars": 39,
+     "seconds": 2.229
+    },
+    {
+     "role": "operator",
+     "chars": 8,
+     "seconds": 0.836
+    }
+   ],
+   "wav_sha256": "67edbe6334a33492520fd4d4d4c28d40cba4012f9761d702268375ba30b3e13c"
+  },
+  {
+   "exchange_id": "A2-027",
+   "chars": 93,
+   "seconds": 8.155,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 48,
+     "seconds": 3.855
+    },
+    {
+     "role": "tech",
+     "chars": 45,
+     "seconds": 2.601
+    }
+   ],
+   "wav_sha256": "c84b3bc1506720683f5446fda4e677f842b3bd2bb9ebea732b9bc8ffc45a5db1"
+  },
+  {
+   "exchange_id": "A2-028",
+   "chars": 74,
+   "seconds": 6.808,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 37,
+     "seconds": 3.111
+    },
+    {
+     "role": "tech",
+     "chars": 37,
+     "seconds": 1.997
+    }
+   ],
+   "wav_sha256": "1255dc94d558e39d25c5e914c49186bdfd84439404df53832c4648d6fcb82ed5"
+  },
+  {
+   "exchange_id": "A2-029",
+   "chars": 78,
+   "seconds": 7.041,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 42,
+     "seconds": 3.437
+    },
+    {
+     "role": "tech",
+     "chars": 36,
+     "seconds": 1.904
+    }
+   ],
+   "wav_sha256": "08cba48edb170820bfb45e5b9f04ad59b3745804ae59a826ed25d2dfddc20ae4"
+  },
+  {
+   "exchange_id": "A2-030",
+   "chars": 196,
+   "seconds": 17.914,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 41,
+     "seconds": 3.111
+    },
+    {
+     "role": "tech",
+     "chars": 46,
+     "seconds": 2.508
+    },
+    {
+     "role": "operator",
+     "chars": 56,
+     "seconds": 4.272
+    },
+    {
+     "role": "tech",
+     "chars": 47,
+     "seconds": 2.647
+    },
+    {
+     "role": "operator",
+     "chars": 6,
+     "seconds": 0.975
+    }
+   ],
+   "wav_sha256": "6de60bff2e0cdd828d373827f8461b74824133af92f2bad0711b035c5672bea0"
+  },
+  {
+   "exchange_id": "A2-031",
+   "chars": 103,
+   "seconds": 8.805,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 62,
+     "seconds": 5.108
+    },
+    {
+     "role": "tech",
+     "chars": 41,
+     "seconds": 1.997
+    }
+   ],
+   "wav_sha256": "f1ca78fbd34d7468dfde9c7fb498b97d800851766e0511957ddbd76bca10a017"
+  },
+  {
+   "exchange_id": "A2-032",
+   "chars": 90,
+   "seconds": 7.691,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 46,
+     "seconds": 3.483
+    },
+    {
+     "role": "tech",
+     "chars": 44,
+     "seconds": 2.508
+    }
+   ],
+   "wav_sha256": "dac634698cd3ff529d4c3ca12470944d6c6cf012844c0823c3fa6647d6418849"
+  },
+  {
+   "exchange_id": "A2-033",
+   "chars": 84,
+   "seconds": 7.041,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 40,
+     "seconds": 3.111
+    },
+    {
+     "role": "tech",
+     "chars": 44,
+     "seconds": 2.229
+    }
+   ],
+   "wav_sha256": "2994f8685583eea524eed7bcfe85b194d0e3bbaa203ab9c7c70b0b0d06e280ed"
+  },
+  {
+   "exchange_id": "A2-034",
+   "chars": 99,
+   "seconds": 8.016,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 56,
+     "seconds": 4.04
+    },
+    {
+     "role": "tech",
+     "chars": 43,
+     "seconds": 2.276
+    }
+   ],
+   "wav_sha256": "255f4f2f66a4c28fc7390d989af1c5141e549ca85bca8edc0ec7edb8c1413bde"
+  },
+  {
+   "exchange_id": "A2-035",
+   "chars": 119,
+   "seconds": 11.47,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 71,
+     "seconds": 5.759
+    },
+    {
+     "role": "tech",
+     "chars": 42,
+     "seconds": 2.136
+    },
+    {
+     "role": "operator",
+     "chars": 6,
+     "seconds": 0.975
+    }
+   ],
+   "wav_sha256": "edaf4bd4b06813349d60462463a53b542d66415875515e0fb5e84a362a38898d"
+  },
+  {
+   "exchange_id": "A2-036",
+   "chars": 229,
+   "seconds": 20.672,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 57,
+     "seconds": 4.226
+    },
+    {
+     "role": "tech",
+     "chars": 57,
+     "seconds": 2.972
+    },
+    {
+     "role": "operator",
+     "chars": 8,
+     "seconds": 0.975
+    },
+    {
+     "role": "operator",
+     "chars": 50,
+     "seconds": 3.437
+    },
+    {
+     "role": "tech",
+     "chars": 51,
+     "seconds": 2.786
+    },
+    {
+     "role": "operator",
+     "chars": 6,
+     "seconds": 0.975
+    }
+   ],
+   "wav_sha256": "eebb88a3885e2a5176ba9b8a5b55e03066a8739765c4824464aeb5c5b9cde6b9"
+  },
+  {
+   "exchange_id": "A2-037",
+   "chars": 155,
+   "seconds": 13.867,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 84,
+     "seconds": 7.523
+    },
+    {
+     "role": "tech",
+     "chars": 71,
+     "seconds": 4.644
+    }
+   ],
+   "wav_sha256": "17f60408a40adc27191a0bca80cadecabae628e08e3a8f5e832224fd8503f499"
+  },
+  {
+   "exchange_id": "A2-038",
+   "chars": 143,
+   "seconds": 11.777,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 71,
+     "seconds": 5.805
+    },
+    {
+     "role": "tech",
+     "chars": 72,
+     "seconds": 4.272
+    }
+   ],
+   "wav_sha256": "f1b61f472de472fdc40fa6c171513a68c4d1fe9f0d30e0a1cc3b95c5b1032b39"
+  },
+  {
+   "exchange_id": "A2-039",
+   "chars": 78,
+   "seconds": 6.762,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 36,
+     "seconds": 3.019
+    },
+    {
+     "role": "tech",
+     "chars": 42,
+     "seconds": 2.043
+    }
+   ],
+   "wav_sha256": "2dd2b747dbd4f715d8c5dfac15d6477772f22f40f43f13549b082c4f3ec6d1f0"
+  },
+  {
+   "exchange_id": "A2-040",
+   "chars": 100,
+   "seconds": 9.287,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 49,
+     "seconds": 3.622
+    },
+    {
+     "role": "tech",
+     "chars": 43,
+     "seconds": 2.229
+    },
+    {
+     "role": "operator",
+     "chars": 8,
+     "seconds": 0.836
+    }
+   ],
+   "wav_sha256": "c5704adc05d9c46e98ab4053d38763a79d349aef711128933a802fb453e1f0c3"
+  },
+  {
+   "exchange_id": "A2-041",
+   "chars": 73,
+   "seconds": 6.994,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 34,
+     "seconds": 3.158
+    },
+    {
+     "role": "tech",
+     "chars": 39,
+     "seconds": 2.136
+    }
+   ],
+   "wav_sha256": "aaf1310cc182deb79f4727f0e0fd102f949ccfa6aaa0f134af3fb88a07078738"
+  },
+  {
+   "exchange_id": "A2-042",
+   "chars": 86,
+   "seconds": 6.994,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 40,
+     "seconds": 2.879
+    },
+    {
+     "role": "tech",
+     "chars": 46,
+     "seconds": 2.415
+    }
+   ],
+   "wav_sha256": "f943f351e7b6ca84ecd657e596b5a25fa5e507584a440668c1b357252fa1b6cf"
+  },
+  {
+   "exchange_id": "A2-043",
+   "chars": 88,
+   "seconds": 7.598,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 46,
+     "seconds": 3.437
+    },
+    {
+     "role": "tech",
+     "chars": 42,
+     "seconds": 2.461
+    }
+   ],
+   "wav_sha256": "cdcd6dd9afa9ceaaf049e4729975546d7693d1c659160e56956a843b1fcc1cce"
+  },
+  {
+   "exchange_id": "A2-044",
+   "chars": 80,
+   "seconds": 7.18,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 41,
+     "seconds": 3.158
+    },
+    {
+     "role": "tech",
+     "chars": 39,
+     "seconds": 2.322
+    }
+   ],
+   "wav_sha256": "b586a3bd9a6f9d7cd9263b6ac8e43726f77f9c7132aa294d178f4e0091ed6a9d"
+  },
+  {
+   "exchange_id": "A2-045",
+   "chars": 176,
+   "seconds": 18.396,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 40,
+     "seconds": 3.204
+    },
+    {
+     "role": "tech",
+     "chars": 45,
+     "seconds": 2.647
+    },
+    {
+     "role": "operator",
+     "chars": 6,
+     "seconds": 0.929
+    },
+    {
+     "role": "operator",
+     "chars": 39,
+     "seconds": 3.111
+    },
+    {
+     "role": "tech",
+     "chars": 40,
+     "seconds": 2.229
+    },
+    {
+     "role": "operator",
+     "chars": 6,
+     "seconds": 0.975
+    }
+   ],
+   "wav_sha256": "86bad206e7ebb651b40f3526da98cdd315beb057d9bc51d6b4acd54509b8e364"
+  },
+  {
+   "exchange_id": "A2-046",
+   "chars": 85,
+   "seconds": 7.041,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 40,
+     "seconds": 3.019
+    },
+    {
+     "role": "tech",
+     "chars": 45,
+     "seconds": 2.322
+    }
+   ],
+   "wav_sha256": "d69ddcd4f8bc02b95fd8ad4a42693ee0092f8a977f39683c29f2f7594d3bc2bb"
+  },
+  {
+   "exchange_id": "A2-047",
+   "chars": 90,
+   "seconds": 7.923,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 47,
+     "seconds": 3.669
+    },
+    {
+     "role": "tech",
+     "chars": 43,
+     "seconds": 2.554
+    }
+   ],
+   "wav_sha256": "238624d1cf020a5cb6ad9aa5097f7b5a08f7351c309074bc6c147efabdabd2e4"
+  },
+  {
+   "exchange_id": "A2-048",
+   "chars": 166,
+   "seconds": 17.171,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 47,
+     "seconds": 3.576
+    },
+    {
+     "role": "tech",
+     "chars": 7,
+     "seconds": 0.789
+    },
+    {
+     "role": "operator",
+     "chars": 60,
+     "seconds": 5.016
+    },
+    {
+     "role": "tech",
+     "chars": 46,
+     "seconds": 2.415
+    },
+    {
+     "role": "operator",
+     "chars": 6,
+     "seconds": 0.975
+    }
+   ],
+   "wav_sha256": "634850fbc1c4b52939ffa6c722a954a9344faedd9843e4f74a8031be2ef28788"
+  },
+  {
+   "exchange_id": "A2-049",
+   "chars": 82,
+   "seconds": 6.994,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 41,
+     "seconds": 3.111
+    },
+    {
+     "role": "tech",
+     "chars": 41,
+     "seconds": 2.183
+    }
+   ],
+   "wav_sha256": "80dd2051e6b3be5e991bd99fedd298e8dcafcde12af945c4bb3495bb0b99f2a4"
+  },
+  {
+   "exchange_id": "A2-050",
+   "chars": 134,
+   "seconds": 10.802,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 66,
+     "seconds": 5.294
+    },
+    {
+     "role": "tech",
+     "chars": 68,
+     "seconds": 3.808
+    }
+   ],
+   "wav_sha256": "c630b9498e21100b134d2464e155a6a565e8f1ae302dcb3dee20068fb0da8e31"
+  },
+  {
+   "exchange_id": "A2-051",
+   "chars": 99,
+   "seconds": 9.223,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 61,
+     "seconds": 5.062
+    },
+    {
+     "role": "tech",
+     "chars": 38,
+     "seconds": 2.461
+    }
+   ],
+   "wav_sha256": "41a5c5da1d12c2239fca39c57023bdd0d37d3a4a0aeb21f4b042ee65816effaf"
+  },
+  {
+   "exchange_id": "A2-052",
+   "chars": 100,
+   "seconds": 9.641,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 69,
+     "seconds": 6.037
+    },
+    {
+     "role": "tech",
+     "chars": 31,
+     "seconds": 1.904
+    }
+   ],
+   "wav_sha256": "d251ab0268651bdf9124e658526f764f50763713598fe3a81e46ebd6a5d29612"
+  },
+  {
+   "exchange_id": "A2-053",
+   "chars": 149,
+   "seconds": 14.367,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 40,
+     "seconds": 2.833
+    },
+    {
+     "role": "tech",
+     "chars": 10,
+     "seconds": 0.743
+    },
+    {
+     "role": "operator",
+     "chars": 53,
+     "seconds": 4.737
+    },
+    {
+     "role": "tech",
+     "chars": 46,
+     "seconds": 2.554
+    }
+   ],
+   "wav_sha256": "6a60dc80f79040cba4a25f964cae56ef6fdadc88137417307fc4ace054db2a53"
+  },
+  {
+   "exchange_id": "A2-054",
+   "chars": 77,
+   "seconds": 7.18,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 37,
+     "seconds": 3.297
+    },
+    {
+     "role": "tech",
+     "chars": 40,
+     "seconds": 2.183
+    }
+   ],
+   "wav_sha256": "031bfde1edde64fec60366a7732df72f0accc879b431632fe18e55c235f0746b"
+  },
+  {
+   "exchange_id": "A2-055",
+   "chars": 80,
+   "seconds": 7.598,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 39,
+     "seconds": 3.576
+    },
+    {
+     "role": "tech",
+     "chars": 41,
+     "seconds": 2.322
+    }
+   ],
+   "wav_sha256": "9734def44b64ecd48a166cc0b35c11b114ec5accaa3b83c8f452ce5c726039b0"
+  },
+  {
+   "exchange_id": "A2-056",
+   "chars": 68,
+   "seconds": 6.623,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 38,
+     "seconds": 3.111
+    },
+    {
+     "role": "tech",
+     "chars": 30,
+     "seconds": 1.811
+    }
+   ],
+   "wav_sha256": "27a8d51e9fe63fb3160fb31931238be5598008065f346e9c056e20107c9d177d"
+  },
+  {
+   "exchange_id": "A2-057",
+   "chars": 105,
+   "seconds": 9.177,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 64,
+     "seconds": 5.294
+    },
+    {
+     "role": "tech",
+     "chars": 41,
+     "seconds": 2.183
+    }
+   ],
+   "wav_sha256": "1845a9f21ef5d7c95ba1bb058a0405b73ea0885e3ba965c2a87cf4ae681504c6"
+  },
+  {
+   "exchange_id": "A2-058",
+   "chars": 80,
+   "seconds": 7.273,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 38,
+     "seconds": 3.251
+    },
+    {
+     "role": "tech",
+     "chars": 42,
+     "seconds": 2.322
+    }
+   ],
+   "wav_sha256": "f4ed73cf4196a6b2ec5e5e2f2f7a4d9efadd3c20178db6fc81a20c4a9e9b2d3d"
+  },
+  {
+   "exchange_id": "A2-059",
+   "chars": 90,
+   "seconds": 7.551,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 42,
+     "seconds": 3.065
+    },
+    {
+     "role": "tech",
+     "chars": 48,
+     "seconds": 2.786
+    }
+   ],
+   "wav_sha256": "b05e0c51cd32299c29ff096bbaf67acaf3a13911fccc5ca2a48c8cda2ed8e4e5"
+  },
+  {
+   "exchange_id": "A2-060",
+   "chars": 93,
+   "seconds": 7.691,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 43,
+     "seconds": 3.251
+    },
+    {
+     "role": "tech",
+     "chars": 50,
+     "seconds": 2.74
+    }
+   ],
+   "wav_sha256": "4421a556041a4d73a1b6094a0a19b87a91985fbbd888eb454561397aaa6744cf"
+  },
+  {
+   "exchange_id": "A2-061",
+   "chars": 82,
+   "seconds": 6.948,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 41,
+     "seconds": 3.111
+    },
+    {
+     "role": "tech",
+     "chars": 41,
+     "seconds": 2.136
+    }
+   ],
+   "wav_sha256": "5dbabb3727ed61f5b392cda478c1cf9ca9eefc8379c75e5a39c7a5417d9644c6"
+  },
+  {
+   "exchange_id": "A2-062",
+   "chars": 115,
+   "seconds": 8.387,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 58,
+     "seconds": 3.762
+    },
+    {
+     "role": "tech",
+     "chars": 57,
+     "seconds": 2.926
+    }
+   ],
+   "wav_sha256": "22190da0721fcdd917e5be81d5635a231369cced0782e015d74c31fa721ea089"
+  },
+  {
+   "exchange_id": "A2-063",
+   "chars": 149,
+   "seconds": 14.274,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 42,
+     "seconds": 3.251
+    },
+    {
+     "role": "tech",
+     "chars": 10,
+     "seconds": 0.743
+    },
+    {
+     "role": "operator",
+     "chars": 55,
+     "seconds": 4.412
+    },
+    {
+     "role": "tech",
+     "chars": 42,
+     "seconds": 2.368
+    }
+   ],
+   "wav_sha256": "7879a82c3db3185ea87264537596b85b2870586107e29e6da0bad944c943d568"
+  },
+  {
+   "exchange_id": "A2-064",
+   "chars": 83,
+   "seconds": 7.087,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 40,
+     "seconds": 3.251
+    },
+    {
+     "role": "tech",
+     "chars": 43,
+     "seconds": 2.136
+    }
+   ],
+   "wav_sha256": "aa80bc5844e61bc1397d75a4237863879b78e1041955549b27e8c894c64adf8d"
+  },
+  {
+   "exchange_id": "A2-065",
+   "chars": 87,
+   "seconds": 7.459,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 40,
+     "seconds": 3.158
+    },
+    {
+     "role": "tech",
+     "chars": 47,
+     "seconds": 2.601
+    }
+   ],
+   "wav_sha256": "13fe425ab909b87406cb394124494f91841e3dbff3ce5dcf890ae5243936fc92"
+  },
+  {
+   "exchange_id": "A2-066",
+   "chars": 75,
+   "seconds": 6.994,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 37,
+     "seconds": 3.111
+    },
+    {
+     "role": "tech",
+     "chars": 38,
+     "seconds": 2.183
+    }
+   ],
+   "wav_sha256": "a8e38edbdd396e2faa4df8c4b3bcdcd6f92e7fedcdb522bb173c6bbb880d6294"
+  },
+  {
+   "exchange_id": "A2-067",
+   "chars": 84,
+   "seconds": 7.366,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 42,
+     "seconds": 3.297
+    },
+    {
+     "role": "tech",
+     "chars": 42,
+     "seconds": 2.368
+    }
+   ],
+   "wav_sha256": "d4b3206d4bd0102666647d762a5de5b27cb0d0031fa877ac9cf598f3cac396aa"
+  },
+  {
+   "exchange_id": "A2-068",
+   "chars": 106,
+   "seconds": 9.223,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 66,
+     "seconds": 5.341
+    },
+    {
+     "role": "tech",
+     "chars": 40,
+     "seconds": 2.183
+    }
+   ],
+   "wav_sha256": "a195d59ddd6d90f7cf2e8f56ab82ddea7f88d64dbf4fdb763525b17cb9ee797d"
+  },
+  {
+   "exchange_id": "A2-069",
+   "chars": 88,
+   "seconds": 7.226,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 44,
+     "seconds": 3.297
+    },
+    {
+     "role": "tech",
+     "chars": 44,
+     "seconds": 2.229
+    }
+   ],
+   "wav_sha256": "f0ca980a4c881b295475e0620e4f1c0e8fce37ad184ddb6e62933020724ee538"
+  },
+  {
+   "exchange_id": "A2-070",
+   "chars": 79,
+   "seconds": 7.319,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 35,
+     "seconds": 3.204
+    },
+    {
+     "role": "tech",
+     "chars": 44,
+     "seconds": 2.415
+    }
+   ],
+   "wav_sha256": "612fd8b99855cef1e3bbe89b037b189e3e771ffcc7273c496bfcf3c4883919b0"
+  },
+  {
+   "exchange_id": "A2-071",
+   "chars": 112,
+   "seconds": 10.199,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 79,
+     "seconds": 6.502
+    },
+    {
+     "role": "tech",
+     "chars": 33,
+     "seconds": 1.997
+    }
+   ],
+   "wav_sha256": "5dc70be9bdf1e82a0a155912c572d542d399249d90544bea12fba3bcaa12f1ca"
+  },
+  {
+   "exchange_id": "A2-072",
+   "chars": 83,
+   "seconds": 7.18,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 40,
+     "seconds": 3.111
+    },
+    {
+     "role": "tech",
+     "chars": 43,
+     "seconds": 2.368
+    }
+   ],
+   "wav_sha256": "24945515a9b449bbdd008f0e049674cdb5a67fda4c03165aab8d78e8ec0c3604"
+  },
+  {
+   "exchange_id": "A2-073",
+   "chars": 95,
+   "seconds": 8.109,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 51,
+     "seconds": 4.133
+    },
+    {
+     "role": "tech",
+     "chars": 44,
+     "seconds": 2.276
+    }
+   ],
+   "wav_sha256": "e3cb8ae3c7d64bfa445896c15a758a22ff204810c1597779db72732253db43d2"
+  },
+  {
+   "exchange_id": "A2-074",
+   "chars": 103,
+   "seconds": 7.923,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 46,
+     "seconds": 3.344
+    },
+    {
+     "role": "tech",
+     "chars": 57,
+     "seconds": 2.879
+    }
+   ],
+   "wav_sha256": "78da9cf982187e109fee319eee5a3fa42a51bb9012ea2c30511a7514598106b9"
+  },
+  {
+   "exchange_id": "A2-075",
+   "chars": 38,
+   "seconds": 13.912,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 38,
+     "seconds": 3.111
+    }
+   ],
+   "wav_sha256": "61bdc0bb94a9b5d20d9e400e824758fcb7e97432bb23a08a4afe5162a5f7775a"
+  },
+  {
+   "exchange_id": "A2-076",
+   "chars": 106,
+   "seconds": 8.712,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 60,
+     "seconds": 4.69
+    },
+    {
+     "role": "tech",
+     "chars": 46,
+     "seconds": 2.322
+    }
+   ],
+   "wav_sha256": "306456af592e0da86b49154484bfae687b830b7674b0c7d40401e2c25951a6c0"
+  },
+  {
+   "exchange_id": "A2-077",
+   "chars": 80,
+   "seconds": 7.226,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 40,
+     "seconds": 3.297
+    },
+    {
+     "role": "tech",
+     "chars": 40,
+     "seconds": 2.229
+    }
+   ],
+   "wav_sha256": "e18bb7cfbc003070366e4d71304ab2acd024f968d43f22df8dcd247d2d886d34"
+  },
+  {
+   "exchange_id": "A2-078",
+   "chars": 66,
+   "seconds": 6.391,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 38,
+     "seconds": 3.065
+    },
+    {
+     "role": "tech",
+     "chars": 28,
+     "seconds": 1.625
+    }
+   ],
+   "wav_sha256": "d1c8d2c9f20ef35a6b754e9a74f5f2d07ab2479fc6b8c116af2c3b528b314122"
+  },
+  {
+   "exchange_id": "A2-079",
+   "chars": 90,
+   "seconds": 7.598,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 47,
+     "seconds": 3.576
+    },
+    {
+     "role": "tech",
+     "chars": 43,
+     "seconds": 2.322
+    }
+   ],
+   "wav_sha256": "57f35ce9b5a22f485194e16f840ac864bab439b621517cfc9ae16845a34ddc47"
+  },
+  {
+   "exchange_id": "A2-080",
+   "chars": 88,
+   "seconds": 8.109,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 48,
+     "seconds": 4.087
+    },
+    {
+     "role": "tech",
+     "chars": 40,
+     "seconds": 2.322
+    }
+   ],
+   "wav_sha256": "d8f67ccae5b4c0e8d9f40f84b080837963e85b4c41f289506da63cd2bb9ec3ee"
+  },
+  {
+   "exchange_id": "A2-081",
+   "chars": 72,
+   "seconds": 6.948,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 36,
+     "seconds": 3.251
+    },
+    {
+     "role": "tech",
+     "chars": 36,
+     "seconds": 1.997
+    }
+   ],
+   "wav_sha256": "8b0e05203fb5549e25a991a44bd1be0cf9760d32ca4279d228a2fb0dae0a4f52"
+  },
+  {
+   "exchange_id": "A2-082",
+   "chars": 36,
+   "seconds": 13.958,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 36,
+     "seconds": 3.158
+    }
+   ],
+   "wav_sha256": "318c8265ae025e189fdb9195815c398b1375140f8a85424b0070ffaad2e9806b"
+  },
+  {
+   "exchange_id": "A2-083",
+   "chars": 81,
+   "seconds": 6.994,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 40,
+     "seconds": 3.019
+    },
+    {
+     "role": "tech",
+     "chars": 41,
+     "seconds": 2.276
+    }
+   ],
+   "wav_sha256": "0488d40e0e4a76347ccbe96f0887cfe0414a231b3db8fada26d02ad3ae729112"
+  },
+  {
+   "exchange_id": "A2-084",
+   "chars": 95,
+   "seconds": 7.691,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 44,
+     "seconds": 3.158
+    },
+    {
+     "role": "tech",
+     "chars": 51,
+     "seconds": 2.833
+    }
+   ],
+   "wav_sha256": "68df074c0c76592d9e3c82d56f70c0bd469f1345d90f7b95811671f60e7c135b"
+  },
+  {
+   "exchange_id": "A2-085",
+   "chars": 113,
+   "seconds": 9.316,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 63,
+     "seconds": 4.923
+    },
+    {
+     "role": "tech",
+     "chars": 50,
+     "seconds": 2.694
+    }
+   ],
+   "wav_sha256": "5c83eaca937267bec9fb3078c8f9c70813bb22d2911197585433c56ca068706b"
+  },
+  {
+   "exchange_id": "A2-086",
+   "chars": 152,
+   "seconds": 16.01,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 39,
+     "seconds": 2.926
+    },
+    {
+     "role": "tech",
+     "chars": 7,
+     "seconds": 0.789
+    },
+    {
+     "role": "operator",
+     "chars": 52,
+     "seconds": 4.319
+    },
+    {
+     "role": "tech",
+     "chars": 46,
+     "seconds": 2.74
+    },
+    {
+     "role": "operator",
+     "chars": 8,
+     "seconds": 0.836
+    }
+   ],
+   "wav_sha256": "085fe6135d109d3e876796b30cc6a59a57b429a88d13bdaa76f0eda63a0c5020"
+  },
+  {
+   "exchange_id": "A2-087",
+   "chars": 82,
+   "seconds": 7.83,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 37,
+     "seconds": 3.529
+    },
+    {
+     "role": "tech",
+     "chars": 45,
+     "seconds": 2.601
+    }
+   ],
+   "wav_sha256": "4cbedc638a9e3a797074a449fea9b91060e93d2fa16b319ca293ef27a09458ea"
+  },
+  {
+   "exchange_id": "A2-088",
+   "chars": 143,
+   "seconds": 11.824,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 71,
+     "seconds": 5.851
+    },
+    {
+     "role": "tech",
+     "chars": 72,
+     "seconds": 4.272
+    }
+   ],
+   "wav_sha256": "01aa6d30c02dbd3356ff321fb35d68e9132853991b9a7f5252d44dc87a5055d1"
+  },
+  {
+   "exchange_id": "A2-089",
+   "chars": 83,
+   "seconds": 7.041,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 39,
+     "seconds": 3.065
+    },
+    {
+     "role": "tech",
+     "chars": 44,
+     "seconds": 2.276
+    }
+   ],
+   "wav_sha256": "89888866d0a7c83d2a8bc121b2d0a91f10c76e18b3572e3a3efacd5fc98e0959"
+  },
+  {
+   "exchange_id": "A2-090",
+   "chars": 92,
+   "seconds": 7.691,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 42,
+     "seconds": 3.344
+    },
+    {
+     "role": "tech",
+     "chars": 50,
+     "seconds": 2.647
+    }
+   ],
+   "wav_sha256": "131a162b90cf4f5196c7b92abf918c0c980f0c8035d3cae6f730797df8b2bea9"
+  },
+  {
+   "exchange_id": "A2-091",
+   "chars": 41,
+   "seconds": 13.772,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 41,
+     "seconds": 2.972
+    }
+   ],
+   "wav_sha256": "83b0193777c8ea5bd8121fd9f44cdbe76266496c6dd68e53d5a073db91f9808f"
+  },
+  {
+   "exchange_id": "A2-092",
+   "chars": 82,
+   "seconds": 6.948,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 39,
+     "seconds": 3.065
+    },
+    {
+     "role": "tech",
+     "chars": 43,
+     "seconds": 2.183
+    }
+   ],
+   "wav_sha256": "343ea597ff96b06bb32016f9e0ef8833f17de845430566b3f16d1a8b62197d56"
+  },
+  {
+   "exchange_id": "A2-093",
+   "chars": 99,
+   "seconds": 9.873,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 69,
+     "seconds": 6.502
+    },
+    {
+     "role": "tech",
+     "chars": 30,
+     "seconds": 1.672
+    }
+   ],
+   "wav_sha256": "db18e8829dc2b288b543a98aeb16a7ad93f8b06bec4b1841c7cf2cdbd668deb0"
+  },
+  {
+   "exchange_id": "A2-094",
+   "chars": 166,
+   "seconds": 12.753,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 83,
+     "seconds": 6.455
+    },
+    {
+     "role": "tech",
+     "chars": 83,
+     "seconds": 4.598
+    }
+   ],
+   "wav_sha256": "fbee7236cc351e1591a8881d61a2581fe0ff691dfdea5416bce307d16fb9861b"
+  },
+  {
+   "exchange_id": "A2-095",
+   "chars": 147,
+   "seconds": 16.149,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 38,
+     "seconds": 3.437
+    },
+    {
+     "role": "tech",
+     "chars": 10,
+     "seconds": 0.743
+    },
+    {
+     "role": "operator",
+     "chars": 51,
+     "seconds": 4.598
+    },
+    {
+     "role": "tech",
+     "chars": 40,
+     "seconds": 2.136
+    },
+    {
+     "role": "operator",
+     "chars": 8,
+     "seconds": 0.836
+    }
+   ],
+   "wav_sha256": "70b2862cead13838451178d795004de16aee9a24493a33f317aaef7f2af141fc"
+  },
+  {
+   "exchange_id": "A2-096",
+   "chars": 89,
+   "seconds": 8.962,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 41,
+     "seconds": 3.065
+    },
+    {
+     "role": "tech",
+     "chars": 42,
+     "seconds": 2.322
+    },
+    {
+     "role": "operator",
+     "chars": 6,
+     "seconds": 0.975
+    }
+   ],
+   "wav_sha256": "dd9be1bf11f46369e3ee47dd2333e241774088b99e444958b9685d5600d266a8"
+  },
+  {
+   "exchange_id": "A2-097",
+   "chars": 87,
+   "seconds": 7.319,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 45,
+     "seconds": 3.437
+    },
+    {
+     "role": "tech",
+     "chars": 42,
+     "seconds": 2.183
+    }
+   ],
+   "wav_sha256": "a5972e3c282ef61b64b743f96be618c9a5b53091026173dacc7759993601447d"
+  },
+  {
+   "exchange_id": "A2-098",
+   "chars": 90,
+   "seconds": 7.319,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 45,
+     "seconds": 3.251
+    },
+    {
+     "role": "tech",
+     "chars": 45,
+     "seconds": 2.368
+    }
+   ],
+   "wav_sha256": "6e1143f3d9511d072c350e209e4c549dccc51812f736a12bdd40763adb3ca69b"
+  },
+  {
+   "exchange_id": "A2-099",
+   "chars": 79,
+   "seconds": 7.366,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 35,
+     "seconds": 3.111
+    },
+    {
+     "role": "tech",
+     "chars": 44,
+     "seconds": 2.554
+    }
+   ],
+   "wav_sha256": "c0e594ebac4814ba09fe3b46099cd11c7a0b4d69cde34dd69bc9264c011ddf6e"
+  },
+  {
+   "exchange_id": "A2-100",
+   "chars": 217,
+   "seconds": 19.029,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 46,
+     "seconds": 3.437
+    },
+    {
+     "role": "tech",
+     "chars": 52,
+     "seconds": 2.972
+    },
+    {
+     "role": "operator",
+     "chars": 60,
+     "seconds": 4.226
+    },
+    {
+     "role": "tech",
+     "chars": 53,
+     "seconds": 3.019
+    },
+    {
+     "role": "operator",
+     "chars": 6,
+     "seconds": 0.975
+    }
+   ],
+   "wav_sha256": "de3b969560c3fcda3f42fddf0b41c400bde2b7b789dd2b67e554f8516855366f"
+  },
+  {
+   "exchange_id": "A2-101",
+   "chars": 74,
+   "seconds": 7.087,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 36,
+     "seconds": 3.251
+    },
+    {
+     "role": "tech",
+     "chars": 38,
+     "seconds": 2.136
+    }
+   ],
+   "wav_sha256": "3b8c7744081536ae91f27e5f018fbeb4b63c8e9e75d669402ea4257add889744"
+  },
+  {
+   "exchange_id": "A2-102",
+   "chars": 75,
+   "seconds": 7.133,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 36,
+     "seconds": 3.251
+    },
+    {
+     "role": "tech",
+     "chars": 39,
+     "seconds": 2.183
+    }
+   ],
+   "wav_sha256": "442fad1cb5f7c77f7a30138198e589ab5a0267efa1e406504ffbb5b8ac80eed2"
+  },
+  {
+   "exchange_id": "A2-103",
+   "chars": 170,
+   "seconds": 16.8,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 34,
+     "seconds": 3.065
+    },
+    {
+     "role": "tech",
+     "chars": 40,
+     "seconds": 2.136
+    },
+    {
+     "role": "operator",
+     "chars": 44,
+     "seconds": 3.808
+    },
+    {
+     "role": "tech",
+     "chars": 44,
+     "seconds": 2.554
+    },
+    {
+     "role": "operator",
+     "chars": 8,
+     "seconds": 0.836
+    }
+   ],
+   "wav_sha256": "20ef308eebd28a04605b79a36ac217a810e117e8b9321a24e92a01837bc3eca4"
+  },
+  {
+   "exchange_id": "A2-104",
+   "chars": 86,
+   "seconds": 7.459,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 41,
+     "seconds": 3.297
+    },
+    {
+     "role": "tech",
+     "chars": 45,
+     "seconds": 2.461
+    }
+   ],
+   "wav_sha256": "b0b04a052f17d0f84aa9aa5607d901854b0aed14483a6502bbb35515e3027b7f"
+  },
+  {
+   "exchange_id": "A2-105",
+   "chars": 76,
+   "seconds": 7.412,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 36,
+     "seconds": 3.251
+    },
+    {
+     "role": "tech",
+     "chars": 40,
+     "seconds": 2.461
+    }
+   ],
+   "wav_sha256": "eabeee88ae83203a07b0ea9225948d657d2f476056fa43fa87b97279d5273ca7"
+  },
+  {
+   "exchange_id": "A2-106",
+   "chars": 76,
+   "seconds": 6.669,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 38,
+     "seconds": 2.879
+    },
+    {
+     "role": "tech",
+     "chars": 38,
+     "seconds": 2.09
+    }
+   ],
+   "wav_sha256": "314089e095d2dc08867d8279f037cd9d19e4d370d4d41d2c356b3b126672b64f"
+  },
+  {
+   "exchange_id": "A2-107",
+   "chars": 97,
+   "seconds": 10.013,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 64,
+     "seconds": 6.362
+    },
+    {
+     "role": "tech",
+     "chars": 33,
+     "seconds": 1.95
+    }
+   ],
+   "wav_sha256": "9b570c46cfec4105985794a08a64da3eef878c56f7c2551b30e35a928911af45"
+  },
+  {
+   "exchange_id": "C-01",
+   "chars": 79,
+   "seconds": 6.205,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 29,
+     "seconds": 2.136
+    },
+    {
+     "role": "tech",
+     "chars": 50,
+     "seconds": 2.368
+    }
+   ],
+   "wav_sha256": "eeccf825bc4302bccad16d60bfdf9d7d89d1125d93b99f8845f0fc2b290858bb"
+  },
+  {
+   "exchange_id": "C-02",
+   "chars": 75,
+   "seconds": 6.065,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 32,
+     "seconds": 2.276
+    },
+    {
+     "role": "tech",
+     "chars": 43,
+     "seconds": 2.09
+    }
+   ],
+   "wav_sha256": "89e6453b5782426bcee2aabee15d1dc9cd9f3d7f89e6230c5b4d26440061dda9"
+  },
+  {
+   "exchange_id": "C-03",
+   "chars": 44,
+   "seconds": 4.858,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 29,
+     "seconds": 2.183
+    },
+    {
+     "role": "tech",
+     "chars": 15,
+     "seconds": 0.975
+    }
+   ],
+   "wav_sha256": "bb47dcc7eed722a0aec909b4da17acbb2b5b53593ca3dabdb32641192b2bc86a"
+  },
+  {
+   "exchange_id": "C-04",
+   "chars": 60,
+   "seconds": 6.344,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 47,
+     "seconds": 3.576
+    },
+    {
+     "role": "tech",
+     "chars": 13,
+     "seconds": 1.068
+    }
+   ],
+   "wav_sha256": "6434b3ef9f1f0b3789bc65d789d7ee2808299d053b251a79116a7ab843155e6e"
+  },
+  {
+   "exchange_id": "C-05",
+   "chars": 49,
+   "seconds": 5.183,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 43,
+     "seconds": 2.926
+    },
+    {
+     "role": "tech",
+     "chars": 6,
+     "seconds": 0.557
+    }
+   ],
+   "wav_sha256": "196175d262f38422fa310284265580d0e9c0b3535f7a98d766966cdeaf0430c4"
+  },
+  {
+   "exchange_id": "C-06",
+   "chars": 79,
+   "seconds": 6.576,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 44,
+     "seconds": 2.972
+    },
+    {
+     "role": "tech",
+     "chars": 35,
+     "seconds": 1.904
+    }
+   ],
+   "wav_sha256": "9c3a3129ba7701d0dba3ccc03a495b2c34ca439809d8dd01fd99aadc1aaeb3d3"
+  },
+  {
+   "exchange_id": "C-07",
+   "chars": 37,
+   "seconds": 4.579,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 32,
+     "seconds": 2.322
+    },
+    {
+     "role": "tech",
+     "chars": 5,
+     "seconds": 0.557
+    }
+   ],
+   "wav_sha256": "177146c00bde6fb4156d16684081b8664296ef47fb30df93bb2e7d91934e2594"
+  },
+  {
+   "exchange_id": "C-08",
+   "chars": 48,
+   "seconds": 4.626,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 21,
+     "seconds": 1.486
+    },
+    {
+     "role": "tech",
+     "chars": 27,
+     "seconds": 1.44
+    }
+   ],
+   "wav_sha256": "a2be35fc647b64f7d91c9249794a3eb806c9509523565c97c0b9bf157537b8f6"
+  },
+  {
+   "exchange_id": "C-09",
+   "chars": 81,
+   "seconds": 6.948,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 58,
+     "seconds": 3.715
+    },
+    {
+     "role": "tech",
+     "chars": 23,
+     "seconds": 1.533
+    }
+   ],
+   "wav_sha256": "3eaffdf9cccc1c27051b401eececdc049211a4d943e380e31e5d111969ea1e3f"
+  },
+  {
+   "exchange_id": "C-10",
+   "chars": 64,
+   "seconds": 5.694,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 30,
+     "seconds": 2.09
+    },
+    {
+     "role": "tech",
+     "chars": 34,
+     "seconds": 1.904
+    }
+   ],
+   "wav_sha256": "9baaa8264edac156425b42925fd44a96631d0a26bd522fa6edf77c22fcf4bff6"
+  },
+  {
+   "exchange_id": "C-11",
+   "chars": 56,
+   "seconds": 5.926,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 51,
+     "seconds": 3.622
+    },
+    {
+     "role": "tech",
+     "chars": 5,
+     "seconds": 0.604
+    }
+   ],
+   "wav_sha256": "7f91ab1fc52b46fddf365f2d74f5db406e5542b6a385a53d4d2af4e39ae96477"
+  },
+  {
+   "exchange_id": "C-12",
+   "chars": 55,
+   "seconds": 5.044,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 45,
+     "seconds": 2.74
+    },
+    {
+     "role": "tech",
+     "chars": 10,
+     "seconds": 0.604
+    }
+   ],
+   "wav_sha256": "7a1fbf6940394f1318389e45c5aa1484bbc6b4a35c42af2ba8883853aabddefa"
+  },
+  {
+   "exchange_id": "C-13",
+   "chars": 59,
+   "seconds": 6.019,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 46,
+     "seconds": 3.251
+    },
+    {
+     "role": "tech",
+     "chars": 13,
+     "seconds": 1.068
+    }
+   ],
+   "wav_sha256": "efc05de8ac3130174efb9c09bca570edebb47356aec40f34120754f22ceb8414"
+  },
+  {
+   "exchange_id": "C-14",
+   "chars": 65,
+   "seconds": 6.344,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 39,
+     "seconds": 3.158
+    },
+    {
+     "role": "tech",
+     "chars": 26,
+     "seconds": 1.486
+    }
+   ],
+   "wav_sha256": "dabb6e37bbe251d60deb5a7c9b5a673310d46283cc805821b3c33474a9040b2b"
+  },
+  {
+   "exchange_id": "C-15",
+   "chars": 51,
+   "seconds": 5.647,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 46,
+     "seconds": 3.158
+    },
+    {
+     "role": "tech",
+     "chars": 5,
+     "seconds": 0.789
+    }
+   ],
+   "wav_sha256": "541e4bf96e1a0d83a46e3d60f23e76ad90056243cdc0767a378adb7a8037ca5e"
+  },
+  {
+   "exchange_id": "KT-01",
+   "chars": 85,
+   "seconds": 7.319,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 38,
+     "seconds": 3.111
+    },
+    {
+     "role": "tech",
+     "chars": 47,
+     "seconds": 2.508
+    }
+   ],
+   "wav_sha256": "cabf648e07708f12013e9b3171f26d0170136907911d1d35f56fbb3f7f816cc3"
+  },
+  {
+   "exchange_id": "KT-02",
+   "chars": 84,
+   "seconds": 7.226,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 37,
+     "seconds": 2.972
+    },
+    {
+     "role": "tech",
+     "chars": 47,
+     "seconds": 2.554
+    }
+   ],
+   "wav_sha256": "06b5c0d402ab442cc74a6600a78082a098d6982b7b03a4f67c80bc9d535e89fd"
+  },
+  {
+   "exchange_id": "KT-03",
+   "chars": 86,
+   "seconds": 7.923,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 39,
+     "seconds": 3.576
+    },
+    {
+     "role": "tech",
+     "chars": 47,
+     "seconds": 2.647
+    }
+   ],
+   "wav_sha256": "bfa7603ac09cc1e93cd5009bdf32dad67d296cbd932d35d51640f9ebc00fdcc9"
+  },
+  {
+   "exchange_id": "KT-04",
+   "chars": 80,
+   "seconds": 6.994,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 38,
+     "seconds": 3.111
+    },
+    {
+     "role": "tech",
+     "chars": 42,
+     "seconds": 2.183
+    }
+   ],
+   "wav_sha256": "70a5615506535b2f91062ddd4fc17ab9ef0a17b2a33b7a4a365f1498a627acb6"
+  },
+  {
+   "exchange_id": "KT-05",
+   "chars": 82,
+   "seconds": 7.319,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 39,
+     "seconds": 3.344
+    },
+    {
+     "role": "tech",
+     "chars": 43,
+     "seconds": 2.276
+    }
+   ],
+   "wav_sha256": "c9f472ab8db553763ce2248888fc70a9b9c53d29a3274137485e83afd371af0e"
+  },
+  {
+   "exchange_id": "KT-06",
+   "chars": 85,
+   "seconds": 6.994,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 40,
+     "seconds": 2.926
+    },
+    {
+     "role": "tech",
+     "chars": 45,
+     "seconds": 2.368
+    }
+   ],
+   "wav_sha256": "b8fbdf02ec7e59f4ea788146bd9cf13ca7ac3766c5f68ed3b1a4f27c0b6ff473"
+  },
+  {
+   "exchange_id": "KT-07",
+   "chars": 80,
+   "seconds": 7.18,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 38,
+     "seconds": 3.204
+    },
+    {
+     "role": "tech",
+     "chars": 42,
+     "seconds": 2.276
+    }
+   ],
+   "wav_sha256": "f9dd96a2e0b2c1621272c14b4a84c9cae624e0e00ac5ab0a2cb971b1408fa4a1"
+  },
+  {
+   "exchange_id": "KT-08",
+   "chars": 101,
+   "seconds": 8.248,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 46,
+     "seconds": 3.483
+    },
+    {
+     "role": "tech",
+     "chars": 55,
+     "seconds": 3.065
+    }
+   ],
+   "wav_sha256": "e3d8da8e9c172ca952ece01e14e76dbfc4210be6ad687e10dc52577387845cc0"
+  },
+  {
+   "exchange_id": "KT-09",
+   "chars": 101,
+   "seconds": 7.877,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 46,
+     "seconds": 3.344
+    },
+    {
+     "role": "tech",
+     "chars": 55,
+     "seconds": 2.833
+    }
+   ],
+   "wav_sha256": "68eed9a86a0e213ea8627b84e0ebb73b56887185dd7f3e41fb4645ac7b1d6089"
+  },
+  {
+   "exchange_id": "KT-10",
+   "chars": 75,
+   "seconds": 6.948,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 36,
+     "seconds": 3.111
+    },
+    {
+     "role": "tech",
+     "chars": 39,
+     "seconds": 2.136
+    }
+   ],
+   "wav_sha256": "0226df62b50ef7a49eb9247ecaf40c077a85bdc547f47b1d6013d0475e60a47e"
+  },
+  {
+   "exchange_id": "KT-11",
+   "chars": 83,
+   "seconds": 6.576,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 42,
+     "seconds": 2.786
+    },
+    {
+     "role": "tech",
+     "chars": 41,
+     "seconds": 2.09
+    }
+   ],
+   "wav_sha256": "f958e59b8ced6106387d9fbb802919224d140aba5de926e9cbe35694823a019d"
+  },
+  {
+   "exchange_id": "KT-12",
+   "chars": 92,
+   "seconds": 7.923,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 49,
+     "seconds": 3.901
+    },
+    {
+     "role": "tech",
+     "chars": 43,
+     "seconds": 2.322
+    }
+   ],
+   "wav_sha256": "2f03bad6b3c6c8629e9c270bda576d4c7e2631c771220c8e06a619f302a3234a"
+  },
+  {
+   "exchange_id": "KT-13",
+   "chars": 94,
+   "seconds": 7.644,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 51,
+     "seconds": 3.762
+    },
+    {
+     "role": "tech",
+     "chars": 43,
+     "seconds": 2.183
+    }
+   ],
+   "wav_sha256": "ab5764215edabf89d59a935a0a63d84fa8de93591036517c96d2822a735b9edf"
+  },
+  {
+   "exchange_id": "KT-14",
+   "chars": 100,
+   "seconds": 8.295,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 54,
+     "seconds": 4.133
+    },
+    {
+     "role": "tech",
+     "chars": 46,
+     "seconds": 2.461
+    }
+   ],
+   "wav_sha256": "8b99723b1fd2d78556fabcc8acc3d7941629561c7415672701ea40ef6f7dfeb3"
+  },
+  {
+   "exchange_id": "KT-15",
+   "chars": 93,
+   "seconds": 7.18,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 47,
+     "seconds": 3.065
+    },
+    {
+     "role": "tech",
+     "chars": 46,
+     "seconds": 2.415
+    }
+   ],
+   "wav_sha256": "00d8a4632b65f686b506b35946c559d760ace77555c9aa8c89769237e1ef4d78"
+  },
+  {
+   "exchange_id": "KT-16",
+   "chars": 96,
+   "seconds": 7.97,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 52,
+     "seconds": 3.762
+    },
+    {
+     "role": "tech",
+     "chars": 44,
+     "seconds": 2.508
+    }
+   ],
+   "wav_sha256": "12da9d860aa7364640687c98424c4a683ad4ffd75dfd4d8c23c498fc2b470c31"
+  },
+  {
+   "exchange_id": "KT-17",
+   "chars": 93,
+   "seconds": 7.459,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 49,
+     "seconds": 3.39
+    },
+    {
+     "role": "tech",
+     "chars": 44,
+     "seconds": 2.368
+    }
+   ],
+   "wav_sha256": "f29e9ca01d0da56a95ce032bdb90f8bbee6fc6af99ec3dc6c7ec62bba3363110"
+  },
+  {
+   "exchange_id": "KT-18",
+   "chars": 89,
+   "seconds": 7.644,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 44,
+     "seconds": 3.39
+    },
+    {
+     "role": "tech",
+     "chars": 45,
+     "seconds": 2.554
+    }
+   ],
+   "wav_sha256": "70d6fae3a59189cbb252725074f84094132ed6a008d4a7a926be5339604dcdec"
+  },
+  {
+   "exchange_id": "KT-19",
+   "chars": 85,
+   "seconds": 7.644,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 46,
+     "seconds": 3.762
+    },
+    {
+     "role": "tech",
+     "chars": 39,
+     "seconds": 2.183
+    }
+   ],
+   "wav_sha256": "68756deaf227906af65091e8f4c33b58688aa32f1b7ce33b7bd94990fff7eae2"
+  },
+  {
+   "exchange_id": "KT-20",
+   "chars": 84,
+   "seconds": 7.226,
+   "turns": [
+    {
+     "role": "operator",
+     "chars": 39,
+     "seconds": 2.926
+    },
+    {
+     "role": "tech",
+     "chars": 45,
+     "seconds": 2.601
+    }
+   ],
+   "wav_sha256": "67139f5d26809326fb6a1fa0b37fddb51f084483f1353b502116eb76322ea29c"
+  }
+ ],
+ "chars_sent_this_run": 12745,
+ "chars_sent_total": 12938
+}

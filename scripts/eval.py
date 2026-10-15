@@ -63,6 +63,7 @@ from sayagain.extract import (  # noqa: E402
 PROVENANCE = "text·scripted"
 CARDS_PATH = ROOT / "data" / "cards.jsonl"
 OUT = ROOT / "bench" / "results" / "text"
+TTS_OUT = ROOT / "bench" / "results" / "tts"  # exploratory synthetic-speech rows (scripts/eval_tts.py)
 RECEIPTS = ROOT / "bench" / "results" / "receipts"
 DAILY_CAP_GUARD = 0.80  # never let the account's daily spend pass this (the cap is $1/day)
 UNKNOWN_COST_USD = 0.001  # charged to the run budget for a call whose cost the API did not report
@@ -118,14 +119,30 @@ def script_turns(card: dict) -> list[tuple[str, float, float, str, str]]:
     return out
 
 
-def judge_card(card: dict, extract: Callable[[str], Extraction], registry: Registry, analyzer=analyze) -> dict:
-    """One card through extraction + the full referee. Returns the per-card record the metrics are computed from."""
+def judge_card(
+    card: dict,
+    extract: Callable[[str], Extraction],
+    registry: Registry,
+    analyzer=analyze,
+    *,
+    asr_turns: list[dict] | None = None,
+    audio_gate: str | None = None,
+) -> dict:
+    """One card through extraction + the full referee. Returns the per-card record the metrics are computed from.
+
+    `asr_turns` (speech rows, scripts/eval_tts.py): the card's turns as the VAD cut them and the ASR read them
+    ({id, t_start, t_end, text, alt_text, not_audited}); a turn the ASR failed on is NOT_AUDITED and never extracted.
+    Without it the turns are the card's script (text rows)."""
     turns, exts = [], []
-    for tid, t0, t1, _role, text in script_turns(card):
-        e = extract(text)
+    if asr_turns is None:
+        src = [(tid, t0, t1, text, None, None) for tid, t0, t1, _role, text in script_turns(card)]
+    else:
+        src = [(t["id"], t["t_start"], t["t_end"], t["text"], t["alt_text"], t["not_audited"]) for t in asr_turns]
+    for tid, t0, t1, text, alt, asr_failed in src:
+        e = Extraction(text, None, asr_failed) if asr_failed else extract(text)
         exts.append(e)
-        turns.append(Turn(tid, card["exchange_id"], t0, t1, text, e.obj, not_audited=e.not_audited))
-    rep = audit(turns, registry, analyzer=analyzer, spot_checks=0)
+        turns.append(Turn(tid, card["exchange_id"], t0, t1, text, e.obj, alt_transcript=alt, not_audited=e.not_audited))
+    rep = audit(turns, registry, analyzer=analyzer, spot_checks=0, audio_gate=audio_gate)
     judged = sorted(rep.judged, key=lambda j: -_SEVERITY[j.verdict.verdict])
     analyses = [analyze_or_not_audited(t, registry, analyzer) for t in turns]
     # the queue fails closed on a referee crash; the benchmark must not count one as a measured NOT_AUDITED
@@ -436,12 +453,20 @@ def run_extraction_rung(
     budget: Budget,
     mode: str = "spans",
     prior: list[dict] | None = None,
+    *,
+    transcripts: Path | None = None,
+    audio_gate: str | None = None,
+    out: Path | None = None,
+    prefix: str = "text",
 ) -> dict:
     """`prior` (re-audit): the stored extractions of an earlier run of this rung — every transcript it audited is
-    reused as-is, only the NOT_AUDITED ones (server error, timeout, rate limit) are requested again."""
+    reused as-is, only the NOT_AUDITED ones (server error, timeout, rate limit) are requested again.
+    `transcripts` (speech rows): a jsonl of per-card ASR turns (scripts/eval_tts.py) used instead of the scripts."""
+    out = out or OUT
     tag = rung.name if mode == "spans" else f"{rung.name}.canonical"
     analyzer = analyze if mode == "spans" else analyze_canonical
-    rpath = RECEIPTS / f"text-{run}-{tag}.jsonl"
+    rpath = RECEIPTS / f"{prefix}-{run}-{tag}.jsonl"
+    asr = {r["exchange_id"]: r["turns"] for r in read_jsonl(transcripts)} if transcripts is not None else None
     client = None
     if rung.model is None:
         fn: Callable[[str], Extraction] = regex_extraction
@@ -458,12 +483,27 @@ def run_extraction_rung(
         if rung.model is not None:
             # extract every distinct transcript first (a thinking rung uses several workers: ~25 s per call), then
             # judge the cards from the cache; call starts stay paced across all rungs by the shared pacer
-            texts = list(dict.fromkeys(t[4] for c in cards for t in script_turns(c)))
+            if asr is None:
+                texts = list(dict.fromkeys(t[4] for c in cards for t in script_turns(c)))
+            else:  # a turn the ASR failed on is never sent
+                texts = list(
+                    dict.fromkeys(t["text"] for c in cards for t in asr[c["exchange_id"]] if not t["not_audited"])
+                )
             workers = 4 if rung.thinking == "on" else 1
             with ThreadPoolExecutor(max_workers=workers) as pool:
                 for text, e in zip(texts, pool.map(fn, texts), strict=True):
                     cache.store[text] = e
-        records = [judge_card(c, cache, registry, analyzer) for c in cards]
+        records = [
+            judge_card(
+                c,
+                cache,
+                registry,
+                analyzer,
+                asr_turns=None if asr is None else asr[c["exchange_id"]],
+                audio_gate=audio_gate,
+            )
+            for c in cards
+        ]
     finally:
         if client is not None:
             client.close()
@@ -481,8 +521,8 @@ def run_extraction_rung(
         }
         for e in cache.store.values()
     ]
-    write_jsonl(OUT / run / f"{tag}.extractions.jsonl", exts)
-    write_jsonl(OUT / run / f"{tag}.cards.jsonl", records)
+    write_jsonl(out / run / f"{tag}.extractions.jsonl", exts)
+    write_jsonl(out / run / f"{tag}.cards.jsonl", records)
     # the paid extractions and the per-card records are on disk first; a referee crash then stops before any summary row
     stop_on_referee_errors(
         records,
@@ -499,9 +539,11 @@ def run_extraction_rung(
         cache_hits=cache.hits,
         wall_s=round(time.time() - t0, 1),
         receipts=str(rpath.relative_to(ROOT)) if rung.model is not None else None,
-        extractions=str((OUT / run / f"{tag}.extractions.jsonl").relative_to(ROOT)),
-        cards=str((OUT / run / f"{tag}.cards.jsonl").relative_to(ROOT)),
+        extractions=str((out / run / f"{tag}.extractions.jsonl").relative_to(ROOT)),
+        cards=str((out / run / f"{tag}.cards.jsonl").relative_to(ROOT)),
     )
+    if transcripts is not None:
+        summary.update(transcripts=str(transcripts.relative_to(ROOT)), audio_gate=audio_gate)
     if prior is not None:
         summary["reaudit"] = {
             "requested_again": sum(not x["reused_from_first_pass"] for x in exts),
@@ -799,7 +841,22 @@ def rescore_summary(summary: dict, cards: list[dict], registry: Registry) -> dic
     stored = {c["exchange_id"]: c for c in read_jsonl(ROOT / summary["cards"])}
     subset = [c for c in cards if c["exchange_id"] in stored]
     fn = regex_extraction if summary["rung"]["model"] is None else stored_extractor(rows)
-    records = [judge_card(c, fn, registry, analyzer) for c in subset]
+    asr = (
+        {r["exchange_id"]: r["turns"] for r in read_jsonl(ROOT / summary["transcripts"])}
+        if summary.get("transcripts")
+        else None
+    )
+    records = [
+        judge_card(
+            c,
+            fn,
+            registry,
+            analyzer,
+            asr_turns=None if asr is None else asr[c["exchange_id"]],
+            audio_gate=summary.get("audio_gate"),
+        )
+        for c in subset
+    ]
     stop_on_referee_errors(
         records,
         f"--rescore {summary.get('extractions') or summary['rung']['name']}",
@@ -828,7 +885,10 @@ def rescore_judge(summary: dict) -> dict:
 
 def cmd_rescore(args) -> int:
     registry, cards = Registry.load(), load_cards()
-    paths = [Path(p) for p in args.files] if args.files else sorted(OUT.glob("*.json"))
+    # default: every text row and every exploratory synthetic-speech row (bench/results/tts/, scripts/eval_tts.py)
+    paths = (
+        [Path(p) for p in args.files] if args.files else sorted(OUT.glob("*.json")) + sorted(TTS_OUT.glob("tts-*.json"))
+    )
     bad = 0
     for p in paths:
         doc = json.loads(p.read_text(encoding="utf-8"))

@@ -18,6 +18,8 @@ dist/
 data/noise/
 data/mix/
 data/human/
+# exploratory synthetic speech (tts·synthetic): audio never committed, only bench/results/tts/manifest.json
+data/tts/
 *.sqlite
 *.sqlite-wal
 *.sqlite-shm
