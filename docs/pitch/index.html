@@ -181,9 +181,9 @@
 <div class="arr" aria-hidden="true">→</div>
 <div class="f3"><p class="h">3 · what code decided</p><ol class="tr"><li>instruction: grounded + covered (1 command(s))</li><li>read-back: grounded + covered (1 command(s))</li><li>audio: no gate (no token probabilities, no unprompted pass)</li><li>instruction: <span class="nw">XV-203</span> line B (registry ok)</li><li>compare: tag: <span class="nw">XV-203</span> ≠ <span class="nw">XV-208</span></li></ol><p class="vd"><i class="ring" aria-hidden="true"></i>MISMATCH</p><p class="vd2">tag: <span class="nw">XV-203</span> ≠ <span class="nw">XV-208</span></p></div>
 </div>
-<p class="stl render">speech-to-text: not run yet · <b>span extraction: AMD Token Factory</b> · referee: local, plain Python · queue: local</p>
+<p class="stl render">speech-to-text: none (written words) · <b>span extraction: AMD Token Factory</b> · referee: local, plain Python · queue: local</p>
 <p class="rcpt render" data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json bench/results/text/ladder-r1.json">receipt, as stored · request_id c9647a04cfcc4eeaadbfa965a4d74c6d · model_served self-dploy/Gemma-4-31B-IT (sic, as served) · host developer.amd.com.cn · latency_s 35.4972 (a slow call; the first pass’s median was 4.304 s) · cost_usd 4.8937e-06</p>
-<aside class="speaker-notes">This is one real exchange end to end. The model has one job, on the AMD Token Factory: copy out the words that carry the action, the tag and the line. Each call leaves a receipt with the host, the model served, the request id and the cost; speech-to-text has not run on a recording yet. Plain code checks those words are really in the transcript, that every safety word is accounted for, and that the tag exists in the plant registry. A pure function returns the verdict; the model never writes it.</aside>
+<aside class="speaker-notes">This is one real exchange end to end. The model has one job, on the AMD Token Factory: copy out the words that carry the action, the tag and the line. Each call leaves a receipt with the host, the model served, the request id and the cost; speech-to-text has not run on a human recording yet. Plain code checks those words are really in the transcript, that every safety word is accounted for, and that the tag exists in the plant registry. A pure function returns the verdict; the model never writes it.</aside>
 </section>
 
 <section class="slide s-refusal" data-title="The refusal" aria-label="Slide 6, the refusal">
@@ -283,7 +283,7 @@
 <blockquote><p class="ab-q">…what a language model adds is unproven until the audio rows exist.</p></blockquote>
 </div>
 </div>
-<p class="ev" data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json"><b>Measured failure</b>A2-050: “line Charlie” covered two pumps, so <span class="n">a correct read-back went to a human</span> (1 of 2 false alarms in 48).</p>
+<p class="ev" data-src="docs/replay/data/ladder-r1-reaudit--Gemma-4-31B-IT.json"><b>Measured today</b>A2-050: “line Charlie” covered two pumps, so <span class="n">a correct read-back went to a human</span>, one of 2 such false alarms in 48.</p>
 <p class="slots-h">No human-recording evaluation in this submission</p>
 <ul class="slots render">
 <li><b>Audio row</b><span>the rule on recorded speech</span></li>
@@ -321,7 +321,7 @@
 <p class="phone">This deck is 16:9. On a phone, open the <a href="sayagain-pitch-deck.pdf">PDF</a> or turn the phone sideways.</p>
 <div class="notes-panel" id="notesPanel" aria-live="polite"><div class="nt" id="noteText"></div><div class="meta" id="noteMeta"></div></div>
 <div class="overview" id="overview" role="dialog" aria-label="Slide overview"></div>
-<script>window.DECK_VERSION = "built on dd8f839 · 2026-10-15";</script>
+<script>window.DECK_VERSION = "built on 46dfd1d · 2026-10-15";</script>
 <script src="deck.js" defer></script>
 </body>
 </html>

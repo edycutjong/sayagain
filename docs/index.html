@@ -928,13 +928,13 @@
 <div class="qa">
 <details><summary>Where does the AMD Token Factory sit in the pipeline?</summary>
 <p>It does the one model job: span extraction. Each call returns the words for action, tag and line, and its receipt records the request id, the model served, the host and the cost.</p>
-<p>Speech-to-text has not run on a recording yet; the Token Factory lists no transcription model. The referee and the queue are plain Python on the operator’s side.</p></details>
+<p>Speech-to-text has not run on a human recording yet (only on synthetic speech: README, exploratory rows); the Token Factory lists no transcription model. The referee and the queue are plain Python on the operator’s side.</p></details>
 <details open><summary>Couldn’t an LLM just judge the read-back?</summary>
 <p data-src="bench/results/text/llm-judge-r1-reaudit.json">We measured that. DeepSeek-V4.1-Flash, given the whole exchange and no plant registry, passed 2 wrong read-backs as VERIFIED, both missing the action word (no registry needed to see that), and passed the <span class="nw">XV-205</span> order, a valve the plant does not have. In SayAgain the model only points at words; the verdict is code.</p></details>
 <details><summary>A regex already meets the rule. Why a model at all?</summary>
 <p>On clean written words it does: that is our own result, and the page says so. Real speech is not clean: recognition errors, code-switched Bahasa, other people’s phrasing. The audio rows decide whether a model earns its place; if they say it does not, the report will say that.</p></details>
 <details><summary>What happens when the radio is too noisy to hear?</summary>
-<p>On the written-word rows, a failed model call is NOT_AUDITED and an exchange the referee cannot clear reaches a human as ABSTAIN, in amber: listen yourself. On noisy audio it has been measured only on synthetic speech (README, exploratory rows); the −6 dB look-alike failure case needs the human recordings (no human-recording evaluation in this submission).</p></details>
+<p>On the written-word rows, a failed model call is NOT_AUDITED and an exchange the referee cannot clear reaches a human as ABSTAIN, in amber: listen yourself. Noise is the weak point. On synthetic speech at −6 dB (README, exploratory rows), 26 of 41 seeded errors raised no card at all, and none was marked VERIFIED (bench/results/tts/tts-r1-radio-m6dB.json). The −6 dB look-alike failure case on human recordings is not run (no human-recording evaluation in this submission).</p></details>
 <details><summary>Does SayAgain control anything in the plant?</summary>
 <p>No. It has no write path to the plant. A card leaves the queue only when a supervisor confirms it or dismisses it with a reason.</p></details>
 <details><summary>Isn’t this a way to watch workers?</summary>
