@@ -1,8 +1,8 @@
 <div align="center">
-  <img src="docs/icon.svg" alt="SayAgain icon" width="144">
+  <img src="docs/assets/icon-animated.svg" alt="SayAgain icon: a lockout tag whose read-back bar turns red when it differs from the instruction" width="144">
   <h1>SayAgain 📻</h1>
   <p><em>Checks every radio read-back of a safety instruction, and sends the wrong ones to a human.</em></p>
-  <img src="docs/screenshots/replay-1440-2-hero.png" alt="The supervisor queue: the field tech read back two-oh-eight, the operator said two-oh-three, and the one differing word is red" width="1000">
+  <img src="docs/assets/readme-hero-animated.svg" alt="SayAgain checks every radio read-back: &quot;Close valve two-oh-three, line Bravo.&quot; — &quot;Copy, closing two-oh-three, line Alpha.&quot; Alpha turns red, and the verdict is made by code." width="1000">
 
   <br/>
 
