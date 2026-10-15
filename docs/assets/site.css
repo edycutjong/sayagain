@@ -87,6 +87,7 @@ nav.jump{display:none}
 .brand{display:inline-flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
 .brand span{font:400 25px/1 var(--font-display);letter-spacing:.03em}
 .brand img{width:34px;height:34px}
+.brand .ag{color:var(--after)} /* same split as the README hero: "Say" in ink, "Again" in MISMATCH red (a wordmark: WCAG 1.4.3 logotype exception) */
 .nav nav{margin-left:auto}
 .links{display:flex;gap:4px;margin:0;padding:0;list-style:none}
 .links a{display:block;padding:8px 10px;border-radius:4px;color:var(--mid);text-decoration:none;font-size:16px;white-space:nowrap}
