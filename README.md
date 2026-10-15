@@ -16,6 +16,7 @@
   ![ruff](https://img.shields.io/badge/ruff-261230?style=flat&logo=ruff&logoColor=white)
   [![License](https://img.shields.io/badge/License-MIT-yellow)](https://opensource.org/licenses/MIT)
   [![CI](https://github.com/edycutjong/sayagain/actions/workflows/ci.yml/badge.svg)](https://github.com/edycutjong/sayagain/actions/workflows/ci.yml)
+  [![Release](https://img.shields.io/github/v/release/edycutjong/sayagain)](https://github.com/edycutjong/sayagain/releases)
 
 </div>
 
