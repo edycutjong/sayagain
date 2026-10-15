@@ -6,6 +6,8 @@
 
   <br/>
 
+  [![Landing page](https://img.shields.io/badge/Landing-Page-E23B2E?style=for-the-badge)](https://sayagain.edycu.dev/)
+  [![Pitch deck](https://img.shields.io/badge/Pitch-Deck-272A2B?style=for-the-badge)](https://sayagain.edycu.dev/pitch/)
   [![Built for AMD Developer Hackathon ACT III](https://img.shields.io/badge/lablab-AMD_Developer_Hackathon_ACT_III-ed1c24?style=for-the-badge)](https://lablab.ai/ai-hackathons/amd-developer-hackathon-act-iii)
 
   <br/>
@@ -17,8 +19,6 @@
   [![License](https://img.shields.io/badge/License-MIT-yellow)](https://opensource.org/licenses/MIT)
   [![CI](https://github.com/edycutjong/sayagain/actions/workflows/ci.yml/badge.svg)](https://github.com/edycutjong/sayagain/actions/workflows/ci.yml)
   [![Release](https://img.shields.io/github/v/release/edycutjong/sayagain)](https://github.com/edycutjong/sayagain/releases)
-  [![Landing page](https://img.shields.io/badge/Landing_page-live-E23B2E)](https://sayagain.edycu.dev/)
-  [![Pitch deck](https://img.shields.io/badge/Pitch_deck-live-272A2B)](https://sayagain.edycu.dev/pitch/)
 
 </div>
 
