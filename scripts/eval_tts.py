@@ -46,6 +46,22 @@ TTS = ROOT / "data" / "tts" / "clean"
 OUT = ROOT / "bench" / "results" / "tts"
 TRANSCRIPTS = OUT / "transcripts"
 AUDIO_GATE = "disagreement"  # the local route returns token log-probs, but the floor gate needs a fitted floor: not run
+# found on these rows and NOT fixed (the referee is frozen for the exploratory run): printed under "Open issues"
+OPEN_ISSUES = (
+    "Seeded errors that form no card: when the ASR mangles the instruction's tag ('for three Bravo' for four-three "
+    "Bravo, A2-032; 'tutu, hotel' for two-two Hotel, A2-097; bench/results/tts/transcripts/radio-clean.jsonl) no order "
+    "is heard, no pairing window opens and the wrong read-back raises no live card. Not a false-VERIFIED; a fix (e.g. a"
+    " card for an exchange in which speech is heard but nothing parses) needs a decision and a new pre-registration.",
+    "Spoken digit runs that the ASR splits with commas ('two, four, three'; '3-1, Alpha') end the number run, so the "
+    "tag is unknown or uncovered: the card abstains (a false alarm, fail closed).",
+    "The disagreement gate fires when only the unprompted Whisper pass mishears a word ('Lain alfa', 'Kopi'): the card "
+    "abstains (a false alarm, fail closed).",
+    "Whisper writes text that was not said on short or noisy turns ('お団に。' for 'Ulangi?' on A2-001 at radio-clean, "
+    "'We are at the top of the runway.' on A2-023 at -6 dB), which feeds the first issue.",
+    "The energy VAD splits some synthetic takes at pauses inside a turn (more turns than the script on A2-001, A2-018, "
+    "A2-023, A2-030, A2-037, A2-048, A2-052, A2-057, A2-069, A2-071, A2-093); A2-030's false MISMATCH at radio-clean "
+    "(regex rung) follows such a split and is not yet explained.",
+)
 
 
 def condition_name(snr: str) -> str:
@@ -283,6 +299,8 @@ def cmd_report(args) -> int:
             f"Whisper WER (card level, number formatting normalised; {path.relative_to(ROOT)}): {wer}",
             "",
         ]
+    lines += ["## Open issues (found on these rows, not fixed: the referee is frozen for this run)", ""]
+    lines += [f"{k}. {t}" for k, t in enumerate(OPEN_ISSUES, 1)] + [""]
     spend = OUT / "spend.json"  # the total, in a file the sentence can cite
     files = [str(Path(p).resolve().relative_to(ROOT)) for p in args.files]
     ev.write_json(spend, {"calls_cost_usd_total": round(total, 6), "files": files, "badge": PROVENANCE})

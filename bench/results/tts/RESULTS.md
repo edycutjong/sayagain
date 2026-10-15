@@ -96,4 +96,12 @@ Re-audit of bench/results/tts/tts-r1-radio-m6dB-reaudit.json: only the transcrip
 
 Whisper WER (card level, number formatting normalised; bench/results/tts/tts-r1-radio-m6dB-reaudit2.json): all 0.8275 (1473/1780 words) · chatter 0.7658 (121/158 words) · dev 0.7987 (369/462 words) · held_out 0.8513 (979/1150 words) · lang:en 0.5728 (590/1030 words) · lang:mix 1.1773 (883/750 words) · refusal 0.4 (4/10 words) · set:A2 0.8624 (1178/1366 words) · set:C 0.7658 (121/158 words) · set:H 0.05 (1/20 words) · set:KT 0.7478 (169/226 words) · set:R 0.4 (4/10 words)
 
+## Open issues (found on these rows, not fixed: the referee is frozen for this run)
+
+1. Seeded errors that form no card: when the ASR mangles the instruction's tag ('for three Bravo' for four-three Bravo, A2-032; 'tutu, hotel' for two-two Hotel, A2-097; bench/results/tts/transcripts/radio-clean.jsonl) no order is heard, no pairing window opens and the wrong read-back raises no live card. Not a false-VERIFIED; a fix (e.g. a card for an exchange in which speech is heard but nothing parses) needs a decision and a new pre-registration.
+2. Spoken digit runs that the ASR splits with commas ('two, four, three'; '3-1, Alpha') end the number run, so the tag is unknown or uncovered: the card abstains (a false alarm, fail closed).
+3. The disagreement gate fires when only the unprompted Whisper pass mishears a word ('Lain alfa', 'Kopi'): the card abstains (a false alarm, fail closed).
+4. Whisper writes text that was not said on short or noisy turns ('お団に。' for 'Ulangi?' on A2-001 at radio-clean, 'We are at the top of the runway.' on A2-023 at -6 dB), which feeds the first issue.
+5. The energy VAD splits some synthetic takes at pauses inside a turn (more turns than the script on A2-001, A2-018, A2-023, A2-030, A2-037, A2-048, A2-052, A2-057, A2-069, A2-071, A2-093); A2-030's false MISMATCH at radio-clean (regex rung) follows such a split and is not yet explained.
+
 Token Factory spend over the 9 files above: $0.002448 (sum of their `calls_cost_usd`; bench/results/tts/spend.json).

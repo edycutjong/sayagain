@@ -68,7 +68,7 @@ The referee half of that design exists and is tested today; the speech half has 
 
 ## 🏗️ Architecture & Tech Stack
 
-<img src="docs/assets/architecture.png" alt="SayAgain architecture: each radio turn's transcript (the card's written words today; a local, off-AMD Whisper speech path not yet run on recorded speech) goes to span extraction on the AMD Token Factory, which writes a receipt per call and fails closed to NOT_AUDITED; a plain-Python referee with no model returns VERIFIED, MISMATCH, NO_READBACK, ABSTAIN or NOT_AUDITED, routes MISMATCH, NO_READBACK and ABSTAIN to the FastAPI + SSE supervisor queue and the rest to the end-of-shift list, and the same stored runs are exported as a static replay on GitHub Pages." width="1000">
+<img src="docs/assets/architecture.png" alt="SayAgain architecture: each radio turn's transcript (the card's written words today; a local, off-AMD Whisper speech path run so far only on synthetic speech, not on a human recording) goes to span extraction on the AMD Token Factory, which writes a receipt per call and fails closed to NOT_AUDITED; a plain-Python referee with no model returns VERIFIED, MISMATCH, NO_READBACK, ABSTAIN or NOT_AUDITED, routes MISMATCH, NO_READBACK and ABSTAIN to the FastAPI + SSE supervisor queue and the rest to the end-of-shift list, and the same stored runs are exported as a static replay on GitHub Pages." width="1000">
 
 <details><summary>The same flow as a Mermaid chart</summary>
 
