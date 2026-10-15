@@ -36,7 +36,9 @@
 
 ## 📸 See it in Action
 
-<a href="https://youtu.be/6a4IF-iJmxg"><img src="docs/assets/demo-video-thumb.png" alt="Demo video on YouTube: the H-01 read-back two-oh-eight blocked red under the order two-oh-three, verdict MISMATCH" width="720"></a>
+<a href="https://sayagain.edycu.dev/replay/"><img src="docs/assets/replay.gif" alt="The supervisor queue replaying a stored run: H-01 arrives and two-oh-eight is flagged MISMATCH against two-oh-three, H-02 is flagged MISMATCH on line Bravo versus Alpha, then R-01 is ABSTAIN because valve XV-205 is not in the plant registry" width="880"></a>
+
+<sub>The live replay page, recorded as is: a stored run of written scripts (text·scripted), played at 8×. Click it to open the replay.</sub>
 
 **Demo video:** [youtu.be/6a4IF-iJmxg](https://youtu.be/6a4IF-iJmxg) — narration is a synthetic voice; the screen captures are the real queue and receipts.
 
