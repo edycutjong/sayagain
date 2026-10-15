@@ -109,7 +109,7 @@ flowchart LR
 | AMD Token Factory client with a receipt per call; access probe | `sayagain/amd_client.py`, `scripts/access_gate.py` | probe run, see below |
 | Span extraction on the AMD Token Factory: JSON mode + local schema check, 429 back-off, fail closed to `NOT_AUDITED`, a receipt per call | `sayagain/extract.py` | done, run on text rows |
 | Model ladder, grounding ablation, LLM-judge baseline, offline re-scoring of every stored model output | `scripts/eval.py` | run on the card scripts (`text·scripted`), see below |
-| Speech path: one WAV per card → VAD turns → speech-to-text (local Whisper, labelled off-AMD; AMD notebook backend switched off until a notebook GPU is confirmed) → disagreement gate | `sayagain/ingest.py`, `sayagain/asr.py` | unit tests done; Whisper has not yet run on a human recording (only on one `tts·fixture` clip, in an opt-in test) |
+| Speech path: one WAV per card → VAD turns → speech-to-text (local Whisper, labelled off-AMD; AMD notebook backend switched off until a notebook GPU is confirmed) → disagreement gate | `sayagain/ingest.py`, `sayagain/asr.py`, `scripts/eval_tts.py` | run end to end on synthetic speech only (`tts·synthetic`, exploratory, see below); not yet run on a human recording |
 | Local kill test (Whisper-large-v3 on a laptop, off-AMD) | `scripts/kill_test_local.py` | harness ready, waiting for recordings |
 | Supervisor queue: read-back strip card, confirm, or dismiss with a required reason, "Try the refused one", end-of-shift list (spot-checks, caught on channel, not audited, read-backs with no order heard), receipts per model call | `sayagain/server.py`, `sayagain/shift.py`, `web/` | done, over the stored text runs |
 | Static replay of stored runs (same page, live at [sayagain.edycu.dev/replay/](https://sayagain.edycu.dev/replay/)) | `scripts/export_run.py` → `docs/replay/` | done |
@@ -169,6 +169,17 @@ valid JSON, and it meets the rule in the ladder re-audit). The model list has no
 transcription will run elsewhere, and every stage will be labelled with where it ran. Friction log:
 [docs/DX-REPORT.md](docs/DX-REPORT.md).
 
+### Exploratory: synthetic speech (not the pre-registered audio row)
+
+ElevenLabs text-to-speech of the 145 card scripts (two voices; bench/results/tts/manifest.json), through the simulated radio path, transcribed by local Whisper-large-v3 (off-AMD), with spans extracted on the AMD Token Factory (Gemma-4-31B-IT) or by the regex rung (`tts·synthetic`, `scripts/eval_tts.py`). **No human recording has been evaluated.** This run was added after the text rows, is not pre-registered (bench/PROTOCOL.md, Deviations, 2026-10-15) and does not replace the audio row; referee, aliases and thresholds were frozen for it. Scored on the same 89 held-out cards, with the disagreement gate between a prompted and an unprompted Whisper pass. Tables and Whisper WER per card set: bench/results/tts/RESULTS.md.
+
+- **0 false-VERIFIED in every row run:** regex at all four noise levels and Gemma-4-31B-IT at radio without noise and at −6 dB, 0/41 seeded errors each, Wilson interval 0 % to 8.57 % (bench/results/tts/tts-r1-radio-clean.json, bench/results/tts/tts-r1-radio-clean-reaudit3.json, bench/results/tts/tts-r1-radio-p6dB.json, bench/results/tts/tts-r1-radio-0dB.json, bench/results/tts/tts-r1-radio-m6dB-reaudit2.json).
+- **Radio, no noise:** Whisper's word error rate on the held-out cards was 0.87 % (10/1150 words). Regex flagged 39/41 seeded errors with 16/48 false alarms (33.33 %, 21.68 % – 47.46 %; bench/results/tts/tts-r1-radio-clean.json); Gemma, fully audited after three re-audit passes, flagged 39/41 with 17/48 false alarms (35.42 %, 23.43 % – 49.56 %; bench/results/tts/tts-r1-radio-clean-reaudit3.json). On written words the same rungs had 0/48 and 2/48: transcription turns correct read-backs into abstains (spoken digit runs split by commas, the two Whisper passes disagreeing), so neither rung meets the 5 % false-alarm budget on synthetic speech.
+- **Seeded errors that formed no card at all:** 2/41 at radio without noise on both rungs, where Whisper wrote "for three Bravo" (A2-032) and "tutu, hotel" (A2-097) for the tag in the instruction, so no order was heard (bench/results/tts/tts-r1-radio-clean.json, bench/results/tts/tts-r1-radio-clean-reaudit3.json); 26/41 at −6 dB on both rungs (bench/results/tts/tts-r1-radio-m6dB.json, bench/results/tts/tts-r1-radio-m6dB-reaudit2.json). None was marked VERIFIED, but none raised a live card either; the stricter form of the ladder rule counts them as failures.
+- **Noise sweep, regex rung** (MIMII machine noise before the radio, held-out word error rate): +6 dB 38/41 flagged, 36/48 false alarms, 9.57 % (bench/results/tts/tts-r1-radio-p6dB.json); 0 dB 36/41, 43/48, 51.39 % (bench/results/tts/tts-r1-radio-0dB.json); −6 dB 15/41, 14/48, 85.13 % (bench/results/tts/tts-r1-radio-m6dB.json). Gemma was run at −6 dB only among the noisy levels: 15/41 and 14/48 once fully audited (bench/results/tts/tts-r1-radio-m6dB-reaudit2.json).
+- **The hero exchange** (H-01, "two-oh-eight" read back for two-oh-three) is `MISMATCH · tag: XV-203 ≠ XV-208` at radio without noise on both rungs (bench/results/tts/tts-r1-radio-clean.json, bench/results/tts/tts-r1-radio-clean-reaudit3.json) and an abstain at −6 dB (bench/results/tts/tts-r1-radio-m6dB.json, bench/results/tts/tts-r1-radio-m6dB-reaudit2.json); the refusal card R-01 abstains as an unknown tag in every final row.
+- **The gateway failed most first-pass calls:** 265 of Gemma's 312 calls at radio without noise ended in a server error or a time-out (bench/results/tts/tts-r1-radio-clean.json), so that row needed three re-audit passes; the extraction calls of all these runs cost $0.002448 together (bench/results/tts/spend.json).
+
 ## 📊 Engineering Rigor
 
 762 tests (`uv run pytest`; one runs only with local Whisper weights), ruff lint and format, `pip-audit` and gitleaks over the
@@ -197,14 +208,14 @@ placeholder, a hardware or serving-stack name no receipt backs, or a number its 
 
 ### Honest limits (9)
 
-1. No recorded speech has been measured. Every result is `text·scripted`, each rung's result on clean written words.
+1. No human recording has been measured. The scored rows are `text·scripted` (each rung's result on clean written words) and the exploratory `tts·synthetic` rows (ElevenLabs voices through the simulated radio path), which are not pre-registered and say nothing about a technician on a real radio.
 2. The held-out set is 89 cards, so the intervals are wide: the best model's 2/48 false alarms is a 4.17 % rate with a Wilson interval of 1.15 % to 13.98 % (bench/results/text/RESULTS.md).
 3. On scripted words the plain regex rung meets the rule with no model, so what a language model adds is unproven until the audio rows exist.
 4. The plant, its 120 tags and every exchange are fictional; the error mix is seeded, not sampled from a real site.
 5. The first Gemma-4-31B-IT pass left 45 of the 89 held-out cards not audited; the headline row is a re-audit of those, and the as-run pass is kept next to it (bench/results/text/ladder-r1.json).
 6. Temperature 0 does not make the gateway deterministic; the repeat run agreed on 40/40 cards (bench/results/text/repro-dev-DeepSeek-V4-Flash.json), which is evidence and not a guarantee.
 7. The Token Factory is a hosted API: receipts name the model and host, never a GPU, so no page here claims one (`on_amd` in a receipt means only that the endpoint host is under amd.com or amd.com.cn; the receipts' host is developer.amd.com.cn).
-8. The gateway ignores `logprobs` for the extraction models. Speech-to-text is planned on local Whisper, whose token probabilities can feed the confidence floor, with the disagreement gate between two transcription passes as the fallback; neither has run on a human recording (the Whisper token probabilities and the confidence floor ran only on one synthetic text-to-speech clip, `tts·fixture`, in an opt-in unit test, never in an eval row).
+8. The gateway ignores `logprobs` for the extraction models. Speech-to-text is planned on local Whisper, whose token probabilities can feed the confidence floor, with the disagreement gate between two transcription passes as the fallback; neither has run on a human recording. The disagreement gate has run only in the exploratory synthetic-speech rows (`tts·synthetic`); the confidence floor has run only on one synthetic clip, `tts·fixture`, in an opt-in unit test, never in an eval row.
 9. The static replay shows stored verdicts. The live queue calls the API only when `SAYAGAIN_LIVE_EXTRACT=1`, paced and capped per process.
 
 ## 🚀 Getting Started
