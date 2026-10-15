@@ -63,7 +63,6 @@ from sayagain.extract import (  # noqa: E402
 PROVENANCE = "text·scripted"
 CARDS_PATH = ROOT / "data" / "cards.jsonl"
 OUT = ROOT / "bench" / "results" / "text"
-TTS_OUT = ROOT / "bench" / "results" / "tts"  # exploratory synthetic-speech rows (scripts/eval_tts.py)
 RECEIPTS = ROOT / "bench" / "results" / "receipts"
 DAILY_CAP_GUARD = 0.80  # never let the account's daily spend pass this (the cap is $1/day)
 UNKNOWN_COST_USD = 0.001  # charged to the run budget for a call whose cost the API did not report
@@ -887,7 +886,9 @@ def cmd_rescore(args) -> int:
     registry, cards = Registry.load(), load_cards()
     # default: every text row and every exploratory synthetic-speech row (bench/results/tts/, scripts/eval_tts.py)
     paths = (
-        [Path(p) for p in args.files] if args.files else sorted(OUT.glob("*.json")) + sorted(TTS_OUT.glob("tts-*.json"))
+        [Path(p) for p in args.files]
+        if args.files
+        else sorted(OUT.glob("*.json")) + sorted((OUT.parent / "tts").glob("tts-*.json"))
     )
     bad = 0
     for p in paths:

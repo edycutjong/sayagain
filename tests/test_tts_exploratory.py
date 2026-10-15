@@ -104,7 +104,6 @@ def tts_env(tmp_path, monkeypatch):
     monkeypatch.setattr(ev, "ROOT", tmp_path)
     monkeypatch.setattr(ev, "RECEIPTS", tmp_path / "bench" / "results" / "receipts")
     monkeypatch.setattr(ev, "OUT", tmp_path / "bench" / "results" / "text")
-    monkeypatch.setattr(ev, "TTS_OUT", tmp_path / "bench" / "results" / "tts")
     monkeypatch.setattr(eval_tts, "ROOT", tmp_path)
     monkeypatch.setattr(eval_tts, "OUT", tmp_path / "bench" / "results" / "tts")
     monkeypatch.setattr(eval_tts, "TRANSCRIPTS", tmp_path / "bench" / "results" / "tts" / "transcripts")
@@ -143,6 +142,9 @@ def test_score_regex_writes_a_rescorable_result_and_a_report(tts_env, capsys) ->
     assert "OK   tts-t1.json :: regex" in capsys.readouterr().out
     assert eval_tts.main(["--report", str(root / "bench" / "results" / "tts" / "tts-t1.json")]) == 0
     report = (root / "bench" / "results" / "tts" / "RESULTS.md").read_text(encoding="utf-8")
+    spend = json.loads((root / "bench" / "results" / "tts" / "spend.json").read_text(encoding="utf-8"))
+    assert spend["calls_cost_usd_total"] == 0.0 and spend["files"] == ["bench/results/tts/tts-t1.json"]
+    assert "bench/results/tts/spend.json" in report
     assert "radio-clean · tts-t1" in report and "Whisper WER" in report and "no human recording" in report
 
 

@@ -268,14 +268,29 @@ def cmd_report(args) -> int:
         f"Audio gate: `{AUDIO_GATE}`. Every row cites its file.",
         "",
     ]
+    total = 0.0
     for p in args.files:
         path = Path(p).resolve()
         doc = json.loads(path.read_text(encoding="utf-8"))
+        total += doc.get("calls_cost_usd") or 0.0
         body = ev.report_lines(path)
         body[0] = body[0].replace("### ", f"### {doc['condition']} · ")
         w = doc["wer"]
         wer = " · ".join(f"{k} {v['wer']} ({v['errors']}/{v['ref_words']} words)" for k, v in sorted(w.items()))
-        lines += [*body[:-1], "", f"Whisper WER (card level, number formatting normalised): {wer}", ""]
+        lines += [
+            *body[:-1],
+            "",
+            f"Whisper WER (card level, number formatting normalised; {path.relative_to(ROOT)}): {wer}",
+            "",
+        ]
+    spend = OUT / "spend.json"  # the total, in a file the sentence can cite
+    files = [str(Path(p).resolve().relative_to(ROOT)) for p in args.files]
+    ev.write_json(spend, {"calls_cost_usd_total": round(total, 6), "files": files, "badge": PROVENANCE})
+    lines += [
+        f"Token Factory spend over the {len(files)} files above: ${round(total, 6)} "
+        f"(sum of their `calls_cost_usd`; {spend.relative_to(ROOT)}).",
+        "",
+    ]
     (OUT / "RESULTS.md").write_text("\n".join(lines), encoding="utf-8")
     print(f"wrote {(OUT / 'RESULTS.md').relative_to(ROOT)}")
     return 0
