@@ -7,7 +7,9 @@
   <br/>
 
   [![Landing page](https://img.shields.io/badge/Landing-Page-E23B2E?style=for-the-badge)](https://sayagain.edycu.dev/)
+  [![Live replay](https://img.shields.io/badge/Live-Replay-ECE6D6?style=for-the-badge)](https://sayagain.edycu.dev/replay/)
   [![Pitch deck](https://img.shields.io/badge/Pitch-Deck-272A2B?style=for-the-badge)](https://sayagain.edycu.dev/pitch/)
+  [![lablab submission](https://img.shields.io/badge/lablab-Submission-6E56CF?style=for-the-badge)](https://lablab.ai/ai-hackathons/amd-developer-hackathon-act-iii/edy-team/sayagain-catches-wrong-radio-read-backs)
   [![Built for AMD Developer Hackathon ACT III](https://img.shields.io/badge/lablab-AMD_Developer_Hackathon_ACT_III-ed1c24?style=for-the-badge)](https://lablab.ai/ai-hackathons/amd-developer-hackathon-act-iii)
 
   <br/>
